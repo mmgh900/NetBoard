@@ -207,3 +207,22 @@
     -fx-font-size: 20px;
     -fx-wrap-text: true;
 }
+
+.control {
+    -fx-background-color: transparent;
+    -fx-font-weight: bold;
+    -fx-background-radius: 0;
+    -fx-font-family: "Arial Black";
+    -fx-text-fill: gray;
+    -fx-font-size: 20px;
+}
+
+.close:hover {
+    -fx-background-color: lightsalmon;
+    -fx-text-fill: white;
+}
+
+.minimizae:hover {
+    -fx-background-color: gainsboro;
+    -fx-text-fill: white;
+}

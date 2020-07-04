@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class GameSceneController implements Initializable {
+
     static public GridPane boardStatic;
     static public TabPane contactsStatic;
     static public TabPane chatsStatic;

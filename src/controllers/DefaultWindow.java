@@ -5,12 +5,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 public class DefaultWindow extends Stage {
     public static String defaultStylesheet = "CssFiles/Light.css";
@@ -35,8 +35,11 @@ public class DefaultWindow extends Stage {
             }
         });
 
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(new File("resources/FXMLFiles/StageControls.fxml").toURL());
+        StageControls stageControls = fxmlLoader.getController();
+        VBox cBox = stageControls.CBox;
 
-        URL url = new File("resources/FXMLFiles/Menu.fxml").toURL();
         Parent menuRoot = FXMLLoader.load(new File("resources/FXMLFiles/Menu.fxml").toURL());
         Parent gameRoot = FXMLLoader.load(new File("resources/FXMLFiles/GameScene.fxml").toURL());
         Parent loginRoot = FXMLLoader.load(new File("resources/FXMLFiles/Login.fxml").toURL());
