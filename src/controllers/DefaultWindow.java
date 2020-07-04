@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 import java.io.File;
@@ -19,6 +20,11 @@ public class DefaultWindow extends Stage {
     private final Scene gameScene;
     private final Scene menuScene;
     private final Scene loginScene;
+    private final GameSceneController gameSceneController;
+    private final MenuController menuController;
+    private final LoginController loginController;
+
+
     FXMLLoader fxmlLoader = new FXMLLoader();
 
     public DefaultWindow(AppUser appUser) throws IOException {
@@ -35,14 +41,29 @@ public class DefaultWindow extends Stage {
             }
         });
 
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(new File("resources/FXMLFiles/StageControls.fxml").toURL());
-        StageControls stageControls = fxmlLoader.getController();
-        VBox cBox = stageControls.CBox;
 
-        Parent menuRoot = FXMLLoader.load(new File("resources/FXMLFiles/Menu.fxml").toURL());
-        Parent gameRoot = FXMLLoader.load(new File("resources/FXMLFiles/GameScene.fxml").toURL());
-        Parent loginRoot = FXMLLoader.load(new File("resources/FXMLFiles/Login.fxml").toURL());
+
+        /*Image img = new Image(new File("/resources/Images/close.png").getPath());
+        stageControls.close.setGraphic(new ImageView(img));*/
+
+
+        fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(new File("resources/FXMLFiles/Menu.fxml").toURL());
+        Parent menuRoot = fxmlLoader.load();
+        menuController = fxmlLoader.getController();
+        menuController.rootPane.getChildren().add(newCbox());
+
+        fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(new File("resources/FXMLFiles/GameScene.fxml").toURL());
+        Parent gameRoot = fxmlLoader.load();
+        gameSceneController = fxmlLoader.getController();
+        gameSceneController.rootPane.getChildren().add(newCbox());
+
+        fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(new File("resources/FXMLFiles/Login.fxml").toURL());
+        Parent loginRoot = fxmlLoader.load();
+        loginController = fxmlLoader.getController();
+        loginController.rootPane.getChildren().add(newCbox());
 
 
         menuScene = new Scene(menuRoot, 1260, 700);
@@ -54,7 +75,8 @@ public class DefaultWindow extends Stage {
         gameScene.getStylesheets().add(defaultStylesheet);
         loginScene.getStylesheets().add(defaultStylesheet);
 
-        //this.initStyle(StageStyle.UNDECORATED);
+        this.initStyle(StageStyle.UNDECORATED);
+        this.setResizable(false);
         this.setScene(loginScene);
         this.show();
 
@@ -104,6 +126,28 @@ public class DefaultWindow extends Stage {
 
             }
         });
+    }
+
+    public GameSceneController getGameSceneController() {
+        return gameSceneController;
+    }
+
+    public MenuController getMenuController() {
+        return menuController;
+    }
+
+    public LoginController getLoginController() {
+        return loginController;
+    }
+
+    public VBox newCbox() throws IOException {
+        fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(new File("resources/FXMLFiles/Close.fxml").toURL());
+        Parent controlParent = fxmlLoader.load();
+        StageControls stageControls = fxmlLoader.getController();
+        stageControls.setAppUser(appUser);
+        VBox cBox = stageControls.CBox;
+        return cBox;
     }
 
 

@@ -3,6 +3,7 @@ package controllers;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
@@ -25,6 +26,7 @@ public class GameSceneController implements Initializable {
     public static Text playerOwinsStatic;
     public static Circle playerXsignStatic;
     public static Circle playerOsignStatic;
+    public AnchorPane rootPane;
     public GridPane board;
     public TabPane contacts;
     public TabPane chats;

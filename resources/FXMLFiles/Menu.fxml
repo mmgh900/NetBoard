@@ -5,13 +5,13 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="720.0" prefWidth="1260.0"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootPane" prefHeight="700.0" prefWidth="1260.0"
             xmlns="http://javafx.com/javafx/8.0.171" fx:controller="controllers.MenuController">
    <children>
       <VBox alignment="CENTER" prefHeight="720.0" prefWidth="1260.0" spacing="20.0" AnchorPane.bottomAnchor="0.0"
             AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="TicTocToe" textAlignment="CENTER"
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="NetBoard" textAlignment="CENTER"
                   wrappingWidth="966.5367431640625">
                <font>
                   <Font name="Product Sans Bold" size="150.0"/>

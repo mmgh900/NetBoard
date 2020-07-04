@@ -15,24 +15,32 @@ public class StageControls implements Initializable {
     public VBox CBox;
     public Button close;
     public Button minimize;
+    private AppUser appUser;
 
+    public void setAppUser(AppUser appUser) {
+        this.appUser = appUser;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Stage stage = (Stage) close.getScene().getWindow();
-        // do what you have to do
-        stage.close();
+
 
         close.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
+                if (appUser.client != null) {
+                    appUser.client.logout();
+                }
+                Stage stage = (Stage) close.getScene().getWindow();
                 stage.close();
             }
         });
 
+
         minimize.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
+                Stage stage = (Stage) close.getScene().getWindow();
                 stage.setIconified(true);
             }
         });

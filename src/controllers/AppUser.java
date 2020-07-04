@@ -38,12 +38,12 @@ public class AppUser {
         }
 
         //Find menu buttons in menu scene
-        singleplayer = (Button) window.getMenuScene().lookup("#singleplayer");
-        multiplayer = (Button) window.getMenuScene().lookup("#multiplayer");
-        online = (Button) window.getMenuScene().lookup("#online");
-        username = (Text) window.getMenuScene().lookup("#username");
-        name = (Text) window.getMenuScene().lookup("#name");
-        viewProfile = MenuController.viewProfileStatic;
+        singleplayer = window.getMenuController().singleplayer;
+        multiplayer = window.getMenuController().multiplayer;
+        online = window.getMenuController().online;
+        username = window.getMenuController().username;
+        name = window.getMenuController().name;
+        viewProfile = window.getMenuController().viewProfile;
 
         //Set the actions to change the game mode
         EventHandler handleClicksOnMenuOptions = new EventHandler<MouseEvent>() {
