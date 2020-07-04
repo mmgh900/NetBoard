@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="720.0" prefWidth="1260.0"
+            xmlns="http://javafx.com/javafx/8.0.171" fx:controller="controllers.MenuController">
+   <children>
+      <VBox alignment="CENTER" prefHeight="720.0" prefWidth="1260.0" spacing="20.0" AnchorPane.bottomAnchor="0.0"
+            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="TicTocToe" textAlignment="CENTER"
+                  wrappingWidth="966.5367431640625">
+               <font>
+                  <Font name="Product Sans Bold" size="150.0"/>
+               </font>
+            </Text>
+            <HBox alignment="CENTER" spacing="50.0">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="260.0" prefWidth="371.0" spacing="20.0">
+                     <children>
+                        <Button fx:id="singleplayer" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0"
+                                text="Singleplayer">
+                           <font>
+                              <Font size="32.0"/>
+                           </font>
+                        </Button>
+                        <Button fx:id="multiplayer" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0"
+                                text="Multiplayer">
+                           <font>
+                              <Font size="32.0"/>
+                           </font>
+                        </Button>
+                        <Button fx:id="online" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0"
+                                text="Online">
+                           <font>
+                              <Font size="32.0"/>
+                           </font>
+                        </Button>
+                        <Text fx:id="menuMassage" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0"/>
+                     </children>
+                  </VBox>
+                  <StackPane>
+                     <children>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <ImageView id="profileImage" fx:id="profile" fitHeight="150.0" fitWidth="153.0"
+                                         pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../../Pictures/Screenshots/photo_2020-03-01_21-56-09.jpg"/>
+                                 </image>
+                              </ImageView>
+                              <VBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                    <Text fill="#003971" layoutX="10.0" layoutY="66.0" strokeType="OUTSIDE"
+                                          strokeWidth="0.0" text="WELCOME" wrappingWidth="346.9199676513672">
+                                       <font>
+                                          <Font name="Product Sans Bold" size="24.0"/>
+                                       </font>
+                                    </Text>
+                                    <AnchorPane>
+                                       <children>
+                                          <Text fx:id="name" fill="#420061" layoutY="29.0" strokeType="OUTSIDE"
+                                                strokeWidth="0.0" text="First Name" wrappingWidth="346.9199676513672">
+                                             <font>
+                                                <Font name="Product Sans Bold" size="40.0"/>
+                                             </font>
+                                          </Text>
+                                          <Text fx:id="username" fill="#949494" layoutY="58.80000305175781"
+                                                strokeType="OUTSIDE" strokeWidth="0.0" text="\@username"
+                                                wrappingWidth="346.9199676513672">
+                                             <font>
+                                                <Font name="Product Sans Bold" size="25.0"/>
+                                             </font>
+                                          </Text>
+                                       </children>
+                                    </AnchorPane>
+                                    <Button id="smallButton" fx:id="viewProfile" mnemonicParsing="false"
+                                            prefHeight="16.0" prefWidth="132.0" text="View Profile"/>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </StackPane>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

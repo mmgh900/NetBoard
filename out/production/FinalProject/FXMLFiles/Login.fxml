@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="720.0" prefWidth="1260.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox prefHeight="720.0" prefWidth="1260.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox prefHeight="720.0" prefWidth="1260.0">
+               <children>
+                  <AnchorPane layoutX="10.0" layoutY="10.0">
+                     <children>
+                        <VBox alignment="CENTER" layoutY="7.0" prefHeight="718.4" prefWidth="626.4" spacing="20.0" AnchorPane.bottomAnchor="-7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="7.0">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Login">
+                                 <font>
+                                    <Font name="Product Sans Bold" size="70.0" />
+                                 </font>
+                              </Text>
+                              <HBox alignment="CENTER">
+                                 <children>
+                                    <TextField fx:id="loginUsername" prefHeight="50.0" prefWidth="400.0" promptText="Username" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" layoutX="10.0" layoutY="387.0">
+                                 <children>
+                                    <PasswordField fx:id="loginPassword" prefHeight="50.0" prefWidth="400.0" promptText="Password" />
+                                 </children>
+                              </HBox>
+                              <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" text="LOGIN">
+                                 <font>
+                                    <Font name="Product Sans Bold" size="26.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="or">
+                           <font>
+                              <Font size="89.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </StackPane>
+                  <ScrollPane hbarPolicy="NEVER" prefHeight="682.0" prefWidth="722.0" vvalue="0.02">
+                    <content>
+                      <AnchorPane prefHeight="718.0" prefWidth="609.0">
+                           <children>
+                              <VBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="910.0" prefWidth="602.0" spacing="20.0">
+                                 <children>
+                                    <Region prefHeight="119.0" prefWidth="602.0" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Sign Up">
+                                       <font>
+                                          <Font name="Product Sans Bold" size="70.0" />
+                                       </font>
+                                    </Text>
+                                    <HBox alignment="CENTER" spacing="20.0">
+                                       <children>
+                                          <TextField fx:id="firstname" prefHeight="50.0" prefWidth="190.0" promptText="First Name" />
+                                          <TextField fx:id="lastname" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="190.0" promptText="Last Name" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                          <TextField fx:id="username" prefHeight="50.0" prefWidth="400.0" promptText="Username" />
+                                       </children>
+                                    </HBox>
+                                    <ChoiceBox fx:id="question" prefHeight="50.0" prefWidth="400.0" />
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                          <TextField fx:id="answer" prefHeight="50.0" prefWidth="400.0" promptText="Answer" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" layoutX="10.0" layoutY="243.0">
+                                       <children>
+                                          <TextField fx:id="email" prefHeight="50.0" prefWidth="400.0" promptText="Email Address" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" layoutX="10.0" layoutY="387.0">
+                                       <children>
+                                          <PasswordField fx:id="password" prefHeight="50.0" prefWidth="400.0" promptText="Password" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" layoutX="10.0" layoutY="425.0">
+                                       <children>
+                                          <PasswordField fx:id="confirmpassword" prefHeight="50.0" prefWidth="400.0" promptText="Confirm Password" />
+                                       </children>
+                                    </HBox>
+                                    <Button fx:id="signupButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" text="SIGN UP">
+                                       <font>
+                                          <Font name="Product Sans Bold" size="26.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </ScrollPane>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="75.0" prefWidth="1260.0">
+               <children>
+                  <Text fx:id="massage" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="984.0943832397461">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

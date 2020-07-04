@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1260.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.GameSceneController">
+   <children>
+      <HBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT">
+         <children>
+            <VBox nodeOrientation="LEFT_TO_RIGHT" prefHeight="700.0" prefWidth="395.0" style="-fx-background-color: black;">
+               <children>
+                  <TabPane fx:id="contacts" prefHeight="300.0" prefWidth="395.0" tabClosingPolicy="UNAVAILABLE" />
+                  <TabPane fx:id="chats" prefWidth="395.0" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                      <Tab text="Untitled Tab 1">
+                        <content>
+                          <AnchorPane prefHeight="355.0" prefWidth="395.0" />
+                        </content>
+                      </Tab>
+                      <Tab text="Untitled Tab 2">
+                        <content>
+                          <AnchorPane prefHeight="355.0" />
+                        </content>
+                      </Tab>
+                    </tabs>
+                  </TabPane>
+               </children>
+               <effect>
+                  <DropShadow radius="23.995" width="76.98" />
+               </effect>
+            </VBox>
+            <VBox alignment="CENTER" maxHeight="700.0" maxWidth="700.0" prefHeight="694.0" prefWidth="580.0" spacing="20.0">
+               <children>
+                  <GridPane fx:id="board" alignment="CENTER" hgap="15.0" maxHeight="500.0" maxWidth="500.0" minHeight="500.0" minWidth="500.0" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #0f0f0f; -fx-background-radius: 30;" vgap="15.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </GridPane>
+                  <Text fx:id="massage" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 30; -fx-font-weight: bold;" textAlignment="CENTER" wrappingWidth="493.02000427246094" />
+                  <Button fx:id="mainMenuButton" mnemonicParsing="false" text="MainMenu" />
+               </children>
+               <padding>
+                  <Insets bottom="40.0" left="40.0" right="40.0" top="20.0" />
+               </padding>
+            </VBox>
+            <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="300.0" style="-fx-background-color: black;">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="350.0" prefHeight="300.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="350.0" prefHeight="300.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <VBox alignment="CENTER">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Circle fx:id="playerXsign" fill="#1a73e8" radius="70.0" stroke="BLACK" strokeType="INSIDE" />
+                              <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 150; -fx-font-weight: bold;" text="X" />
+                           </children>
+                        </StackPane>
+                        <Region prefHeight="21.0" prefWidth="238.0" />
+                        <Text fx:id="playerXname" fill="#1a73e8" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 28; -fx-font-weight: bold;" text="First Name 1" />
+                        <Text fx:id="playerXusername" fill="#e8e8e8" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="\@username1" />
+                        <Text fx:id="playerXwins" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 70; -fx-font-weight: bold;" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="30.0" layoutY="30.0" nodeOrientation="RIGHT_TO_LEFT" GridPane.rowIndex="1">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Circle fx:id="playerOsign" fill="#868686" radius="70.0" stroke="BLACK" strokeType="INSIDE" />
+                              <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 150; -fx-font-weight: bold;" text="O" />
+                           </children>
+                        </StackPane>
+                        <Region prefHeight="21.0" prefWidth="238.0" />
+                        <Text fx:id="playerOname" fill="#1a73e8" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 28; -fx-font-weight: bold;" text="First Name 2" />
+                        <Text fx:id="playerOusername" fill="#e8e8e8" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="\@username2" />
+                        <Text fx:id="playerOwins" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 70; -fx-font-weight: bold;" />
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+               </padding>
+               <effect>
+                  <DropShadow radius="18.552500000000002" width="55.21" />
+               </effect>
+            </GridPane>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
