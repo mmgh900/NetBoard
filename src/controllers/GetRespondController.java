@@ -13,7 +13,7 @@ import users.Client;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class GetRespondController implements Initializable {
+public class GetRespondController extends StandardController implements Initializable {
 
     public Button decline;
     public Button accept;
@@ -27,7 +27,7 @@ public class GetRespondController implements Initializable {
     }
 
     public void setToFriendRequest(ClientProfile sender, Client receiver) {
-        massage.setText(receiver.getClientProfile().getFirstName() + ", you have received a add friend request from @" + sender.getUserInfo().getUsername().toUpperCase());
+        massage.setText(receiver.getClientProfile().getFirstName() + ", you have received a add friend request from @" + sender.getUsername().toUpperCase());
         decline.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -46,7 +46,7 @@ public class GetRespondController implements Initializable {
     }
 
     public void setToPlayRequest(ClientProfile sender, Client receiver) {
-        massage.setText(receiver.getClientProfile().getFirstName() + ", you have received a play request from @" + sender.getUserInfo().getUsername().toUpperCase());
+        massage.setText(receiver.getClientProfile().getFirstName() + ", you have received a play request from @" + sender.getUsername().toUpperCase());
         decline.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {

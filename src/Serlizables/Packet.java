@@ -1,23 +1,17 @@
 package Serlizables;
 
-import users.User;
+import users.Client;
+import users.Server;
 
 import java.io.Serializable;
 
 public class Packet implements Serializable {
     private final Serializable content;
     private final PacketPropose propose;
-    private UserInfo sender;
     private ClientProfile senderProfile;
-    private UserInfo receiver;
+
     private ClientProfile receiverProfile;
 
-    public Packet(Serializable content, UserInfo sender, UserInfo receiver, PacketPropose propose) {
-        this.content = content;
-        this.sender = sender;
-        this.receiver = receiver;
-        this.propose = propose;
-    }
 
     public Packet(Serializable content, ClientProfile sender, ClientProfile receiver, PacketPropose propose) {
         this.content = content;
@@ -26,40 +20,32 @@ public class Packet implements Serializable {
         this.propose = propose;
     }
 
-    public Packet(Serializable content, User sender, UserInfo receiver, PacketPropose propose) {
+    public Packet(Serializable content, ClientProfile sender, PacketPropose propose) {
         this.content = content;
-        this.sender = sender.userInfo;
-        this.receiver = receiver;
+        this.senderProfile = sender;
         this.propose = propose;
     }
 
-    public Packet(Serializable content, UserInfo sender, PacketPropose propose) {
+    public Packet(Serializable content, Client sender, PacketPropose propose) {
         this.content = content;
-        this.sender = sender;
+        this.senderProfile = sender.getClientProfile();
         this.propose = propose;
     }
 
-    public Packet(Serializable content, User sender, PacketPropose propose) {
+    public Packet(Serializable content, Server sender, PacketPropose propose) {
         this.content = content;
-        this.sender = sender.userInfo;
         this.propose = propose;
     }
+
 
     public Serializable getContent() {
         return content;
-    }
-
-    public UserInfo getSender() {
-        return sender;
     }
 
     public PacketPropose getPropose() {
         return propose;
     }
 
-    public UserInfo getReceiver() {
-        return receiver;
-    }
 
     public ClientProfile getSenderProfile() {
         return senderProfile;

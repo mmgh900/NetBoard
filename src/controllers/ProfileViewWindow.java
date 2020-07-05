@@ -78,12 +78,12 @@ public class ProfileViewWindow extends Stage {
         });
 
         name.setText(profile.getFirstName() + " " + profile.getLastName());
-        username.setText("@" + profile.getUserInfo().getUsername());
+        username.setText("@" + profile.getUsername());
         onlineWins.setText(profile.getTotalOnlineWins() + "");
         singleWins.setText(profile.getSinglePlayerWins() + "");
         onlineLosses.setText(profile.getTotalOnlineLosses() + "");
         singleLosses.setText(profile.getSinglePlayerLosses() + "");
-        if (viewer.getClientProfile().getUserInfo().getUsername().toLowerCase().equals(profile.getUserInfo().getUsername().toLowerCase())) {
+        if (viewer.getClientProfile().getUsername().toLowerCase().equals(profile.getUsername().toLowerCase())) {
             playTogether.setVisible(false);
             addFriend.setVisible(false);
             startChat.setVisible(false);
@@ -93,7 +93,7 @@ public class ProfileViewWindow extends Stage {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 thisWindow.close();
-                viewer.connection.sendPacket(new Packet(viewer.userInfo, viewer.getClientProfile(), profile, Packet.PacketPropose.ADD_FRIEND_REQUEST));
+                viewer.connection.sendPacket(new Packet(viewer.getClientProfile(), viewer.getClientProfile(), profile, Packet.PacketPropose.ADD_FRIEND_REQUEST));
             }
         });
 
@@ -102,8 +102,8 @@ public class ProfileViewWindow extends Stage {
             public void handle(MouseEvent mouseEvent) {
                 thisWindow.close();
                 viewer.getClientProfile().getChats().add(new Chat(viewer.getClientProfile(), profile));
-                if (viewer.getAppUser().game instanceof ClientGame) {
-                    ((ClientGame) viewer.getAppUser().game).update();
+                if (viewer.game instanceof ClientGame) {
+                    ((ClientGame) viewer.game).update();
                 }
             }
         });
@@ -112,7 +112,7 @@ public class ProfileViewWindow extends Stage {
             @Override
             public void handle(MouseEvent event) {
                 thisWindow.close();
-                viewer.connection.sendPacket(new Packet(viewer.userInfo, viewer.getClientProfile(), profile, Packet.PacketPropose.PLAY_TOGETHER_REQUEST));
+                viewer.connection.sendPacket(new Packet(viewer.getClientProfile(), viewer.getClientProfile(), profile, Packet.PacketPropose.PLAY_TOGETHER_REQUEST));
             }
         });
 

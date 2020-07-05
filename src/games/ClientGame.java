@@ -1,7 +1,6 @@
 package games;
 
 import Serlizables.*;
-import controllers.AppUser;
 import controllers.ChatBoxController;
 import controllers.GameSceneController;
 import controllers.ProfileViewWindow;
@@ -18,6 +17,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import users.Client;
 import users.Connection;
 
 import java.io.File;
@@ -35,14 +35,14 @@ public class ClientGame extends GameWithUI {
     private Button sendChat;
     private TextField textField;
 
-    public ClientGame(AppUser appUser, Connection connection) {
-        super(appUser);
+    public ClientGame(Client client) {
+        super(client);
         setPlayersInfo("", "", "", "");
         board.setDisable(true);
         gameMode = GameModes.ONLINE;
         setCurrentPlayer(Player.NONE);
         this.thisPlayer = thisPlayer;
-        this.connection = connection;
+        this.connection = client.connection;
         initializeTabs();
 
 
@@ -52,20 +52,20 @@ public class ClientGame extends GameWithUI {
     void doAboutResult(Player result) {
         super.doAboutResult(result);
         if (result == thisPlayer) {
-            appUser.client.getClientProfile().setTotalOnlineWins(appUser.client.getClientProfile().getTotalOnlineWins() + 1);
-            appUser.client.sendProfileToServer();
+            client.getClientProfile().setTotalOnlineWins(client.getClientProfile().getTotalOnlineWins() + 1);
+            client.sendProfileToServer();
         } else if (result != Player.NONE && result != null) {
-            appUser.client.getClientProfile().setTotalOnlineLosses(appUser.client.getClientProfile().getTotalOnlineLosses() + 1);
-            appUser.client.sendProfileToServer();
+            client.getClientProfile().setTotalOnlineLosses(client.getClientProfile().getTotalOnlineLosses() + 1);
+            client.sendProfileToServer();
         }
     }
 
     public void startGame(ClientProfile playerX, ClientProfile playerO) {
-        setPlayersInfo(playerX.getFirstName(), playerO.getFirstName(), "@" + playerX.getUserInfo().getUsername().toLowerCase(), "@" + playerO.getUserInfo().getUsername().toLowerCase());
+        setPlayersInfo(playerX.getFirstName(), playerO.getFirstName(), "@" + playerX.getUsername().toLowerCase(), "@" + playerO.getUsername().toLowerCase());
         board.setDisable(false);
-        if (playerX.getUserInfo().getUsername().toLowerCase().equals(appUser.client.userInfo.getUsername().toLowerCase())) {
+        if (playerX.getUsername().toLowerCase().equals(client.getClientProfile().getUsername().toLowerCase())) {
             thisPlayer = Player.PLAYER_X;
-        } else if (playerO.getUserInfo().getUsername().toLowerCase().equals(appUser.client.userInfo.getUsername().toLowerCase())) {
+        } else if (playerO.getUsername().toLowerCase().equals(client.getClientProfile().getUsername().toLowerCase())) {
             thisPlayer = Player.PLAYER_O;
         }
         setCurrentPlayer(Player.PLAYER_X);
@@ -77,7 +77,7 @@ public class ClientGame extends GameWithUI {
 
     private void updateOnlinesList() {
         onlineContacts.getItems().clear();
-        for (ClientProfile clientProfile : appUser.client.getOtherPlayers()) {
+        for (ClientProfile clientProfile : client.getOtherPlayers()) {
             if (clientProfile.getOnline()) {
                 onlineContacts.getItems().add(clientProfile);
             }
@@ -88,7 +88,7 @@ public class ClientGame extends GameWithUI {
 
     private void updateFriendsList() {
         friends.getItems().clear();
-        for (ClientProfile clientProfile : appUser.client.getClientProfile().getFriends()) {
+        for (ClientProfile clientProfile : client.getClientProfile().getFriends()) {
             friends.getItems().add(clientProfile);
         }
         friends.refresh();
@@ -99,14 +99,14 @@ public class ClientGame extends GameWithUI {
             @Override
             public void run() {
                 chats.getTabs().clear();
-                for (Chat chat : appUser.client.getClientProfile().getChats()) {
+                for (Chat chat : client.getClientProfile().getChats()) {
                     ClientProfile otherOne = null;
-                    if (chat.getMembers().get(0).equals(appUser.client.getClientProfile())) {
+                    if (chat.getMembers().get(0).equals(client.getClientProfile())) {
                         otherOne = chat.getMembers().get(1);
-                        chat.setName(chat.getMembers().get(1).getUserInfo().getUsername().toLowerCase());
-                    } else if (chat.getMembers().get(1).equals(appUser.client.getClientProfile())) {
+                        chat.setName(chat.getMembers().get(1).getUsername().toLowerCase());
+                    } else if (chat.getMembers().get(1).equals(client.getClientProfile())) {
                         otherOne = chat.getMembers().get(0);
-                        chat.setName(chat.getMembers().get(0).getUserInfo().getUsername().toLowerCase());
+                        chat.setName(chat.getMembers().get(0).getUsername().toLowerCase());
                     }
                     AnchorPane anchorPane = null;
                     FXMLLoader fxmlLoader = new FXMLLoader();
@@ -127,7 +127,7 @@ public class ClientGame extends GameWithUI {
                     VBox massages = chatBoxController.massages;
                     massages.getChildren().clear();
                     for (Massage massage : chat.getMassages()) {
-                        massages.getChildren().add(newMassageBox(massage, appUser.client.getClientProfile()));
+                        massages.getChildren().add(newMassageBox(massage, client.getClientProfile()));
                     }
                     ChatBoxController chatBoxController1 = chatBoxController;
                     ClientProfile otherOne1 = otherOne;
@@ -136,14 +136,14 @@ public class ClientGame extends GameWithUI {
                         public void handle(MouseEvent mouseEvent) {
                             String text = chatBoxController1.textField.getText();
                             if (!text.isBlank()) {
-                                Massage massage = new Massage(appUser.client.getClientProfile(), new Date(), chatBoxController1.textField.getText());
+                                Massage massage = new Massage(client.getClientProfile(), new Date(), chatBoxController1.textField.getText());
                                 /*chat.getMassages().add(massage);
                                 if (appUser.game instanceof ClientGame) {
                                     ((ClientGame) appUser.game).updateChats();
                                 }
-                                appUser.client.sendProfileToServer();
+                                client.sendProfileToServer();
                                 updateChats();*/
-                                appUser.client.connection.sendPacket(new Packet(massage, appUser.client.getClientProfile(), otherOne1, Packet.PacketPropose.CHAT));
+                                client.connection.sendPacket(new Packet(massage, client.getClientProfile(), otherOne1, Packet.PacketPropose.CHAT));
                             }
                         }
                     });
@@ -207,7 +207,7 @@ public class ClientGame extends GameWithUI {
                         public void run() {
 
                             if (item != null) {
-                                setText(item.getUserInfo().getUsername());
+                                setText(item.getUsername());
                             }
                         }
                     });
@@ -219,7 +219,7 @@ public class ClientGame extends GameWithUI {
                         @Override
                         public void run() {
                             if (e.getClickCount() == 2) {
-                                new ProfileViewWindow(appUser.client, cell.getItem());
+                                new ProfileViewWindow(client, cell.getItem());
                             }
 
                         }
@@ -242,7 +242,7 @@ public class ClientGame extends GameWithUI {
                         public void run() {
 
                             if (item != null) {
-                                setText(item.getUserInfo().getUsername());
+                                setText(item.getUsername());
                             }
                         }
                     });
@@ -254,7 +254,7 @@ public class ClientGame extends GameWithUI {
                         @Override
                         public void run() {
                             if (e.getClickCount() == 2) {
-                                new ProfileViewWindow(appUser.client, cell.getItem());
+                                new ProfileViewWindow(client, cell.getItem());
                             }
 
                         }
@@ -289,7 +289,7 @@ public class ClientGame extends GameWithUI {
 
         if (isMyTurn() && square.getState().equals(Player.NONE)) {
             square.setState(getCurrentPlayer());
-            appUser.client.connection.sendPacket(new Packet(squares, appUser.client, Packet.PacketPropose.UPDATE_GAME));
+            client.connection.sendPacket(new Packet(squares, client, Packet.PacketPropose.UPDATE_GAME));
 
             if (thisPlayer == Player.PLAYER_X) {
                 setCurrentPlayer(Player.PLAYER_O);

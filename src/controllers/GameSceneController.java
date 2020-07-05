@@ -11,7 +11,7 @@ import javafx.scene.text.Text;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class GameSceneController implements Initializable {
+public class GameSceneController extends StandardController implements Initializable {
 
     static public GridPane boardStatic;
     static public TabPane contactsStatic;

@@ -1,8 +1,8 @@
 package mains;
 
-import controllers.AppUser;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import users.Client;
 
 
 public class ClientMain extends Application {
@@ -14,7 +14,6 @@ public class ClientMain extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        AppUser appUser = new AppUser();
-        //new controllers.ProfileViewWindow(appUser.client, games.GameWithUI.me);
+        Client appUser = new Client();
     }
 }

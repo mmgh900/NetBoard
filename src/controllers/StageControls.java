@@ -15,15 +15,10 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 
-public class StageControls implements Initializable {
+public class StageControls extends StandardController implements Initializable {
     public VBox CBox;
     public Button close;
     public Button minimize;
-    private AppUser appUser;
-
-    public void setAppUser(AppUser appUser) {
-        this.appUser = appUser;
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -38,8 +33,8 @@ public class StageControls implements Initializable {
         close.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (appUser.client != null) {
-                    appUser.client.logout();
+                if (client != null) {
+                    client.logout();
                 }
                 Stage stage = (Stage) close.getScene().getWindow();
                 stage.close();

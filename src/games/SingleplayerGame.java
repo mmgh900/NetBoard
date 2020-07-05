@@ -1,9 +1,9 @@
 package games;
 
 import Serlizables.Square;
-import controllers.AppUser;
 import gui.elements.SquareSkin;
 import javafx.scene.input.MouseEvent;
+import users.Client;
 
 import java.util.Random;
 
@@ -12,26 +12,26 @@ public class SingleplayerGame extends GameWithUI {
     Random random = new Random();
 
 
-    public SingleplayerGame(AppUser appUser) {
-        super(appUser);
+    public SingleplayerGame(Client client) {
+        super(client);
     }
 
     @Override
     void doAboutResult(Player result) {
         super.doAboutResult(result);
         if (result == Player.PLAYER_X) {
-            appUser.client.getClientProfile().setSinglePlayerWins(appUser.client.getClientProfile().getSinglePlayerWins() + 1);
-            appUser.client.sendProfileToServer();
+            client.getClientProfile().setSinglePlayerWins(client.getClientProfile().getSinglePlayerWins() + 1);
+            client.sendProfileToServer();
         } else if (result != Player.PLAYER_O) {
-            appUser.client.getClientProfile().setSinglePlayerLosses(appUser.client.getClientProfile().getSinglePlayerLosses() + 1);
-            appUser.client.sendProfileToServer();
+            client.getClientProfile().setSinglePlayerLosses(client.getClientProfile().getSinglePlayerLosses() + 1);
+            client.sendProfileToServer();
         }
     }
 
     @Override
     public void makeUI() throws Exception {
         super.makeUI();
-        setPlayersInfo(appUser.client.getClientProfile().getFirstName(), "Computer AI", "@" + appUser.client.userInfo.getUsername().toLowerCase(), "");
+        setPlayersInfo(client.getClientProfile().getFirstName(), "Computer AI", "@" + client.getClientProfile().getUsername().toLowerCase(), "");
     }
 
     @Override

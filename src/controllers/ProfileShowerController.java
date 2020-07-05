@@ -7,7 +7,7 @@ import javafx.scene.text.Text;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ProfileShowerController implements Initializable {
+public class ProfileShowerController extends StandardController implements Initializable {
     public static Button playTogetherStatic;
     public static Button closeStatic;
     public static Button startChatStatic;

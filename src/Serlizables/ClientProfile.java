@@ -6,13 +6,15 @@ import java.util.Objects;
 
 public class ClientProfile implements Serializable {
 
-    private final UserInfo userInfo;
+    /*    private final UserInfo userInfo;*/
 
-    private final String firstName;
-    private final String lastName;
-    private final String email;
+    private final String username;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private String email;
     private final ArrayList<ClientProfile> friends = new ArrayList<>();
-    private final ArrayList<Chat> chats;
+    private ArrayList<Chat> chats;
     private SecurityQuestions securityQuestion;
     private String answer;
     private Boolean isOnline;
@@ -22,8 +24,15 @@ public class ClientProfile implements Serializable {
     private int singlePlayerLosses;
 
 
+    public ClientProfile(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
     public ClientProfile(String firstName, String lastName, String username, String password, SecurityQuestions securityQuestion, String answer, String email) {
-        this.userInfo = new UserInfo(username, password);
+        /*        this.userInfo = new UserInfo(username, password);*/
+        this.username = username;
+        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.securityQuestion = securityQuestion;
@@ -39,27 +48,14 @@ public class ClientProfile implements Serializable {
 
     @Override
     public String toString() {
-        return "[" + userInfo.getUsername().toUpperCase() + "]";
+        return "[" + username.toUpperCase() + "]";
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof ClientProfile))
-            return false;
-        ClientProfile that = (ClientProfile) o;
-        return getUserInfo().equals(that.getUserInfo());
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getUserInfo());
-    }
 
-    public UserInfo getUserInfo() {
+/*    public UserInfo getUserInfo() {
         return userInfo;
-    }
+    }*/
 
     public String getFirstName() {
         return firstName;
@@ -131,7 +127,30 @@ public class ClientProfile implements Serializable {
 
     public void clearSecurityInfo() {
         this.securityQuestion = null;
-        this.userInfo.password = null;
+        this.password = null;
         this.answer = null;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ClientProfile))
+            return false;
+        ClientProfile that = (ClientProfile) o;
+        return getUsername().equals(that.getUsername());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUsername());
     }
 }

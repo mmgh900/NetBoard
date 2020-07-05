@@ -1,9 +1,10 @@
 package users;
 
 import Serlizables.*;
-import controllers.AppUser;
+import controllers.DefaultWindow;
 import controllers.GetRespondWindow;
 import games.ClientGame;
+import games.GameWithUI;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
@@ -20,40 +21,30 @@ import java.util.ArrayList;
 
 public class Client extends User implements Serializable {
 
-    private final AppUser appUser;
+    public GameWithUI game;
+    private DefaultWindow window;
     private final Client thisClient = this;
-    private final SignUpForm signUpForm;
-    private final LoginForm loginForm;
+    private SignUpForm signUpForm;
+    private LoginForm loginForm;
     public Button mainMenu;
     public Text loginSceneMassage;
     private ArrayList<ClientProfile> otherPlayers;
     private ClientProfile clientProfile;
     private Socket socket;
-    EventHandler logoutHandler = new EventHandler<MouseEvent>() {
-        public void handle(MouseEvent event) {
-            logout();
-            connection.sendPacket(new Packet(userInfo, thisClient, Packet.PacketPropose.LOGOUT_REQUEST));
-            try {
-                close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            new Client(appUser);
+
+    public Client() {
+        try {
+            this.window = new DefaultWindow(this);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    };
 
-    public Client(AppUser appUser) {
-
-
-        this.appUser = appUser;
-
-        loginSceneMassage = (Text) appUser.window.getLoginScene().lookup("#massage");
+        loginSceneMassage = window.getLoginController().massage;
         loginSceneMassage.getStyleClass().add("massage");
         loginSceneMassage.setText("");
 
-        this.loginForm = new LoginForm();
-        this.signUpForm = new SignUpForm();
-
+        //this.loginForm = new LoginForm();
+        //this.signUpForm = new SignUpForm();
         try {
             socket = new Socket("localhost", PORT);
             //game = new games.ClientGame(appUser, games.Game.Player.PLAYER_O, connection);
@@ -63,24 +54,12 @@ public class Client extends User implements Serializable {
         } catch (IOException e) {
             badNews("There was a problem in connecting to the server. Try again later");
         }
-
-    }
-
-    public void logout() {
-        if (socket != null) {
-            connection.sendPacket(new Packet(userInfo, thisClient, Packet.PacketPropose.LOGOUT_REQUEST));
-            try {
-                close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            window.loadLoginScene();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-    }
-
-    private void updateProfile(ClientProfile clientProfile) {
-        userInfo = clientProfile.getUserInfo();
-        this.clientProfile = clientProfile;
     }
 
     @Override
@@ -88,98 +67,119 @@ public class Client extends User implements Serializable {
         System.out.println("I got a packet with this purpose: " + packet.getPropose().toString());
         Packet.PacketPropose packetPropose = packet.getPropose();
         if (packetPropose == Packet.PacketPropose.PROFILES_IN_SYSTEM) {
-            otherPlayers = (ArrayList<ClientProfile>) packet.getContent();
-            otherPlayers.removeIf(cp -> cp.getUserInfo().getUsername().equals(userInfo.getUsername()));
-            if (appUser.game != null && appUser.game instanceof ClientGame) {
-                ClientGame clientGame = (ClientGame) appUser.game;
-                clientGame.update();
-            }
+            respondToProfilesInSystem(packet);
         }
         if (packet.getContent() instanceof ServerMassages) {
             if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP)) {
-                ServerMassages serverMassage = (ServerMassages) packet.getContent();
-
-                if (serverMassage == ServerMassages.SIGN_UP_SUCCESSFUL) {
-                    goodNews("Sign up successful. Welcome " + userInfo.getUsername().toUpperCase() + ".");
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            appUser.window.setTitle(userInfo.getUsername());
-                        }
-                    });
-                    try {
-                        appUser.window.loadMenuScene();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    badNews(serverMassage.toString().toLowerCase().replace("_", " "));
-                }
+                respondToServerRespondToSignUp(packet);
             }
             if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_LOGIN)) {
                 ServerMassages serverMassage = (ServerMassages) packet.getContent();
-                if (serverMassage == ServerMassages.LOGIN_SUCCESSFUL) {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            appUser.window.setTitle(userInfo.getUsername());
-                        }
-                    });
-                    goodNews("Login successful. Welcome " + userInfo.getUsername().toUpperCase() + ".");
-                    try {
-                        appUser.window.loadMenuScene();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    badNews(serverMassage.toString().toLowerCase().replace("_", " "));
-                }
+                respondToServerRespondToLogin(serverMassage);
             }
-
         }
         if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
-            updateProfile((ClientProfile) packet.getContent());
-            if (appUser.game instanceof ClientGame) {
-                ((ClientGame) appUser.game).update();
-            }
+            respondToProfileInfo(packet);
         }
         if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
-            if (!(appUser.game instanceof ClientGame)) {
-                connection.sendPacket(new Packet(false, packet.getSender(), this.getClientProfile().getUserInfo(), Packet.PacketPropose.RESPOND_PLAY_TOGETHER));
+            if (respondToRequests(packet, Packet.PacketPropose.RESPOND_PLAY_TOGETHER))
                 return;
-            } else {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        new GetRespondWindow(packet.getSender(), thisClient, packet.getPropose());
-                    }
-                });
-            }
         }
         if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
-            if (!(appUser.game instanceof ClientGame)) {
-                connection.sendPacket(new Packet(false, packet.getSenderProfile(), this.getClientProfile(), Packet.PacketPropose.RESPOND_ADD_FRIEND));
+            if (respondToRequests(packet, Packet.PacketPropose.RESPOND_ADD_FRIEND))
                 return;
-            } else {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
-                    }
-                });
-            }
         }
         if (packet.getPropose().equals(Packet.PacketPropose.START_GAME)) {
-            ClientGame clientGame = (ClientGame) appUser.game;
-            ClientProfile[] clientProfiles = (ClientProfile[]) packet.getContent();
-            clientGame.startGame(clientProfiles[0], clientProfiles[1]);
+            respondToStartGame(packet);
         }
         if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
-            Square[][] squares = (Square[][]) packet.getContent();
-            ClientGame clientGame = (ClientGame) appUser.game;
-            clientGame.updateGame(squares);
+            respondToUpdateGame(packet);
         }
 
+    }
+
+    private void respondToUpdateGame(Packet packet) {
+        Square[][] squares = (Square[][]) packet.getContent();
+        ClientGame clientGame = (ClientGame) game;
+        clientGame.updateGame(squares);
+    }
+
+    private void respondToStartGame(Packet packet) {
+        ClientGame clientGame = (ClientGame) game;
+        ClientProfile[] clientProfiles = (ClientProfile[]) packet.getContent();
+        clientGame.startGame(clientProfiles[0], clientProfiles[1]);
+
+    }
+
+    private boolean respondToRequests(Packet packet, Packet.PacketPropose respondPlayTogether) {
+        if (!(game instanceof ClientGame)) {
+            connection.sendPacket(new Packet(false, packet.getSenderProfile(), this.getClientProfile(), respondPlayTogether));
+            return true;
+        } else {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
+                }
+            });
+        }
+        return false;
+    }
+
+    private void respondToProfileInfo(Packet packet) {
+        updateProfile((ClientProfile) packet.getContent());
+        if (game instanceof ClientGame) {
+            ((ClientGame) game).update();
+        }
+    }
+
+    private void respondToServerRespondToLogin(ServerMassages serverMassage) {
+        if (serverMassage == ServerMassages.LOGIN_SUCCESSFUL) {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    window.setTitle(clientProfile.getUsername());
+                }
+            });
+            goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
+            try {
+                window.loadMenuScene();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            badNews(serverMassage.toString().toLowerCase().replace("_", " "));
+        }
+    }
+
+    private void respondToServerRespondToSignUp(Packet packet) {
+        ServerMassages serverMassage = (ServerMassages) packet.getContent();
+
+        if (serverMassage == ServerMassages.SIGN_UP_SUCCESSFUL) {
+            goodNews("Sign up successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    window.setTitle(clientProfile.getUsername());
+                }
+            });
+            try {
+                window.loadMenuScene();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            badNews(serverMassage.toString().toLowerCase().replace("_", " "));
+        }
+    }
+
+    private void respondToProfilesInSystem(Packet packet) {
+        otherPlayers = (ArrayList<ClientProfile>) packet.getContent();
+        otherPlayers.removeIf(cp -> cp.getUsername().equals(clientProfile.getUsername()));
+        if (game != null && game instanceof ClientGame) {
+            ClientGame clientGame = (ClientGame) game;
+            clientGame.update();
+        }
     }
 
     @Override
@@ -209,12 +209,18 @@ public class Client extends User implements Serializable {
 
     }
 
-    public AppUser getAppUser() {
-        return appUser;
-    }
 
     public Socket getSocket() {
         return socket;
+    }
+
+    public DefaultWindow getWindow() {
+        return window;
+    }
+
+
+    public Client getThisClient() {
+        return thisClient;
     }
 
     public ClientProfile getClientProfile() {
@@ -227,6 +233,22 @@ public class Client extends User implements Serializable {
 
     public void sendProfileToServer() {
         connection.sendPacket(new Packet(clientProfile, thisClient, Packet.PacketPropose.PROFILE_INFO));
+    }
+
+    public void logout() {
+        if (socket != null) {
+            connection.sendPacket(new Packet(clientProfile, clientProfile, Packet.PacketPropose.LOGOUT_REQUEST));
+            try {
+                close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private void updateProfile(ClientProfile clientProfile) {
+        this.clientProfile = clientProfile;
     }
 
     class SignUpForm {
@@ -268,8 +290,8 @@ public class Client extends User implements Serializable {
                     badNews("Invalid email");
                     return;
                 }
-                userInfo = new UserInfo(usernameS, passwordS);
-                ClientProfile clientProfile = new ClientProfile(firstNameS, lastNameS, usernameS, passwordS, securityQuestionS, answerS, emailS);
+
+                clientProfile = new ClientProfile(firstNameS, lastNameS, usernameS, passwordS, securityQuestionS, answerS, emailS);
 
                 connection.sendPacket(new Packet(clientProfile, thisClient, Packet.PacketPropose.SIGN_UP_REQUEST));
             }
@@ -277,29 +299,21 @@ public class Client extends User implements Serializable {
 
         public SignUpForm() {
 
-            firstNameField = (TextField) appUser.window.getLoginScene().lookup("#firstname");
-            lastNameField = (TextField) appUser.window.getLoginScene().lookup("#lastname");
-            usernameField = (TextField) appUser.window.getLoginScene().lookup("#username");
+            firstNameField = (TextField) window.getLoginScene().lookup("#firstname");
+            lastNameField = (TextField) window.getLoginScene().lookup("#lastname");
+            usernameField = (TextField) window.getLoginScene().lookup("#username");
 
-            emailField = (TextField) appUser.window.getLoginScene().lookup("#email");
-            answerField = (TextField) appUser.window.getLoginScene().lookup("#answer");
-            choiceBox = (ChoiceBox) appUser.window.getLoginScene().lookup("#question");
-            passwordField = (PasswordField) appUser.window.getLoginScene().lookup("#password");
-            passwordConfirmField = (PasswordField) appUser.window.getLoginScene().lookup("#confirmpassword");
-            signupButton = (Button) appUser.window.getLoginScene().lookup("#signupButton");
+            emailField = (TextField) window.getLoginScene().lookup("#email");
+            answerField = (TextField) window.getLoginScene().lookup("#answer");
+            choiceBox = (ChoiceBox) window.getLoginScene().lookup("#question");
+            passwordField = (PasswordField) window.getLoginScene().lookup("#password");
+            passwordConfirmField = (PasswordField) window.getLoginScene().lookup("#confirmpassword");
+            signupButton = (Button) window.getLoginScene().lookup("#signupButton");
             signupButton.setOnMouseClicked(signUp);
 
             choiceBox.setItems(FXCollections.observableArrayList(SecurityQuestions.WHAT_IS_THE_NAME_OF_YOUR_FAVORITE_CHILDHOOD_FRIEND, SecurityQuestions.WHAT_WAS_THE_LAST_NAME_OF_YOUR_THIRD_GRADE_TEACHER, SecurityQuestions.WHAT_WAS_THE_NAME_OF_YOUR_SECOND_PET, SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO));
             choiceBox.setValue(SecurityQuestions.WHAT_IS_THE_NAME_OF_YOUR_FAVORITE_CHILDHOOD_FRIEND);
             choiceBox.setTooltip(new Tooltip("Select a security question"));
-
-
-
-
-            /*choiceBox.getItems().add(Serlizables.SecurityQuestions.WHAT_IS_THE_NAME_OF_YOUR_FAVORITE_CHILDHOOD_FRIEND.toString());
-            choiceBox.getItems().add(Serlizables.SecurityQuestions.WHAT_WAS_THE_LAST_NAME_OF_YOUR_THIRD_GRADE_TEACHER.toString());
-            choiceBox.getItems().add(Serlizables.SecurityQuestions.WHAT_WAS_THE_NAME_OF_YOUR_SECOND_PET.toString());
-            choiceBox.getItems().add(Serlizables.SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO.toString());*/
 
 
         }
@@ -312,15 +326,15 @@ public class Client extends User implements Serializable {
         public Button signupButton;
         EventHandler login = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {
-                userInfo = new UserInfo(usernameField.getText(), passwordField.getText());
-                connection.sendPacket(new Packet(userInfo, thisClient, Packet.PacketPropose.LOGIN_REQUEST));
+                clientProfile = new ClientProfile(usernameField.getText(), passwordField.getText());
+                connection.sendPacket(new Packet(clientProfile, thisClient, Packet.PacketPropose.LOGIN_REQUEST));
             }
         };
 
         public LoginForm() {
-            usernameField = (TextField) appUser.window.getLoginScene().lookup("#loginUsername");
-            passwordField = (PasswordField) appUser.window.getLoginScene().lookup("#loginPassword");
-            signupButton = (Button) appUser.window.getLoginScene().lookup("#loginButton");
+            usernameField = (TextField) window.getLoginScene().lookup("#loginUsername");
+            passwordField = (PasswordField) window.getLoginScene().lookup("#loginPassword");
+            signupButton = (Button) window.getLoginScene().lookup("#loginButton");
 
             signupButton.setOnMouseClicked(login);
         }

@@ -5,17 +5,19 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import users.Client;
 
 import java.io.File;
 import java.io.IOException;
 
 public class DefaultWindow extends Stage {
     public static String defaultStylesheet = "CssFiles/Light.css";
-    private final AppUser appUser;
+    private final Client client;
     private final DefaultWindow thisWindow;
     private final Scene gameScene;
     private final Scene menuScene;
@@ -27,16 +29,16 @@ public class DefaultWindow extends Stage {
 
     FXMLLoader fxmlLoader = new FXMLLoader();
 
-    public DefaultWindow(AppUser appUser) throws IOException {
+    public DefaultWindow(Client appUser) throws IOException {
 
-        this.appUser = appUser;
+        this.client = appUser;
         this.setTitle("TicTocToe");
         this.thisWindow = this;
         this.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent windowEvent) {
-                if (appUser.client != null) {
-                    appUser.client.logout();
+                if (client != null) {
+                    client.logout();
                 }
             }
         });
@@ -72,7 +74,7 @@ public class DefaultWindow extends Stage {
 
         this.initStyle(StageStyle.UNDECORATED);
         this.setResizable(false);
-        this.setScene(loginScene);
+        this.setScene(new Scene(new AnchorPane()));
         this.show();
 
 
@@ -94,6 +96,7 @@ public class DefaultWindow extends Stage {
     }
 
     public void loadGameScene() throws IOException {
+        gameSceneController.setClient(client);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -104,16 +107,18 @@ public class DefaultWindow extends Stage {
     }
 
     public void loadMenuScene() throws IOException {
+        menuController.setClient(client);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 thisWindow.setScene(menuScene);
-                appUser.updateProfileUiGraphics();
+                menuController.updateProfileUiGraphics();
             }
         });
     }
 
     public void loadLoginScene() throws IOException {
+        loginController.setClient(client);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -140,7 +145,7 @@ public class DefaultWindow extends Stage {
         fxmlLoader.setLocation(new File("resources/FXMLFiles/Close.fxml").toURL());
         Parent controlParent = fxmlLoader.load();
         StageControls stageControls = fxmlLoader.getController();
-        stageControls.setAppUser(appUser);
+        stageControls.setClient(client);
 
         VBox cBox = stageControls.CBox;
         return cBox;

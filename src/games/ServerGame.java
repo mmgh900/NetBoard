@@ -35,11 +35,11 @@ public class ServerGame extends Game {
     public void updateGame(Square[][] squares, ClientProfile sender) {
         this.squares = squares;
 
-        if (sender.getUserInfo().getUsername().toLowerCase().equals(playerO.getUserInfo().getUsername().toLowerCase())) {
+        if (sender.equals(playerO)) {
             connections.get(playerX).sendPacket(new Packet(squares, server, Packet.PacketPropose.UPDATE_GAME));
             setCurrentPlayer(Player.PLAYER_X);
         }
-        if (sender.getUserInfo().getUsername().toLowerCase().equals(playerX.getUserInfo().getUsername().toLowerCase())) {
+        if (sender.equals(playerX)) {
             connections.get(playerO).sendPacket(new Packet(squares, server, Packet.PacketPropose.UPDATE_GAME));
             setCurrentPlayer(Player.PLAYER_O);
         }

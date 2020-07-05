@@ -1,12 +1,12 @@
 package games;
 
 import Serlizables.Square;
-import controllers.AppUser;
 import javafx.scene.input.MouseEvent;
+import users.Client;
 
 public class TwoPlayerGame extends GameWithUI {
-    public TwoPlayerGame(AppUser appUser) {
-        super(appUser);
+    public TwoPlayerGame(Client client) {
+        super(client);
         gameMode = GameModes.TWO_PLAYERS_ONE_CLIENT;
 
     }

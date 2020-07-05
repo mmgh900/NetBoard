@@ -23,6 +23,7 @@ public class Server extends User {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
+
     private final HashMap<ClientProfile, Connection> connections = new HashMap<>();
     private final File file = new File("ServerSaves/clientProfiles.dat");
     private ArrayList<ClientProfile> usersInSystem = new ArrayList<>();
@@ -34,18 +35,21 @@ public class Server extends User {
         if (!file.exists()) {
             throw new Exception("Couldn't find file");
         }
-        this.userInfo = new UserInfo("Server", "");
-        addUserToSystem(new Serlizables.ClientProfile("Mohammad Mahdi", "Gheysari", "m", "", Serlizables.SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "gheysari.mm@gmail.com"));
-        addUserToSystem(new Serlizables.ClientProfile("Reza", "Ahmadi", "r", "", Serlizables.SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "reaza@gmail.com"));
+        //addSampleClients();
 
         readFile();
         for (ClientProfile clientProfile : usersInSystem) {
-            System.out.println(clientProfile.getUserInfo().getUsername() + ":" + clientProfile.getUserInfo().getPassword());
+            System.out.println(clientProfile.getUsername() + ":" + clientProfile.getPassword());
         }
         makeClientsInitiallyOffline();
         setUpServerSocket();
 
 
+    }
+
+    private void addSampleClients() {
+        addUserToSystem(new ClientProfile("Mohammad Mahdi", "Gheysari", "m", "", SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "gheysari.mm@gmail.com"));
+        addUserToSystem(new ClientProfile("Reza", "Ahmadi", "r", "", SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "reaza@gmail.com"));
     }
 
     private void addToList(ClientProfile clientProfile) {
@@ -58,7 +62,7 @@ public class Server extends User {
         ArrayList<ClientProfile> clientProfiles = new ArrayList<ClientProfile>();
 
         for (ClientProfile cp : usersInSystem) {
-            ClientProfile clientProfile = new ClientProfile(cp.getFirstName(), cp.getLastName(), cp.getUserInfo().getUsername(), cp.getUserInfo().getPassword(), cp.getSecurityQuestion(), cp.getAnswer(), cp.getEmail());
+            ClientProfile clientProfile = new ClientProfile(cp.getFirstName(), cp.getLastName(), cp.getUsername(), cp.getPassword(), cp.getSecurityQuestion(), cp.getAnswer(), cp.getEmail());
             clientProfile.setSinglePlayerWins(cp.getSinglePlayerWins());
             clientProfile.setSinglePlayerLosses(cp.getSinglePlayerLosses());
             clientProfile.setTotalOnlineWins(cp.getTotalOnlineWins());
@@ -72,13 +76,13 @@ public class Server extends User {
     @Override
     public void receivePacket(Packet packet) {
         System.out.println(ANSI_RED + "[SERVER]: received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
-        if (packet.getContent() instanceof UserInfo && packet.getPropose().equals(Packet.PacketPropose.LOGOUT_REQUEST)) {
-            UserInfo userInfo = (UserInfo) packet.getContent();
-            respondToLogoutRequest(userInfo);
+        if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGOUT_REQUEST)) {
+            ClientProfile clientProfile = (ClientProfile) packet.getContent();
+            respondToLogoutRequest(clientProfile);
         }
-        if (packet.getContent() instanceof UserInfo && packet.getPropose().equals(Packet.PacketPropose.LOGIN_REQUEST)) {
-            UserInfo userInfo = (UserInfo) packet.getContent();
-            respondToLoginRequest(userInfo);
+        if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGIN_REQUEST)) {
+            ClientProfile clientProfile = (ClientProfile) packet.getContent();
+            respondToLoginRequest(clientProfile);
         }
         if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.SIGN_UP_REQUEST)) {
             ClientProfile clientProfile = (ClientProfile) packet.getContent();
@@ -100,14 +104,7 @@ public class Server extends User {
             updateOneClient((ClientProfile) packet.getContent());
         }
         if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
-            ClientProfile foundClient = null;
-            for (ClientProfile cip : usersInSystem) {
-                if (packet.getSender().getUsername().toLowerCase().equals(cip.getUserInfo().getUsername().toLowerCase())) {
-                    foundClient = cip;
-                }
-
-            }
-            serverGame.updateGame((Square[][]) packet.getContent(), foundClient);
+            respondToUpdateGame(packet);
         }
         if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
             respondToChat(packet);
@@ -119,15 +116,26 @@ public class Server extends User {
 
     }
 
+    private void respondToUpdateGame(Packet packet) {
+        ClientProfile foundClient = null;
+        for (ClientProfile cip : usersInSystem) {
+            if (packet.getSenderProfile().equals(cip)) {
+                foundClient = cip;
+            }
+
+        }
+        serverGame.updateGame((Square[][]) packet.getContent(), foundClient);
+    }
+
     private void respondToAddFriendRespond(Packet packet) {
         ClientProfile sender = null;
         ClientProfile receiver = null;
 
         for (ClientProfile cip : usersInSystem) {
-            if (packet.getSenderProfile().getUserInfo().getUsername().equalsIgnoreCase(cip.getUserInfo().getUsername())) {
+            if (packet.getSenderProfile().equals(cip)) {
                 sender = cip;
             }
-            if (packet.getReceiverProfile().getUserInfo().getUsername().equalsIgnoreCase(cip.getUserInfo().getUsername())) {
+            if (packet.getReceiverProfile().equals(cip)) {
                 receiver = cip;
             }
         }
@@ -146,10 +154,10 @@ public class Server extends User {
         ClientProfile receiver = null;
 
         for (ClientProfile cip : usersInSystem) {
-            if (packet.getSenderProfile().getUserInfo().getUsername().equalsIgnoreCase(cip.getUserInfo().getUsername())) {
+            if (packet.getSenderProfile().getUsername().equalsIgnoreCase(cip.getUsername())) {
                 sender = cip;
             }
-            if (packet.getReceiverProfile().getUserInfo().getUsername().equalsIgnoreCase(cip.getUserInfo().getUsername())) {
+            if (packet.getReceiverProfile().getUsername().equalsIgnoreCase(cip.getUsername())) {
                 receiver = cip;
             }
         }
@@ -161,10 +169,10 @@ public class Server extends User {
         ClientProfile receiver = null;
 
         for (ClientProfile cip : usersInSystem) {
-            if (packet.getSenderProfile().getUserInfo().getUsername().equalsIgnoreCase(cip.getUserInfo().getUsername())) {
+            if (packet.getSenderProfile().getUsername().equalsIgnoreCase(cip.getUsername())) {
                 sender = cip;
             }
-            if (packet.getReceiverProfile().getUserInfo().getUsername().equalsIgnoreCase(cip.getUserInfo().getUsername())) {
+            if (packet.getReceiverProfile().getUsername().equalsIgnoreCase(cip.getUsername())) {
                 receiver = cip;
             }
         }
@@ -181,7 +189,7 @@ public class Server extends User {
         Chat foundChat = null;
         for (Chat chat : target.getChats()) {
             for (ClientProfile cp : chat.getMembers()) {
-                if (cp.getUserInfo().equals(target.getUserInfo())) {
+                if (cp.equals(target)) {
                     foundChat = chat;
                 }
             }
@@ -195,7 +203,7 @@ public class Server extends User {
         foundChat.getMassages().add(massage);
         for (Chat chat : target.getChats()) {
             for (ClientProfile cp : chat.getMembers()) {
-                if (cp.getUserInfo().equals(target.getUserInfo())) {
+                if (cp.equals(target)) {
                     int index = target.getChats().indexOf(chat);
                     target.getChats().set(index, foundChat);
                 }
@@ -210,7 +218,7 @@ public class Server extends User {
         ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
         ClientProfile foundClient = null;
         for (ClientProfile cip : usersInSystem) {
-            if (clientProfile.getUserInfo().getUsername().toLowerCase().equals(cip.getUserInfo().getUsername().toLowerCase())) {
+            if (clientProfile.getUsername().equalsIgnoreCase(cip.getUsername())) {
                 cip = clientProfile;
             }
         }
@@ -235,37 +243,37 @@ public class Server extends User {
 
     }
 
-    public void respondToLoginRequest(UserInfo userInfo) {
+    private void respondToLoginRequest(ClientProfile clientProfile) {
         System.out.println("A login request received");
         ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
         ClientProfile foundClient = null;
         for (ClientProfile cip : usersInSystem) {
-            if (userInfo.getUsername().toLowerCase().equals(cip.getUserInfo().getUsername().toLowerCase())) {
+            if (clientProfile.getUsername().equalsIgnoreCase(cip.getUsername())) {
                 foundClient = cip;
             }
         }
         if (foundClient == null) {
             serverMassage = ServerMassages.USERNAME_NOT_FOUND;
         } else {
-            if (userInfo.getPassword().equals(foundClient.getUserInfo().getPassword())) {
+            if (clientProfile.getPassword().equals(foundClient.getPassword())) {
                 usersInSystem.get(usersInSystem.indexOf(foundClient)).setOnline(true);
                 serverMassage = ServerMassages.LOGIN_SUCCESSFUL;
                 connections.put(foundClient, connection);
                 sendOneToOne(foundClient);
             } else {
                 serverMassage = ServerMassages.WRONG_PASSWORD;
-                System.out.println("getPassword() was: " + foundClient.getUserInfo().getPassword() + "but client entered: " + userInfo.getPassword());
+                System.out.println("getPassword() was: " + foundClient.getPassword() + "but client entered: " + clientProfile.getPassword());
             }
         }
         connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_RESPOND_TO_LOGIN));
     }
 
-    public void respondToSignUpRequest(ClientProfile clientProfile) {
+    private void respondToSignUpRequest(ClientProfile clientProfile) {
         System.out.println("A sign up request received");
         ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
         ClientProfile foundClient = null;
         for (ClientProfile cip : usersInSystem) {
-            if (clientProfile.getUserInfo().getUsername().toLowerCase().equals(cip.getUserInfo().getUsername().toLowerCase())) {
+            if (clientProfile.getUsername().equalsIgnoreCase(cip.getUsername())) {
                 foundClient = cip;
             }
         }
@@ -282,7 +290,7 @@ public class Server extends User {
         connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP));
     }
 
-    public void respondToLogoutRequest(UserInfo userInfo) {
+    private void respondToLogoutRequest(ClientProfile clientProfile) {
         System.out.println("A logout request received");
 
         ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
@@ -290,7 +298,7 @@ public class Server extends User {
         ClientProfile foundClient = null;
 
         for (ClientProfile cip : usersInSystem) {
-            if (userInfo.getUsername().toLowerCase().equals(cip.getUserInfo().getUsername().toLowerCase())) {
+            if (clientProfile.getUsername().equalsIgnoreCase(cip.getUsername())) {
                 foundClient = cip;
             }
         }
@@ -303,7 +311,7 @@ public class Server extends User {
             serverMassage = ServerMassages.LOGOUT_SUCCESSFUL;
 
         }
-        System.out.println(usersInSystem.get(usersInSystem.indexOf(foundClient)).getUserInfo().getUsername() + " loged out.");
+        System.out.println(usersInSystem.get(usersInSystem.indexOf(foundClient)).getUsername() + " loged out.");
     }
 
     private void respondToPlayTogetherRespond(Packet packet) {
@@ -312,10 +320,10 @@ public class Server extends User {
         ClientProfile[] clientProfiles = new ClientProfile[2];
         System.out.println("A play together respond received");
         for (Map.Entry<ClientProfile, Connection> connectionHashMap : connections.entrySet()) {
-            if (connectionHashMap.getKey().getUserInfo().getUsername().toLowerCase().equals(packet.getReceiver().getUsername().toLowerCase())) {
+            if (connectionHashMap.getKey().getUsername().equalsIgnoreCase(packet.getReceiverProfile().getUsername())) {
                 playerO = connectionHashMap.getKey();
             }
-            if (connectionHashMap.getKey().getUserInfo().getUsername().toLowerCase().equals(packet.getSender().getUsername().toLowerCase())) {
+            if (connectionHashMap.getKey().getUsername().equalsIgnoreCase(packet.getSenderProfile().getUsername())) {
                 playerX = connectionHashMap.getKey();
             }
         }
@@ -332,7 +340,7 @@ public class Server extends User {
     private void respondToPlayTogetherRequest(Packet packet) {
         System.out.println("A play together request received");
         for (Map.Entry<ClientProfile, Connection> connectionHashMap : connections.entrySet()) {
-            if (connectionHashMap.getKey().getUserInfo().getUsername().toLowerCase().equals(packet.getReceiver().getUsername().toLowerCase())) {
+            if (connectionHashMap.getKey().getUsername().equalsIgnoreCase(packet.getReceiverProfile().getUsername())) {
                 System.out.println("Found target of play request. sending packet ...");
                 connectionHashMap.getValue().sendPacket(packet);
                 return;
@@ -352,7 +360,6 @@ public class Server extends User {
             e.printStackTrace();
         }
     }
-
     public void readFile() {
         try ( // Create an input stream for file clientProfiles.dat
               ObjectInputStream input = new ObjectInputStream(new FileInputStream(file))) {
@@ -406,7 +413,7 @@ public class Server extends User {
 
     private boolean addUserToSystem(ClientProfile clientProfile) {
         for (ClientProfile cp : usersInSystem) {
-            if (clientProfile.getUserInfo().getUsername().equalsIgnoreCase(cp.getUserInfo().getUsername())) {
+            if (clientProfile.getUsername().equalsIgnoreCase(cp.getUsername())) {
                 return false;
             }
         }
