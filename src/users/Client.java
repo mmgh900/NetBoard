@@ -156,6 +156,19 @@ public class Client extends User implements Serializable {
                 });
             }
         }
+        if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
+            if (!(appUser.game instanceof ClientGame)) {
+                connection.sendPacket(new Packet(false, packet.getSenderProfile(), this.getClientProfile(), Packet.PacketPropose.RESPOND_ADD_FRIEND));
+                return;
+            } else {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
+                    }
+                });
+            }
+        }
         if (packet.getPropose().equals(Packet.PacketPropose.START_GAME)) {
             ClientGame clientGame = (ClientGame) appUser.game;
             ClientProfile[] clientProfiles = (ClientProfile[]) packet.getContent();

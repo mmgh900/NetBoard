@@ -1,13 +1,17 @@
 package controllers;
 
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 
@@ -24,6 +28,12 @@ public class StageControls implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        Shape shape = new Shape() {
+            @Override
+            public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
+                return super.getCssMetaData();
+            }
+        };
 
         close.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override

@@ -17,7 +17,8 @@
                             <String fx:value="minimizae"/>
                         </styleClass>
                     </Button>
-                    <Button fx:id="close" layoutX="1169.0" layoutY="10.0" mnemonicParsing="false" prefHeight="50.0"
+                    <Button fx:id="close" layoutX="1169.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity"
+                            minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0"
                             prefWidth="80.0" text="X">
                         <styleClass>
                             <String fx:value="control"/>

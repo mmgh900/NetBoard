@@ -90,6 +90,12 @@ public class Server extends User {
         if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_PLAY_TOGETHER)) {
             respondToPlayTogetherRespond(packet);
         }
+        if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
+            respondToAddFriend(packet);
+        }
+        if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
+            respondToAddFriendRespond(packet);
+        }
         if (packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
             updateOneClient((ClientProfile) packet.getContent());
         }
@@ -111,6 +117,43 @@ public class Server extends User {
         sendAllToAll();
         writeFile();
 
+    }
+
+    private void respondToAddFriendRespond(Packet packet) {
+        ClientProfile sender = null;
+        ClientProfile receiver = null;
+
+        for (ClientProfile cip : usersInSystem) {
+            if (packet.getSenderProfile().getUserInfo().getUsername().equalsIgnoreCase(cip.getUserInfo().getUsername())) {
+                sender = cip;
+            }
+            if (packet.getReceiverProfile().getUserInfo().getUsername().equalsIgnoreCase(cip.getUserInfo().getUsername())) {
+                receiver = cip;
+            }
+        }
+
+        if (packet.getContent().equals(true)) {
+            sender.getFriends().add(receiver);
+            sendOneToOne(sender);
+            receiver.getFriends().add(sender);
+            sendOneToOne(receiver);
+
+        }
+    }
+
+    private void respondToAddFriend(Packet packet) {
+        ClientProfile sender = null;
+        ClientProfile receiver = null;
+
+        for (ClientProfile cip : usersInSystem) {
+            if (packet.getSenderProfile().getUserInfo().getUsername().equalsIgnoreCase(cip.getUserInfo().getUsername())) {
+                sender = cip;
+            }
+            if (packet.getReceiverProfile().getUserInfo().getUsername().equalsIgnoreCase(cip.getUserInfo().getUsername())) {
+                receiver = cip;
+            }
+        }
+        connections.get(receiver).sendPacket(packet);
     }
 
     private void respondToChat(Packet packet) {

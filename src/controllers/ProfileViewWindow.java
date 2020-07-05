@@ -89,13 +89,13 @@ public class ProfileViewWindow extends Stage {
             startChat.setVisible(false);
 
         }
-        /*addFriend.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        addFriend.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 thisWindow.close();
-                viewer.connection.sendPacket(new Packet(viewer.userInfo, viewer, profile.getUserInfo(), Packet.PacketPropose.ADD_FRIEND_REQUEST));
+                viewer.connection.sendPacket(new Packet(viewer.userInfo, viewer.getClientProfile(), profile, Packet.PacketPropose.ADD_FRIEND_REQUEST));
             }
-        });*/
+        });
 
         startChat.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -112,7 +112,7 @@ public class ProfileViewWindow extends Stage {
             @Override
             public void handle(MouseEvent event) {
                 thisWindow.close();
-                viewer.connection.sendPacket(new Packet(viewer.userInfo, viewer, profile.getUserInfo(), Packet.PacketPropose.PLAY_TOGETHER_REQUEST));
+                viewer.connection.sendPacket(new Packet(viewer.userInfo, viewer.getClientProfile(), profile, Packet.PacketPropose.PLAY_TOGETHER_REQUEST));
             }
         });
 

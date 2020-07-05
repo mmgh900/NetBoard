@@ -42,11 +42,6 @@ public class DefaultWindow extends Stage {
         });
 
 
-
-        /*Image img = new Image(new File("/resources/Images/close.png").getPath());
-        stageControls.close.setGraphic(new ImageView(img));*/
-
-
         fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(new File("resources/FXMLFiles/Menu.fxml").toURL());
         Parent menuRoot = fxmlLoader.load();
@@ -146,6 +141,7 @@ public class DefaultWindow extends Stage {
         Parent controlParent = fxmlLoader.load();
         StageControls stageControls = fxmlLoader.getController();
         stageControls.setAppUser(appUser);
+
         VBox cBox = stageControls.CBox;
         return cBox;
     }
