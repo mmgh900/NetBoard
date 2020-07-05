@@ -11,7 +11,8 @@
         <children>
             <HBox alignment="TOP_RIGHT">
                 <children>
-                    <Button fx:id="minimize" mnemonicParsing="false" prefHeight="50.0" prefWidth="80.0" text="-">
+                    <Button fx:id="minimize" maxHeight="68.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="80.0"
+                            text="-">
                         <styleClass>
                             <String fx:value="control"/>
                             <String fx:value="minimizae"/>

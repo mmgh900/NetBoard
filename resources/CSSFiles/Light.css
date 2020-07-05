@@ -8,15 +8,19 @@
     -fx-font-weight: bold;
     -fx-background-radius: 45px;
     -fx-text-fill: white;
-    -fx-font-size: 30px;
+    -fx-font-size: 25px;
 }
 
 .button:hover {
     -fx-background-color: #4285f4;
 }
 
-.text-field {
-    -fx-pref-height: 55px;
+.label {
+    -fx-font-family: "Product Sans";
+}
+
+.form {
+    -fx-pref-height: 35px;
     -fx-background-color: #e6e6e6;
     -fx-background-radius: 45px;
     -fx-font-family: "Product Sans";
@@ -26,18 +30,8 @@
 }
 
 #chat {
-    -fx-pref-height: 40px;
-    -fx-font-size: 20px;
-
-}
-
-.text-field:hover {
-    -fx-background-color: #ebebeb;
-
-}
-
-.choice-box {
-    -fx-pref-height: 55px;
+    -fx-wrap-text: true;
+    -fx-pref-height: 35px;
     -fx-background-color: #e6e6e6;
     -fx-background-radius: 45px;
     -fx-font-family: "Product Sans";
@@ -45,13 +39,29 @@
     -fx-font-size: 20px;
 }
 
+.chat {
+    -fx-wrap-text: true;
+    -fx-pref-height: 35px;
+    -fx-background-color: #e6e6e6;
+    -fx-background-radius: 45px;
+    -fx-font-family: "Product Sans";
+    -fx-font-weight: bold;
+    -fx-font-size: 20px;
+}
+
+.text-field:hover {
+    -fx-background-color: #ebebeb;
+
+}
+
+
 .square {
     -fx-font-family: Arial;
     -fx-background-color: #1e1e1e;
     -fx-background-radius: 30px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
-    -fx-font-size: 70px;
+    -fx-font-size: 60px;
 }
 
 .square:hover {
@@ -202,11 +212,6 @@
     -fx-border: #f5f5f5;
 }
 
-.chat {
-    -fx-pref-height: inherit;
-    -fx-font-size: 20px;
-    -fx-wrap-text: true;
-}
 
 .control {
     -fx-background-color: transparent;

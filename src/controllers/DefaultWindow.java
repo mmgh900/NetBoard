@@ -18,14 +18,17 @@ import java.io.IOException;
 public class DefaultWindow extends Stage {
     public static String defaultStylesheet = "CssFiles/Light.css";
     private final Client client;
-    private final DefaultWindow thisWindow;
-    private final Scene gameScene;
-    private final Scene menuScene;
-    private final Scene loginScene;
-    private final GameSceneController gameSceneController;
-    private final MenuController menuController;
-    private final LoginController loginController;
 
+    private final DefaultWindow thisWindow;
+
+    private final Scene gameScene;
+    private final GameSceneController gameSceneController;
+
+    private final Scene menuScene;
+    private final MenuController menuController;
+
+    private final Scene loginScene;
+    private final LoginController loginController;
 
     FXMLLoader fxmlLoader = new FXMLLoader();
 

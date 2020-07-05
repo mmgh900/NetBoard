@@ -53,7 +53,7 @@
             <HBox prefHeight="36.0" prefWidth="355.0" spacing="10.0" style="-fx-background-color: BLACK;">
                <children>
                   <TextField id="chat" fx:id="textField" prefHeight="39.0" prefWidth="321.0" promptText="Text massage"
-                             style="-fx-pref-height: 30;"/>
+                             style="-fx-pref-height: 30;" styleClass="chat"/>
                   <Button id="smallButton" fx:id="send" mnemonicParsing="false" prefHeight="39.0" prefWidth="46.0">
                      <graphic>
                         <ImageView fitHeight="23.0" fitWidth="20.0">

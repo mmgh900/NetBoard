@@ -1,16 +1,15 @@
 package users;
 
-import Serlizables.*;
+import Serlizables.ClientProfile;
+import Serlizables.Packet;
+import Serlizables.ServerMassages;
+import Serlizables.Square;
 import controllers.DefaultWindow;
 import controllers.GetRespondWindow;
 import games.ClientGame;
 import games.GameWithUI;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.event.EventHandler;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
+import javafx.scene.control.Button;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
@@ -24,8 +23,6 @@ public class Client extends User implements Serializable {
     public GameWithUI game;
     private DefaultWindow window;
     private final Client thisClient = this;
-    private SignUpForm signUpForm;
-    private LoginForm loginForm;
     public Button mainMenu;
     public Text loginSceneMassage;
     private ArrayList<ClientProfile> otherPlayers;
@@ -39,10 +36,6 @@ public class Client extends User implements Serializable {
             e.printStackTrace();
         }
 
-        loginSceneMassage = window.getLoginController().massage;
-        loginSceneMassage.getStyleClass().add("massage");
-        loginSceneMassage.setText("");
-
         //this.loginForm = new LoginForm();
         //this.signUpForm = new SignUpForm();
         try {
@@ -52,7 +45,7 @@ public class Client extends User implements Serializable {
             new Thread(connection, "guest connection").start();
 
         } catch (IOException e) {
-            badNews("There was a problem in connecting to the server. Try again later");
+            window.getLoginController().badNews("There was a problem in connecting to the server. Try again later");
         }
         try {
             window.loadLoginScene();
@@ -141,14 +134,14 @@ public class Client extends User implements Serializable {
                     window.setTitle(clientProfile.getUsername());
                 }
             });
-            goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
+            window.getLoginController().goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
             try {
                 window.loadMenuScene();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            badNews(serverMassage.toString().toLowerCase().replace("_", " "));
+            window.getLoginController().badNews(serverMassage.toString().toLowerCase().replace("_", " "));
         }
     }
 
@@ -156,7 +149,7 @@ public class Client extends User implements Serializable {
         ServerMassages serverMassage = (ServerMassages) packet.getContent();
 
         if (serverMassage == ServerMassages.SIGN_UP_SUCCESSFUL) {
-            goodNews("Sign up successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
+            //window.getLoginController().goodNews("Sign up successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
@@ -169,7 +162,7 @@ public class Client extends User implements Serializable {
                 e.printStackTrace();
             }
         } else {
-            badNews(serverMassage.toString().toLowerCase().replace("_", " "));
+            window.getLoginController().badNews(serverMassage.toString().toLowerCase().replace("_", " "));
         }
     }
 
@@ -188,24 +181,6 @@ public class Client extends User implements Serializable {
             socket.close();
             connection.close();
         }
-
-    }
-
-    public void badNews(String s) {
-        String s1 = s.substring(0, 1).toUpperCase();
-        String massageCapitalized = s1 + s.substring(1).toLowerCase();
-
-        loginSceneMassage.setFill(Color.RED);
-        loginSceneMassage.setText(massageCapitalized);
-
-    }
-
-    public void goodNews(String s) {
-        String s1 = s.substring(0, 1).toUpperCase();
-        String massageCapitalized = s1 + s.substring(1).toLowerCase();
-
-        loginSceneMassage.setFill(Color.GREEN);
-        loginSceneMassage.setText(massageCapitalized);
 
     }
 
@@ -235,6 +210,10 @@ public class Client extends User implements Serializable {
         connection.sendPacket(new Packet(clientProfile, thisClient, Packet.PacketPropose.PROFILE_INFO));
     }
 
+    public void setClientProfile(ClientProfile clientProfile) {
+        this.clientProfile = clientProfile;
+    }
+
     public void logout() {
         if (socket != null) {
             connection.sendPacket(new Packet(clientProfile, clientProfile, Packet.PacketPropose.LOGOUT_REQUEST));
@@ -251,94 +230,9 @@ public class Client extends User implements Serializable {
         this.clientProfile = clientProfile;
     }
 
-    class SignUpForm {
-        public TextField firstNameField;
-        public TextField lastNameField;
-        public TextField usernameField;
-        public TextField emailField;
-        public TextField answerField;
-        public ChoiceBox choiceBox;
-        public PasswordField passwordField;
-        public PasswordField passwordConfirmField;
-        public Button signupButton;
-        EventHandler signUp = new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent event) {
-                String firstNameS = firstNameField.getText();
-                String lastNameS = lastNameField.getText();
-                String usernameS = usernameField.getText();
-                String passwordS = passwordField.getText();
-                String confirmPasswordS = passwordConfirmField.getText();
-                String emailS = emailField.getText();
-                String answerS = answerField.getText();
-                SecurityQuestions securityQuestionS = (SecurityQuestions) choiceBox.getValue();
-
-                if (firstNameS.isBlank() || lastNameS.isBlank() || usernameS.isBlank() || passwordS.isBlank() || confirmPasswordS.isBlank() || emailS.isBlank() || answerS.isBlank() || securityQuestionS == null) {
-                    badNews("Please fill all the text fields");
-                    return;
-                }
-                if (!passwordS.equals(confirmPasswordS)) {
-                    badNews("Passwords does not match.");
-                    return;
-                }
-
-                if (passwordS.length() < 8) {
-                    badNews("Password must be at least 8 characters");
-                    return;
-                }
-
-                if (!emailS.toLowerCase().contains("@") || !emailS.toLowerCase().contains(".")) {
-                    badNews("Invalid email");
-                    return;
-                }
-
-                clientProfile = new ClientProfile(firstNameS, lastNameS, usernameS, passwordS, securityQuestionS, answerS, emailS);
-
-                connection.sendPacket(new Packet(clientProfile, thisClient, Packet.PacketPropose.SIGN_UP_REQUEST));
-            }
-        };
-
-        public SignUpForm() {
-
-            firstNameField = (TextField) window.getLoginScene().lookup("#firstname");
-            lastNameField = (TextField) window.getLoginScene().lookup("#lastname");
-            usernameField = (TextField) window.getLoginScene().lookup("#username");
-
-            emailField = (TextField) window.getLoginScene().lookup("#email");
-            answerField = (TextField) window.getLoginScene().lookup("#answer");
-            choiceBox = (ChoiceBox) window.getLoginScene().lookup("#question");
-            passwordField = (PasswordField) window.getLoginScene().lookup("#password");
-            passwordConfirmField = (PasswordField) window.getLoginScene().lookup("#confirmpassword");
-            signupButton = (Button) window.getLoginScene().lookup("#signupButton");
-            signupButton.setOnMouseClicked(signUp);
-
-            choiceBox.setItems(FXCollections.observableArrayList(SecurityQuestions.WHAT_IS_THE_NAME_OF_YOUR_FAVORITE_CHILDHOOD_FRIEND, SecurityQuestions.WHAT_WAS_THE_LAST_NAME_OF_YOUR_THIRD_GRADE_TEACHER, SecurityQuestions.WHAT_WAS_THE_NAME_OF_YOUR_SECOND_PET, SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO));
-            choiceBox.setValue(SecurityQuestions.WHAT_IS_THE_NAME_OF_YOUR_FAVORITE_CHILDHOOD_FRIEND);
-            choiceBox.setTooltip(new Tooltip("Select a security question"));
 
 
-        }
 
-    }
-
-    class LoginForm {
-        public TextField usernameField;
-        public PasswordField passwordField;
-        public Button signupButton;
-        EventHandler login = new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent event) {
-                clientProfile = new ClientProfile(usernameField.getText(), passwordField.getText());
-                connection.sendPacket(new Packet(clientProfile, thisClient, Packet.PacketPropose.LOGIN_REQUEST));
-            }
-        };
-
-        public LoginForm() {
-            usernameField = (TextField) window.getLoginScene().lookup("#loginUsername");
-            passwordField = (PasswordField) window.getLoginScene().lookup("#loginPassword");
-            signupButton = (Button) window.getLoginScene().lookup("#loginButton");
-
-            signupButton.setOnMouseClicked(login);
-        }
-    }
 
 
 }
