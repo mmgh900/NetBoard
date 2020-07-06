@@ -192,6 +192,7 @@ public class Client extends User implements Serializable {
         }
         otherPlayers = (ArrayList) packet.getContent();
         otherPlayers.removeIf(cp -> cp.equals(clientProfile));
+        System.out.println(Server.ANSI_GREEN + "\t" + clientProfile.toString() + ": OTHER PLAYERS UPDATED" + ANSI_RESET);
 
         if (game != null && game instanceof ClientGame) {
             ClientGame clientGame = (ClientGame) game;
@@ -253,10 +254,6 @@ public class Client extends User implements Serializable {
     private void updateProfile(ClientProfile clientProfile) {
         this.clientProfile = clientProfile;
     }
-
-
-
-
 
 
 }

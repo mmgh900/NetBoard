@@ -25,7 +25,6 @@ public class ClientGame extends GameWithUI {
     private TabPane chats;
     private Button sendChat;
     private TextField textField;
-    private Client client;
 
     public ClientGame(Client client) {
         super(client);

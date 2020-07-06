@@ -14,6 +14,6 @@ public class ClientMain extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Client appUser = new Client();
+        Client client = new Client();
     }
 }
