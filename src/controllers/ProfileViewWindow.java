@@ -102,6 +102,7 @@ public class ProfileViewWindow extends Stage {
             public void handle(MouseEvent mouseEvent) {
                 thisWindow.close();
                 viewer.getClientProfile().getChats().add(new Chat(viewer.getClientProfile(), profile));
+                viewer.sendProfileToServer();
                 if (viewer.game instanceof ClientGame) {
                     ((ClientGame) viewer.game).update();
                 }

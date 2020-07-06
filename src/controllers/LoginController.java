@@ -10,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.net.URL;
@@ -31,6 +32,13 @@ public class LoginController extends StandardController implements Initializable
     public PasswordField confirmpassword;
     public Button signupButton;
     public Label massage;
+    public Label goToLogin;
+    public Label goToSignUp;
+    public Label goToForgetPassword;
+    public VBox loginForm;
+    public ScrollPane signupForm;
+
+
     EventHandler signUp = new EventHandler<MouseEvent>() {
         public void handle(MouseEvent event) {
             String firstNameS = firstname.getText();
@@ -69,13 +77,29 @@ public class LoginController extends StandardController implements Initializable
 
     EventHandler login = new EventHandler<MouseEvent>() {
         public void handle(MouseEvent event) {
-            ClientProfile clientProfile = new ClientProfile(loginUsername.getText(), loginPassword.getText());
-            client.connection.sendPacket(new Packet(clientProfile, client, Packet.PacketPropose.LOGIN_REQUEST));
+            client.setClientProfile(new ClientProfile(loginUsername.getText(), loginPassword.getText()));
+            client.connection.sendPacket(new Packet(client.getClientProfile(), client, Packet.PacketPropose.LOGIN_REQUEST));
         }
     };
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        signupForm.setVisible(true);
+        loginForm.setVisible(false);
+        goToLogin.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                signupForm.setVisible(false);
+                loginForm.setVisible(true);
+            }
+        });
+        goToSignUp.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                signupForm.setVisible(true);
+                loginForm.setVisible(false);
+            }
+        });
         loginButton.setOnMouseClicked(login);
         signupButton.setOnMouseClicked(signUp);
         question.setItems(FXCollections.observableArrayList(SecurityQuestions.WHAT_IS_THE_NAME_OF_YOUR_FAVORITE_CHILDHOOD_FRIEND, SecurityQuestions.WHAT_WAS_THE_LAST_NAME_OF_YOUR_THIRD_GRADE_TEACHER, SecurityQuestions.WHAT_WAS_THE_NAME_OF_YOUR_SECOND_PET, SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO));

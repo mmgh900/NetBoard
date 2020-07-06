@@ -1,9 +1,10 @@
 .root {
-    -fx-background-color: white;
+    -fx-background-color: null;
     -fx-font-family: "Product Sans";
 }
 
 .button {
+    -fx-cursor: hand;
     -fx-background-color: #1a73e8;
     -fx-font-weight: bold;
     -fx-background-radius: 45px;
@@ -12,11 +13,17 @@
 }
 
 .button:hover {
+    -fx-cursor: hand;
     -fx-background-color: #4285f4;
 }
 
-.label {
+.additional-options {
     -fx-font-family: "Product Sans";
+    -fx-font-weight: bold;
+}
+
+.additional-options:hover {
+    -fx-underline: true;
 }
 
 .form {
@@ -26,34 +33,51 @@
     -fx-font-family: "Product Sans";
     -fx-font-weight: bold;
     -fx-font-size: 20px;
-
 }
 
-#chat {
-    -fx-wrap-text: true;
-    -fx-pref-height: 35px;
-    -fx-background-color: #e6e6e6;
-    -fx-background-radius: 45px;
+.form-lable {
     -fx-font-family: "Product Sans";
     -fx-font-weight: bold;
     -fx-font-size: 20px;
+    -fx-text-fill: dimgrey;
 }
 
-.chat {
+.chatTextField {
     -fx-wrap-text: true;
     -fx-pref-height: 35px;
     -fx-background-color: #e6e6e6;
-    -fx-background-radius: 45px;
-    -fx-font-family: "Product Sans";
-    -fx-font-weight: bold;
     -fx-font-size: 20px;
 }
 
-.text-field:hover {
+.chatTextField:focused {
+    -fx-pref-height: 30px;
+    -fx-background-color: #ffffff;
+}
+
+.chatBox {
+    -fx-cursor: default;
+    -fx-font-weight: bold;
+    -fx-background-radius: 30px;
+    -fx-text-fill: white;
+    -fx-font-size: 25px;
+    -fx-wrap-text: true;
+}
+
+.chatBox:hover {
+    -fx-cursor: default;
+    -fx-font-weight: bold;
+    -fx-background-radius: 30px;
+    -fx-text-fill: white;
+    -fx-font-size: 25px;
+}
+
+
+.text-field {
     -fx-background-color: #ebebeb;
-
+    -fx-background-radius: 45px;
+    -fx-font-family: "Product Sans";
+    -fx-font-weight: bold;
 }
-
 
 .square {
     -fx-font-family: Arial;
@@ -67,20 +91,16 @@
 .square:hover {
     -fx-background-color: #1a73e8;
 }
-
 .massage {
-
     -fx-font-family: "Product Sans";
     -fx-font-weight: bold;
     -fx-font-size: 25px;
     -fx-font-weight: bold;
-
-
 }
 
 .scroll-pane {
-    -fx-background-color: white;
-    -fx-background: white;
+    -fx-background-color: transparent;
+    -fx-background: transparent;
 }
 
 .scroll-bar:horizontal .track,
@@ -135,9 +155,9 @@
     -fx-background-radius: 3em;
 }
 
-.split-pane {
+/*.split-pane {
     -fx-background-color: white;
-}
+}*/
 
 .split-pane .split-pane-divider {
     -fx-background-color: transparent;
@@ -163,11 +183,11 @@
 .tab {
 
     -fx-background-color: #0f0f0f;
-    -fx-pref-width: 150;
     -fx-pref-height: 40;
     -fx-font-size: 18;
     -fx-font-family: "Product Sans";
-    -fx-text-base-color: grey
+    -fx-text-base-color: white;
+    -fx-wrap-text: true;
 
 }
 

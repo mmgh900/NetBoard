@@ -17,6 +17,9 @@ import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import static users.Server.ANSI_PURPLE;
+import static users.Server.ANSI_RESET;
+
 
 public class Client extends User implements Serializable {
 
@@ -29,15 +32,10 @@ public class Client extends User implements Serializable {
     private ClientProfile clientProfile;
     private Socket socket;
 
-    public Client() {
-        try {
-            this.window = new DefaultWindow(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        //this.loginForm = new LoginForm();
-        //this.signUpForm = new SignUpForm();
+    public Client() {
+
+        boolean isConnectionFailed = false;
         try {
             socket = new Socket("localhost", PORT);
             //game = new games.ClientGame(appUser, games.Game.Player.PLAYER_O, connection);
@@ -45,6 +43,14 @@ public class Client extends User implements Serializable {
             new Thread(connection, "guest connection").start();
 
         } catch (IOException e) {
+            isConnectionFailed = true;
+        }
+        try {
+            this.window = new DefaultWindow(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (isConnectionFailed) {
             window.getLoginController().badNews("There was a problem in connecting to the server. Try again later");
         }
         try {
@@ -57,19 +63,12 @@ public class Client extends User implements Serializable {
 
     @Override
     public void receivePacket(Packet packet) {
-        System.out.println("I got a packet with this purpose: " + packet.getPropose().toString());
-        Packet.PacketPropose packetPropose = packet.getPropose();
-        if (packetPropose == Packet.PacketPropose.PROFILES_IN_SYSTEM) {
+        System.out.println(ANSI_PURPLE + clientProfile.toString() + ": received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
+        if (packet.getPropose().equals(Packet.PacketPropose.PROFILES_IN_SYSTEM)) {
             respondToProfilesInSystem(packet);
         }
         if (packet.getContent() instanceof ServerMassages) {
-            if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP)) {
-                respondToServerRespondToSignUp(packet);
-            }
-            if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_LOGIN)) {
-                ServerMassages serverMassage = (ServerMassages) packet.getContent();
-                respondToServerRespondToLogin(serverMassage);
-            }
+            respondToServerMassages(packet);
         }
         if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
             respondToProfileInfo(packet);
@@ -88,7 +87,24 @@ public class Client extends User implements Serializable {
         if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
             respondToUpdateGame(packet);
         }
+        if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
+            System.out.println();
+            updateProfile((ClientProfile) packet.getContent());
+            if (game instanceof ClientGame) {
+                ((ClientGame) game).updateChats();
+            }
+        }
 
+    }
+
+    private void respondToServerMassages(Packet packet) {
+        if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP)) {
+            respondToServerRespondToSignUp(packet);
+        }
+        if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_LOGIN)) {
+            ServerMassages serverMassage = (ServerMassages) packet.getContent();
+            respondToServerRespondToLogin(serverMassage);
+        }
     }
 
     private void respondToUpdateGame(Packet packet) {
@@ -167,8 +183,16 @@ public class Client extends User implements Serializable {
     }
 
     private void respondToProfilesInSystem(Packet packet) {
-        otherPlayers = (ArrayList<ClientProfile>) packet.getContent();
-        otherPlayers.removeIf(cp -> cp.getUsername().equals(clientProfile.getUsername()));
+        if (!(packet.getContent() instanceof ArrayList)) {
+            try {
+                throw new Exception("INVALID INFORMATION");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        otherPlayers = (ArrayList) packet.getContent();
+        otherPlayers.removeIf(cp -> cp.equals(clientProfile));
+
         if (game != null && game instanceof ClientGame) {
             ClientGame clientGame = (ClientGame) game;
             clientGame.update();

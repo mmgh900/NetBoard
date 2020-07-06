@@ -20,6 +20,7 @@ public class StageControls extends StandardController implements Initializable {
     public Button close;
     public Button minimize;
 
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 

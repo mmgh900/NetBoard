@@ -1,29 +1,20 @@
 package games;
 
-import Serlizables.*;
-import controllers.ChatBoxController;
+import Serlizables.Chat;
+import Serlizables.ClientProfile;
+import Serlizables.Packet;
+import Serlizables.Square;
 import controllers.GameSceneController;
 import controllers.ProfileViewWindow;
+import gui.elements.ChatTab;
 import gui.elements.SquareSkin;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.geometry.NodeOrientation;
-import javafx.geometry.Pos;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import users.Client;
 import users.Connection;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Date;
 
 public class ClientGame extends GameWithUI {
     private final Connection connection;
@@ -75,18 +66,17 @@ public class ClientGame extends GameWithUI {
         return getCurrentPlayer() == thisPlayer;
     }
 
-    private void updateOnlinesList() {
+    public void updateOnlinesList() {
         onlineContacts.getItems().clear();
         for (ClientProfile clientProfile : client.getOtherPlayers()) {
             if (clientProfile.getOnline()) {
                 onlineContacts.getItems().add(clientProfile);
             }
-
         }
         onlineContacts.refresh();
     }
 
-    private void updateFriendsList() {
+    public void updateFriendsList() {
         friends.getItems().clear();
         for (ClientProfile clientProfile : client.getClientProfile().getFriends()) {
             friends.getItems().add(clientProfile);
@@ -94,62 +84,41 @@ public class ClientGame extends GameWithUI {
         friends.refresh();
     }
 
-    private void updateChats() {
+    public void updateChats() {
+        chats.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+            @Override
+            public void changed(ObservableValue<? extends Tab> observableValue, Tab tab, Tab t1) {
+                if (tab != null && t1 != null) {
+                    System.out.println("Changed from" + tab.getText() + " to " + t1.getText());
+                    makeItZaro(t1);
+                }
+
+            }
+        });
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 chats.getTabs().clear();
                 for (Chat chat : client.getClientProfile().getChats()) {
-                    ClientProfile otherOne = null;
-                    if (chat.getMembers().get(0).equals(client.getClientProfile())) {
-                        otherOne = chat.getMembers().get(1);
-                        chat.setName(chat.getMembers().get(1).getUsername().toLowerCase());
-                    } else if (chat.getMembers().get(1).equals(client.getClientProfile())) {
-                        otherOne = chat.getMembers().get(0);
-                        chat.setName(chat.getMembers().get(0).getUsername().toLowerCase());
-                    }
-                    AnchorPane anchorPane = null;
-                    FXMLLoader fxmlLoader = new FXMLLoader();
-                    ChatBoxController chatBoxController = null;
-                    try {
-                        fxmlLoader.setLocation(new File("resources/FXMLFiles/ChatBox.fxml").toURL());
-                        anchorPane = fxmlLoader.load();
-                        chatBoxController = fxmlLoader.getController();
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    Tab tab = new Tab(chat.getName());
-                    tab.setContent(anchorPane);
-                    chats.getTabs().add(tab);
-                    VBox massages = chatBoxController.massages;
-                    massages.getChildren().clear();
-                    for (Massage massage : chat.getMassages()) {
-                        massages.getChildren().add(newMassageBox(massage, client.getClientProfile()));
-                    }
-                    ChatBoxController chatBoxController1 = chatBoxController;
-                    ClientProfile otherOne1 = otherOne;
-                    chatBoxController.send.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent mouseEvent) {
-                            String text = chatBoxController1.textField.getText();
-                            if (!text.isBlank()) {
-                                Massage massage = new Massage(client.getClientProfile(), new Date(), chatBoxController1.textField.getText());
-                                /*chat.getMassages().add(massage);
-                                if (appUser.game instanceof ClientGame) {
-                                    ((ClientGame) appUser.game).updateChats();
-                                }
-                                client.sendProfileToServer();
-                                updateChats();*/
-                                client.connection.sendPacket(new Packet(massage, client.getClientProfile(), otherOne1, Packet.PacketPropose.CHAT));
-                            }
+                    ChatTab foundTab = null;
+                    for (Tab tab : chats.getTabs()) {
+                        if (tab instanceof ChatTab && ((ChatTab) tab).getChat().equals(chat)) {
+                            foundTab = (ChatTab) tab;
                         }
-                    });
+                    }
+                    if (foundTab == null) {
+                        foundTab = new ChatTab(chat, client);
+                        chats.getTabs().add(foundTab);
+                    }
+                    foundTab.refreshMassages(chat);
                 }
             }
         });
+    }
+
+    private void makeItZaro(Tab t1) {
+        ChatTab tab = (ChatTab) t1;
+        ((ChatTab) t1).readAll();
     }
 
     public void update() {
@@ -158,32 +127,6 @@ public class ClientGame extends GameWithUI {
         updateFriendsList();
     }
 
-    public HBox newMassageBox(Massage massage, ClientProfile clientProfile) {
-        HBox hBox = new HBox();
-        hBox.setSpacing(5);
-        hBox.setPadding(new Insets(5, 10, 5, 10));
-        hBox.setPrefWidth(395);
-        Button button = new Button();
-        button.setWrapText(true);
-        button.setText(massage.getContent());
-        Text text = new Text(massage.getDate().getHours() + ":" + massage.getDate().getMinutes());
-        button.getStyleClass().add("chat");
-
-        hBox.getChildren().add(button);
-        button.getStyleClass().add("chat");
-        hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.getChildren().add(text);
-        if (massage.getSender().equals(clientProfile)) {
-            hBox.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-
-        } else {
-            hBox.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-            button.setStyle("-fx-background-color: dimgray");
-        }
-
-
-        return hBox;
-    }
 
     private void initializeTabs() {
         chats = GameSceneController.chatsStatic;

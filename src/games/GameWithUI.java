@@ -14,7 +14,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
-import users.Client;
 
 import java.io.IOException;
 
@@ -24,7 +23,7 @@ public abstract class GameWithUI extends Game {
     protected Scene gameScene;
     protected GridPane board;
 
-    protected Client client;
+    protected Cli appUser;
     protected Text massage;
 
     protected Text playerXname;
@@ -37,9 +36,9 @@ public abstract class GameWithUI extends Game {
     protected Circle playerOsign;
     protected SquareSkin[][] squareSkins = new SquareSkin[3][3];
 
-    public GameWithUI(Client client) {
+    public GameWithUI(AppUser appUser) {
         super();
-        this.client = client;
+        this.appUser = appUser;
         this.massage = GameSceneController.massageStatic;
         playerXname = GameSceneController.playerXnameStatic;
         playerOname = GameSceneController.playerOnameStatic;
@@ -48,7 +47,7 @@ public abstract class GameWithUI extends Game {
             @Override
             public void handle(MouseEvent event) {
                 try {
-                    client.getWindow().loadMenuScene();
+                    appUser.window.loadMenuScene();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -69,7 +68,7 @@ public abstract class GameWithUI extends Game {
         repaintBoard();
         board.setDisable(false);
         try {
-            client.getWindow().loadGameScene();
+            appUser.window.loadGameScene();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,10 +120,10 @@ public abstract class GameWithUI extends Game {
     public void makeUI() throws Exception {
         squareSkins = new SquareSkin[3][3];
 
-        gameScene = client.getWindow().getGameScene();
+        gameScene = appUser.window.getGameScene();
         massage.setText("");
 
-        //SplitPane splitPane = (SplitPane) client.getWindow().getGameScene().lookup("#boardContainer");
+        //SplitPane splitPane = (SplitPane) appUser.window.getGameScene().lookup("#boardContainer");
         board = GameSceneController.boardStatic;
         //board.resize(WIDTH, HEIGHT);
         for (int i = 0; i < 3; i++) {

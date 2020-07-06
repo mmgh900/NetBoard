@@ -16,6 +16,28 @@ public class Chat implements Serializable {
         this.members = new ArrayList<>();
         members.add(member1);
         members.add(member2);
+        name = member2.getFirstName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Chat))
+            return false;
+        Chat chat = (Chat) o;
+        boolean allMembersAreTheSame = true;
+        for (int i = 0; i < chat.members.size(); i++) {
+            if (!chat.members.get(i).equals(this.members.get(i))) {
+                allMembersAreTheSame = false;
+            }
+        }
+        return getName().equals(chat.getName()) && allMembersAreTheSame;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getMembers());
     }
 
     public String getName() {
@@ -26,20 +48,6 @@ public class Chat implements Serializable {
         this.name = name;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Chat))
-            return false;
-        Chat chat = (Chat) o;
-        return getMembers().equals(chat.getMembers());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getMembers());
-    }
 
     public ArrayList<Massage> getMassages() {
         return massages;

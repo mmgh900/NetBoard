@@ -35,7 +35,7 @@ public class Server extends User {
         if (!file.exists()) {
             throw new Exception("Couldn't find file");
         }
-        //addSampleClients();
+        addSampleClients();
 
         readFile();
         for (ClientProfile clientProfile : usersInSystem) {
@@ -50,6 +50,7 @@ public class Server extends User {
     private void addSampleClients() {
         addUserToSystem(new ClientProfile("Mohammad Mahdi", "Gheysari", "m", "", SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "gheysari.mm@gmail.com"));
         addUserToSystem(new ClientProfile("Reza", "Ahmadi", "r", "", SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "reaza@gmail.com"));
+        addUserToSystem(new ClientProfile("Kambiz", "Dirbaz", "k", "", SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "reaza@gmail.com"));
     }
 
     private void addToList(ClientProfile clientProfile) {
@@ -169,10 +170,10 @@ public class Server extends User {
         ClientProfile receiver = null;
 
         for (ClientProfile cip : usersInSystem) {
-            if (packet.getSenderProfile().getUsername().equalsIgnoreCase(cip.getUsername())) {
+            if (packet.getSenderProfile().equals(cip)) {
                 sender = cip;
             }
-            if (packet.getReceiverProfile().getUsername().equalsIgnoreCase(cip.getUsername())) {
+            if (packet.getReceiverProfile().equals(cip)) {
                 receiver = cip;
             }
         }
@@ -188,28 +189,19 @@ public class Server extends User {
 
         Chat foundChat = null;
         for (Chat chat : target.getChats()) {
-            for (ClientProfile cp : chat.getMembers()) {
-                if (cp.equals(target)) {
-                    foundChat = chat;
-                }
+            if (chat.getMembers().get(0).equals(target) && chat.getMembers().get(1).equals(otherOne)) {
+                foundChat = chat;
             }
         }
 
         if (foundChat == null) {
             foundChat = new Chat(target, otherOne);
+            foundChat.setName(otherOne.getFirstName());
             target.getChats().add(foundChat);
         }
-        int size = foundChat.getMassages().size();
+
         foundChat.getMassages().add(massage);
-        for (Chat chat : target.getChats()) {
-            for (ClientProfile cp : chat.getMembers()) {
-                if (cp.equals(target)) {
-                    int index = target.getChats().indexOf(chat);
-                    target.getChats().set(index, foundChat);
-                }
-            }
-        }
-        sendOneToOne(target);
+        sendOneToOne(target, Packet.PacketPropose.CHAT);
 
     }
 
@@ -243,12 +235,20 @@ public class Server extends User {
 
     }
 
+    private void sendOneToOne(ClientProfile clientProfile, Packet.PacketPropose customPurpose) {
+        Connection foundConnection = connections.get(clientProfile);
+        if (clientProfile.getOnline() && foundConnection != null) {
+            foundConnection.sendPacket(new Packet(clientProfile, this, customPurpose));
+        }
+
+    }
+
     private void respondToLoginRequest(ClientProfile clientProfile) {
         System.out.println("A login request received");
         ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
         ClientProfile foundClient = null;
         for (ClientProfile cip : usersInSystem) {
-            if (clientProfile.getUsername().equalsIgnoreCase(cip.getUsername())) {
+            if (clientProfile.equals(cip)) {
                 foundClient = cip;
             }
         }
@@ -256,10 +256,12 @@ public class Server extends User {
             serverMassage = ServerMassages.USERNAME_NOT_FOUND;
         } else {
             if (clientProfile.getPassword().equals(foundClient.getPassword())) {
+
                 usersInSystem.get(usersInSystem.indexOf(foundClient)).setOnline(true);
                 serverMassage = ServerMassages.LOGIN_SUCCESSFUL;
                 connections.put(foundClient, connection);
                 sendOneToOne(foundClient);
+
             } else {
                 serverMassage = ServerMassages.WRONG_PASSWORD;
                 System.out.println("getPassword() was: " + foundClient.getPassword() + "but client entered: " + clientProfile.getPassword());
@@ -273,19 +275,20 @@ public class Server extends User {
         ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
         ClientProfile foundClient = null;
         for (ClientProfile cip : usersInSystem) {
-            if (clientProfile.getUsername().equalsIgnoreCase(cip.getUsername())) {
+            if (clientProfile.equals(cip)) {
                 foundClient = cip;
             }
         }
         if (foundClient != null) {
             serverMassage = ServerMassages.USERNAME_ALREADY_EXISTS;
         } else {
-            clientProfile.setOnline(true);
             addUserToSystem(clientProfile);
+            respondToLoginRequest(clientProfile);
+
+            /*clientProfile.setOnline(true);
             serverMassage = ServerMassages.SIGN_UP_SUCCESSFUL;
             connections.put(foundClient, connection);
-
-            sendOneToOne(clientProfile);
+            sendOneToOne(clientProfile);*/
         }
         connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP));
     }
@@ -307,6 +310,7 @@ public class Server extends User {
         if (foundClient == null) {
             serverMassage = ServerMassages.USERNAME_NOT_FOUND;
         } else {
+            connections.remove(foundClient);
             usersInSystem.get(usersInSystem.indexOf(foundClient)).setOnline(false);
             serverMassage = ServerMassages.LOGOUT_SUCCESSFUL;
 
@@ -364,11 +368,7 @@ public class Server extends User {
         try ( // Create an input stream for file clientProfiles.dat
               ObjectInputStream input = new ObjectInputStream(new FileInputStream(file))) {
             usersInSystem = (ArrayList<ClientProfile>) (input.readObject());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
