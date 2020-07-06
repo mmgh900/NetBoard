@@ -35,31 +35,6 @@ public class FrostyTech extends Application {
         launch(args);
     }
 
-    @Override
-    public void start(Stage stage) {
-        layout.getChildren().setAll(background, createContent());
-        layout.setStyle("-fx-background-color: null");
-
-        Scene scene = new Scene(layout, 200, 300, Color.TRANSPARENT);
-
-        Platform.setImplicitExit(false);
-
-        scene.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2)
-                Platform.exit();
-        });
-        makeSmoke(stage);
-
-        stage.initStyle(StageStyle.TRANSPARENT);
-        stage.setScene(scene);
-        stage.show();
-
-        background.setImage(copyBackground(stage));
-        background.setEffect(frostEffect);
-
-        makeDraggable(stage, layout);
-    }
-
     // copy a background node to be frozen over.
     private Image copyBackground(Stage stage) {
         final int X = (int) stage.getX();
@@ -90,6 +65,31 @@ public class FrostyTech extends Application {
         label.setWrapText(true);
 
         return label;
+    }
+
+    @Override
+    public void start(Stage stage) {
+        layout.getChildren().setAll(background, createContent());
+        layout.setStyle("-fx-background-color: null");
+
+        Scene scene = new Scene(layout, 200, 300, Color.TRANSPARENT);
+
+        Platform.setImplicitExit(false);
+
+        scene.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2)
+                Platform.exit();
+        });
+        makeSmoke(stage);
+
+        stage.initStyle(StageStyle.TRANSPARENT);
+        stage.setScene(scene);
+        stage.show();
+
+        background.setImage(copyBackground(stage));
+        background.setEffect(frostEffect);
+
+        makeDraggable(stage, layout);
     }
 
     // makes a stage draggable using a given node.

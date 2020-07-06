@@ -234,7 +234,6 @@ public class Server extends User {
         }
 
     }
-
     private void sendOneToOne(ClientProfile clientProfile, Packet.PacketPropose customPurpose) {
         Connection foundConnection = connections.get(clientProfile);
         if (clientProfile.getOnline() && foundConnection != null) {
@@ -285,10 +284,6 @@ public class Server extends User {
             addUserToSystem(clientProfile);
             respondToLoginRequest(clientProfile);
 
-            /*clientProfile.setOnline(true);
-            serverMassage = ServerMassages.SIGN_UP_SUCCESSFUL;
-            connections.put(foundClient, connection);
-            sendOneToOne(clientProfile);*/
         }
         connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP));
     }

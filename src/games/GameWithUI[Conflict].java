@@ -1,3 +1,4 @@
+/*
 package games;
 
 import Serlizables.ClientProfile;
@@ -139,7 +140,7 @@ public abstract class GameWithUI extends Game {
 
                     @Override
                     public void handle(javafx.scene.input.MouseEvent event) {
-                        /*System.out.println("I'm clicked...");
+System.out.println("I'm clicked...");
 
                           double normalSize = square.getHeight();
                       timeline.getKeyFrames().addAll(
@@ -158,7 +159,8 @@ public abstract class GameWithUI extends Game {
                         );
 
                         // play 40s of animation
-                        timeline.play();*/
+                        timeline.play();
+
                         handleClick(event);
 
                     }
@@ -223,3 +225,4 @@ public abstract class GameWithUI extends Game {
         }
     }
 }
+*/
