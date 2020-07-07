@@ -60,6 +60,7 @@ public class ChatTab extends Tab {
             if (!text.isBlank()) {
                 Massage massage = new Massage(client.getClientProfile(), new Date(), chatBoxController.textField.getText());
                 client.connection.sendPacket(new Packet(massage, client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.CHAT));
+                chatBoxController.textField.clear();
             }
         }
     };

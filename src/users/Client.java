@@ -146,9 +146,9 @@ public class Client extends User implements Serializable {
 
     private void respondToProfileInfo(Packet packet) {
         updateProfile((ClientProfile) packet.getContent());
-        if (game instanceof ClientGame) {
-            game.update();
-        }
+        game = new ClientGame(this);
+        //game.update();
+        game.initializeChats();
     }
 
     private void respondToServerRespondToLogin(ServerMassages serverMassage) {
@@ -196,12 +196,7 @@ public class Client extends User implements Serializable {
         otherPlayers.removeIf(cp -> cp.equals(clientProfile));
         System.out.println(Server.ANSI_GREEN + "\t" + clientProfile.toString() + ": OTHER PLAYERS UPDATED" + ANSI_RESET);
 
-        if (game != null && game instanceof ClientGame) {
-            ClientGame clientGame = (ClientGame) game;
-            clientGame.updateOnlinesList();
-        } else if (game == null) {
-            game = new ClientGame(thisClient);
-        }
+        game.updateOnlinesList();
     }
 
     @Override

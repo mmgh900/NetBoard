@@ -119,7 +119,7 @@ public abstract class GameWithUI extends Game {
         int numberOfServerChats = clientProfile.getChats().size();
 
         if (numberOfLocalChats == numberOfServerChats) {
-            System.out.println(ANSI_RED + "\t" + clientProfile.toString() + "numberOfLocalChats= " + numberOfLocalChats + " numberOfServerChats= " + numberOfServerChats + " so no chat added" + ANSI_RESET);
+            //System.out.println(ANSI_RED + "\t" + clientProfile.toString() + "numberOfLocalChats= " + numberOfLocalChats + " numberOfServerChats= " + numberOfServerChats + " so no chat added" + ANSI_RESET);
         } else if (numberOfServerChats < numberOfLocalChats) {
             try {
                 throw new Exception("ERROR: SERVER CHATS MUST BE MORE THAN LOCAL CHATS");
@@ -129,11 +129,15 @@ public abstract class GameWithUI extends Game {
         }
 
         for (int i = numberOfLocalChats; i < numberOfServerChats; i++) {
-            client.getClientProfile().getChats().add(clientProfile.getChats().get(i));
-            addChatTab(clientProfile.getChats().get(i));
+            Chat chat = clientProfile.getChats().get(i);
+            client.getClientProfile().getChats().add(chat);
+            addChatTab(chat);
+            for (Massage massage : clientProfile.getChats().get(i).getMassages()) {
+                addMassageToChat(massage, chat, client.getClientProfile().getChats().indexOf(chat));
+            }
         }
 
-        for (int i = 0; i < numberOfServerChats; i++) {
+        for (int i = 0; i < numberOfLocalChats; i++) {
             System.out.println("im in");
             int numberOfLocalMassages = client.getClientProfile().getChats().get(i).getMassages().size();
             int numberOfServerMassages = clientProfile.getChats().get(i).getMassages().size();
@@ -142,7 +146,7 @@ public abstract class GameWithUI extends Game {
                 for (int j = numberOfLocalMassages; j < numberOfServerMassages; j++) {
                     client.getClientProfile().getChats().get(i).getMassages().add(clientProfile.getChats().get(i).getMassages().get(j));
                     addMassageToChat(clientProfile.getChats().get(i).getMassages().get(j), client.getClientProfile().getChats().get(i), i);
-                    System.out.println(ANSI_RED + "\t" + clientProfile.toString() + "numberOfLocalMassages= " + numberOfLocalMassages + " numberOfServerMassages= " + numberOfServerMassages + " so massage added" + ANSI_RESET);
+                    //System.out.println(ANSI_RED + "\t" + clientProfile.toString() + "numberOfLocalMassages= " + numberOfLocalMassages + " numberOfServerMassages= " + numberOfServerMassages + " so massage added" + ANSI_RESET);
                 }
             } else if (numberOfLocalMassages == numberOfServerMassages) {
                 System.out.println(ANSI_RED + "\t" + clientProfile.toString() + "numberOfLocalMassages= " + numberOfLocalMassages + " numberOfServerMassages= " + numberOfServerMassages + " so NO massage added" + ANSI_RESET);
@@ -155,7 +159,7 @@ public abstract class GameWithUI extends Game {
         }
     }
 
-    private void initializeChats() {
+    public void initializeChats() {
         for (Chat chat : client.getClientProfile().getChats()) {
             addChatTab(chat);
             for (Massage massage : chat.getMassages()) {

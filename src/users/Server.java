@@ -171,22 +171,24 @@ public class Server extends User {
     }
 
     private void respondToChat(Packet packet) {
-        ClientProfile sender = null;
-        ClientProfile receiver = null;
+        if (packet.getContent() instanceof Massage) {
+            Massage massage = (Massage) packet.getContent();
+            ClientProfile sender = null;
+            ClientProfile receiver = null;
 
-        for (ClientProfile cip : usersInSystem) {
-            if (packet.getSenderProfile().equals(cip)) {
-                sender = cip;
+            for (ClientProfile cip : usersInSystem) {
+                if (packet.getSenderProfile().equals(cip)) {
+                    sender = cip;
+                }
+                if (packet.getReceiverProfile().equals(cip)) {
+                    receiver = cip;
+                }
             }
-            if (packet.getReceiverProfile().equals(cip)) {
-                receiver = cip;
-            }
+
+            getMassage(massage, sender, receiver);
+            getMassage(massage, receiver, sender);
         }
 
-        Massage massage = (Massage) packet.getContent();
-
-        getMassage(massage, sender, receiver);
-        getMassage(massage, receiver, sender);
 
     }
 

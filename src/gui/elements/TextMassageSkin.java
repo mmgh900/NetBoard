@@ -23,8 +23,8 @@ public class TextMassageSkin extends HBox {
         this.massage = massage;
 
         this.setSpacing(5);
-        this.setPadding(new Insets(5, 10, 5, 10));
-        this.setPrefWidth(350);
+        this.setPadding(new Insets(5, 15, 5, 15));
+        this.setPrefWidth(395);
         this.setAlignment(Pos.CENTER_LEFT);
 
         massageBox.getStyleClass().remove("button");
