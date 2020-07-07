@@ -49,6 +49,7 @@ public class GetRespondWindow extends Stage {
         this.initStyle(StageStyle.UNDECORATED);
         this.initModality(Modality.APPLICATION_MODAL);
         this.setScene(scene);
+
         this.show();
     }
 

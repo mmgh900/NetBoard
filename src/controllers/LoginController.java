@@ -3,6 +3,7 @@ package controllers;
 import Serlizables.ClientProfile;
 import Serlizables.Packet;
 import Serlizables.SecurityQuestions;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
@@ -108,22 +109,32 @@ public class LoginController extends StandardController implements Initializable
 
     public void badNews(String s) {
 
-        String s1 = s.substring(0, 1).toUpperCase();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                String s1 = s.substring(0, 1).toUpperCase();
                 String massageCapitalized = s1 + s.substring(1).toLowerCase();
 
                 massage.setTextFill(Color.RED);
                 massage.setText(massageCapitalized);
+            }
+        });
 
 
     }
 
     public void goodNews(String s) {
 
-        String s1 = s.substring(0, 1).toUpperCase();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                String s1 = s.substring(0, 1).toUpperCase();
                 String massageCapitalized = s1 + s.substring(1).toLowerCase();
 
                 massage.setTextFill(Color.GREEN);
                 massage.setText(massageCapitalized);
+            }
+        });
 
 
     }

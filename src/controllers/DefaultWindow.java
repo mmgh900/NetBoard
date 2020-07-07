@@ -29,6 +29,7 @@ import users.Client;
 import java.io.File;
 import java.io.IOException;
 
+
 public class DefaultWindow extends Stage {
     public static String defaultStylesheet = "CssFiles/Light.css";
     private final Client client;

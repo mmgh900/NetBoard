@@ -10,6 +10,7 @@ import gui.elements.ChatTab;
 import gui.elements.SquareSkin;
 import gui.elements.TextMassageSkin;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -188,17 +189,29 @@ public abstract class GameWithUI extends Game {
     }
 
     public void addMassageToChat(Massage massage, Chat chat, int chatIndex) {
-        ChatTab chatTab = (ChatTab) chats.getTabs().get(chatIndex);
-        boolean isSelf = (massage.getSender().equals(client.getClientProfile()));
-        chatTab.getMassages().getChildren().add(new TextMassageSkin(isSelf, massage));
-        if (!chatTab.getTabPane().getSelectionModel().getSelectedItem().equals(chatTab)) {
-            chatTab.addUnReadMassages();
-        }
-        chatTab.getChatBoxController().scrollPane.setVvalue(1.0);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                ChatTab chatTab = (ChatTab) chats.getTabs().get(chatIndex);
+                boolean isSelf = (massage.getSender().equals(client.getClientProfile()));
+                chatTab.getMassages().getChildren().add(new TextMassageSkin(isSelf, massage));
+                if (!chatTab.getTabPane().getSelectionModel().getSelectedItem().equals(chatTab)) {
+                    chatTab.addUnReadMassages();
+                }
+                chatTab.getChatBoxController().scrollPane.setVvalue(1.0);
+            }
+        });
+
     }
 
     public void addChatTab(Chat chat) {
-        chats.getTabs().add(new ChatTab(chat, client));
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                chats.getTabs().add(new ChatTab(chat, client));
+            }
+        });
+
     }
 
     private void initializeTabs() {
@@ -380,28 +393,34 @@ public abstract class GameWithUI extends Game {
     }
 
     public void repaintBoard() {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                board.getChildren().clear();
 
-        board.getChildren().clear();
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        Button button = new Button();
+                        if (squares[i][j].getState() == Player.PLAYER_X) {
+                            squareSkins[i][j].setText("X");
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                Button button = new Button();
-                if (squares[i][j].getState() == Player.PLAYER_X) {
-                    squareSkins[i][j].setText("X");
+                        } else if (squares[i][j].getState() == Player.PLAYER_O) {
+                            squareSkins[i][j].setText("O");
+                        }
 
-                } else if (squares[i][j].getState() == Player.PLAYER_O) {
-                    squareSkins[i][j].setText("O");
+                        squareSkins[i][j].setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+                            @Override
+                            public void handle(javafx.scene.input.MouseEvent event) {
+                                handleClick(event);
+                            }
+                        });
+                        board.add(squareSkins[i][j], i, j);
+                    }
                 }
 
-                squareSkins[i][j].setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
-                    @Override
-                    public void handle(javafx.scene.input.MouseEvent event) {
-                        handleClick(event);
-                    }
-                });
-                board.add(squareSkins[i][j], i, j);
             }
-        }
+        });
+
 
     }
 

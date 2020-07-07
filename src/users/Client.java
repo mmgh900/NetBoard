@@ -64,7 +64,7 @@ public class Client extends User implements Serializable {
 
     @Override
     public void receivePacket(Packet packet) {
-        Platform.runLater(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 System.out.println(ANSI_PURPLE + clientProfile.toString() + ": received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
@@ -103,9 +103,7 @@ public class Client extends User implements Serializable {
                     }*/
                 }
             }
-        });
-
-
+        }, "Respond to " + packet.getPropose().toString().toLowerCase()).start();
     }
 
 
@@ -137,8 +135,13 @@ public class Client extends User implements Serializable {
             connection.sendPacket(new Packet(false, packet.getSenderProfile(), this.getClientProfile(), respondPlayTogether));
             return true;
         } else {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
+                }
+            });
 
-            new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
 
         }
         return false;
@@ -153,7 +156,13 @@ public class Client extends User implements Serializable {
 
     private void respondToServerRespondToLogin(ServerMassages serverMassage) {
         if (serverMassage == ServerMassages.LOGIN_SUCCESSFUL) {
-            window.setTitle(clientProfile.getUsername());
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    window.setTitle(clientProfile.getUsername());
+                }
+            });
+
             window.getLoginController().goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
             try {
                 window.loadMenuScene();
@@ -196,6 +205,8 @@ public class Client extends User implements Serializable {
         otherPlayers.removeIf(cp -> cp.equals(clientProfile));
         System.out.println(Server.ANSI_GREEN + "\t" + clientProfile.toString() + ": OTHER PLAYERS UPDATED" + ANSI_RESET);
 
+        while (game == null) {
+        }
         game.updateOnlinesList();
     }
 
