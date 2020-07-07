@@ -7,7 +7,6 @@ public abstract class Game {
 
     final static int WIDTH = 600;
     final static int HEIGHT = 600;
-    protected GameModes gameMode;
     protected Square[][] squares = new Square[3][3];
     private Player currentPlayer;
 
@@ -16,7 +15,6 @@ public abstract class Game {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 squares[i][j] = new Square(i, j);
-
             }
         }
         currentPlayer = Player.PLAYER_X;
@@ -74,10 +72,6 @@ public abstract class Game {
 
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
-    }
-
-    public enum GameModes {
-        SINGLE_PLAYER, TWO_PLAYERS_ONE_CLIENT, ONLINE
     }
 
     public enum Player {

@@ -10,7 +10,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import services.UpdateSingleChatService;
 import users.Client;
 
 import java.io.File;
@@ -74,7 +73,7 @@ public class ChatTab extends Tab {
         thisChatTab = this;
         this.chat = chat;
         this.setUserData(chat);
-        new UpdateSingleChatService(this, chat.getMassages(), client).start();
+        //new UpdateSingleChatService(this, chat.getMassages(), client).start();
 /*        for (Massage massage : chat.getMassages()) {
             boolean exists = false;
             for (Node node : massages.getChildren()) {

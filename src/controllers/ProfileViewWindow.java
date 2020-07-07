@@ -3,7 +3,6 @@ package controllers;
 import Serlizables.Chat;
 import Serlizables.ClientProfile;
 import Serlizables.Packet;
-import games.ClientGame;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -101,11 +100,11 @@ public class ProfileViewWindow extends Stage {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 thisWindow.close();
-                viewer.getClientProfile().getChats().add(new Chat(viewer.getClientProfile(), profile));
+                Chat newChat = new Chat(viewer.getClientProfile(), profile);
+                viewer.getClientProfile().getChats().add(newChat);
+                viewer.game.addChatTab(newChat);
                 viewer.sendProfileToServer();
-                if (viewer.game instanceof ClientGame) {
-                    ((ClientGame) viewer.game).update();
-                }
+                viewer.game.update();
             }
         });
 

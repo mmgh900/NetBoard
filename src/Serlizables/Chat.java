@@ -17,10 +17,12 @@ public class Chat implements Serializable {
             @Override
             public boolean add(Massage massage) {
                 boolean result = super.add(massage);
-                lastMassage = massage.getDate();
+                System.out.println("something added:" + massage.getContent());
+                //lastMassage = massage.getDate();
                 return result;
             }
         };
+        System.out.println("nothing has added:" + massages.size());
         this.members = new ArrayList<>();
         this.lastMassage = new Date();
         members.add(member1);

@@ -8,7 +8,6 @@ import users.Client;
 public class TwoPlayerGame extends GameWithUI {
     public TwoPlayerGame(Client client) {
         super(client);
-        gameMode = GameModes.TWO_PLAYERS_ONE_CLIENT;
 
     }
 

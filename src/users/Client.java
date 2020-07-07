@@ -92,17 +92,22 @@ public class Client extends User implements Serializable {
                     respondToUpdateGame(packet);
                 }
                 if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
-                    System.out.println();
-                    updateProfile((ClientProfile) packet.getContent());
-                    if (game instanceof ClientGame) {
+
+                    ClientProfile updateProfile = (ClientProfile) packet.getContent();
+                    game.updateChats(updateProfile);
+                    clientProfile = updateProfile;
+
+
+                    /*if (game instanceof ClientGame) {
                         ((ClientGame) game).updateChats();
-                    }
+                    }*/
                 }
             }
         });
 
 
     }
+
 
     private void respondToServerMassages(Packet packet) {
         if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP)) {
@@ -142,7 +147,7 @@ public class Client extends User implements Serializable {
     private void respondToProfileInfo(Packet packet) {
         updateProfile((ClientProfile) packet.getContent());
         if (game instanceof ClientGame) {
-            ((ClientGame) game).update();
+            game.update();
         }
     }
 
