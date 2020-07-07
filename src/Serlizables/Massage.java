@@ -2,6 +2,7 @@ package Serlizables;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 public class Massage implements Serializable {
     private ClientProfile sender;
@@ -15,6 +16,21 @@ public class Massage implements Serializable {
         this.sender = sender;
         this.date = date;
         this.content = content;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Massage))
+            return false;
+        Massage massage = (Massage) o;
+        return getSender().equals(massage.getSender()) && getDate().equals(massage.getDate()) && getContent().equals(massage.getContent());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getSender(), getDate(), getContent());
     }
 
     public ClientProfile getSender() {

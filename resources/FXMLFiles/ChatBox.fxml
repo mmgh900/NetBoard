@@ -17,7 +17,7 @@
             style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <ScrollPane hbarPolicy="NEVER" hvalue="1.0" vbarPolicy="NEVER" vvalue="1.0">
+            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" hvalue="1.0" vvalue="1.0">
                <content>
                   <VBox fx:id="massages" alignment="CENTER"/>
                </content>

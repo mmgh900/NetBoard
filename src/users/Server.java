@@ -80,14 +80,19 @@ public class Server extends User {
         if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGOUT_REQUEST)) {
             ClientProfile clientProfile = (ClientProfile) packet.getContent();
             respondToLogoutRequest(clientProfile);
+            sendAllToAll();
         }
         if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGIN_REQUEST)) {
             ClientProfile clientProfile = (ClientProfile) packet.getContent();
             respondToLoginRequest(clientProfile);
+            sendAllToAll();
+            writeFile();
         }
         if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.SIGN_UP_REQUEST)) {
             ClientProfile clientProfile = (ClientProfile) packet.getContent();
             respondToSignUpRequest(clientProfile);
+            sendAllToAll();
+            writeFile();
         }
         if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
             respondToPlayTogetherRequest(packet);
@@ -103,17 +108,17 @@ public class Server extends User {
         }
         if (packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
             updateOneClient((ClientProfile) packet.getContent());
+            sendAllToAll();
+            writeFile();
         }
         if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
             respondToUpdateGame(packet);
         }
         if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
             respondToChat(packet);
+            writeFile();
         }
 
-
-        sendAllToAll();
-        writeFile();
 
     }
 

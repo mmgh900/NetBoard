@@ -16,7 +16,7 @@ public class TextMassageSkin extends HBox {
     private final Massage massage;
     private final Button massageBox = new Button();
     private final Label date = new Label();
-    private final DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+    private final DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy hh:mm");
 
     public TextMassageSkin(boolean isFromSelf, Massage massage) {
         this.isFromSelf = isFromSelf;
@@ -24,7 +24,7 @@ public class TextMassageSkin extends HBox {
 
         this.setSpacing(5);
         this.setPadding(new Insets(5, 10, 5, 10));
-        this.setPrefWidth(395);
+        this.setPrefWidth(350);
         this.setAlignment(Pos.CENTER_LEFT);
 
         massageBox.getStyleClass().remove("button");
@@ -42,6 +42,8 @@ public class TextMassageSkin extends HBox {
             this.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
             this.setStyle("-fx-background-color: dimgrey");
         }
+
+
     }
 
     public boolean isFromSelf() {

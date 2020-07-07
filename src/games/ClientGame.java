@@ -67,10 +67,17 @@ public class ClientGame extends GameWithUI {
     }
 
     public void updateOnlinesList() {
-        onlineContacts.getItems().clear();
         for (ClientProfile clientProfile : client.getOtherPlayers()) {
-            if (clientProfile.getOnline()) {
+            ClientProfile foundClient = null;
+            for (ClientProfile clientProfile1 : onlineContacts.getItems()) {
+                if (clientProfile.equals(clientProfile1)) {
+                    foundClient = clientProfile1 = clientProfile;
+                }
+            }
+            if (foundClient == null && clientProfile.getOnline()) {
                 onlineContacts.getItems().add(clientProfile);
+            } else if (clientProfile != null && !clientProfile.getOnline()) {
+                onlineContacts.getItems().remove(foundClient);
             }
         }
         onlineContacts.refresh();
@@ -89,31 +96,27 @@ public class ClientGame extends GameWithUI {
             @Override
             public void changed(ObservableValue<? extends Tab> observableValue, Tab tab, Tab t1) {
                 if (tab != null && t1 != null) {
-                    System.out.println("Changed from" + tab.getText() + " to " + t1.getText());
+                    //System.out.println("Changed from" + tab.getText() + " to " + t1.getText());
                     makeItZaro(t1);
                 }
 
             }
         });
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                chats.getTabs().clear();
-                for (Chat chat : client.getClientProfile().getChats()) {
-                    ChatTab foundTab = null;
-                    for (Tab tab : chats.getTabs()) {
-                        if (tab instanceof ChatTab && ((ChatTab) tab).getChat().equals(chat)) {
-                            foundTab = (ChatTab) tab;
-                        }
-                    }
-                    if (foundTab == null) {
-                        foundTab = new ChatTab(chat, client);
-                        chats.getTabs().add(foundTab);
-                    }
-                    foundTab.refreshMassages(chat);
+
+
+        for (Chat chat : client.getClientProfile().getChats()) {
+            ChatTab foundTab = null;
+            for (Tab tab : chats.getTabs()) {
+                if (tab instanceof ChatTab && ((ChatTab) tab).getChat().equals(chat)) {
+                    foundTab = (ChatTab) tab;
                 }
             }
-        });
+            if (foundTab == null) {
+                foundTab = new ChatTab(chat, client);
+                chats.getTabs().add(foundTab);
+            }
+            foundTab.refreshMassages(chat);
+        }
     }
 
     private void makeItZaro(Tab t1) {
@@ -131,13 +134,18 @@ public class ClientGame extends GameWithUI {
     private void initializeTabs() {
         chats = GameSceneController.chatsStatic;
         contacts = GameSceneController.contactsStatic;
+        chats.getTabs().clear();
         updateChats();
-        contacts.getTabs().clear();
-        Tab onlineClientsTab = new Tab("Onlines");
-        Tab friendsTab = new Tab("Friends");
 
-        friends = new ListView<>();
-        onlineContacts = new ListView<>();
+
+        contacts.getTabs().clear();
+
+        Tab friendsTab = new Tab("Friends");
+        Tab onlineClientsTab = new Tab("Onlines");
+
+
+        friends = new ListView<ClientProfile>();
+        onlineContacts = new ListView<ClientProfile>();
 
         onlineContacts.setCellFactory(lv -> {
             ListCell<ClientProfile> cell = new ListCell<ClientProfile>() {
@@ -148,7 +156,6 @@ public class ClientGame extends GameWithUI {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-
                             if (item != null) {
                                 setText(item.getUsername());
                             }
@@ -173,7 +180,6 @@ public class ClientGame extends GameWithUI {
 
             return cell;
         });
-
         friends.setCellFactory(lv -> {
             ListCell<ClientProfile> cell = new ListCell<ClientProfile>() {
 
@@ -213,9 +219,8 @@ public class ClientGame extends GameWithUI {
         onlineClientsTab.setContent(onlineContacts);
         friendsTab.setContent(friends);
 
-        contacts.getTabs().add(friendsTab);
         contacts.getTabs().add(onlineClientsTab);
-        //onlineContacts.getItems().add(me);
+        contacts.getTabs().add(friendsTab);
     }
 
     public void updateGame(Square[][] squares) {

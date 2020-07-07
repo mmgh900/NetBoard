@@ -196,7 +196,7 @@ public class Client extends User implements Serializable {
 
         if (game != null && game instanceof ClientGame) {
             ClientGame clientGame = (ClientGame) game;
-            clientGame.update();
+            clientGame.updateOnlinesList();
         }
     }
 
