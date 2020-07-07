@@ -10,6 +10,8 @@ import gui.elements.ChatTab;
 import gui.elements.SquareSkin;
 import gui.elements.TextMassageSkin;
 import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -174,7 +176,7 @@ public abstract class GameWithUI extends Game {
     }
 */
 
-    private void makeItZaro(Tab t1) {
+    private void makeItZero(Tab t1) {
         ChatTab tab = (ChatTab) t1;
         ((ChatTab) t1).readAll();
     }
@@ -189,6 +191,10 @@ public abstract class GameWithUI extends Game {
         ChatTab chatTab = (ChatTab) chats.getTabs().get(chatIndex);
         boolean isSelf = (massage.getSender().equals(client.getClientProfile()));
         chatTab.getMassages().getChildren().add(new TextMassageSkin(isSelf, massage));
+        if (!chatTab.getTabPane().getSelectionModel().getSelectedItem().equals(chatTab)) {
+            chatTab.addUnReadMassages();
+        }
+        chatTab.getChatBoxController().scrollPane.setVvalue(1.0);
     }
 
     public void addChatTab(Chat chat) {
@@ -197,6 +203,16 @@ public abstract class GameWithUI extends Game {
 
     private void initializeTabs() {
         chats = GameSceneController.chatsStatic;
+        chats.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+            @Override
+            public void changed(ObservableValue<? extends Tab> observableValue, Tab tab, Tab t1) {
+                if (tab != null && t1 != null) {
+                    //System.out.println("Changed from" + tab.getText() + " to " + t1.getText());
+                    makeItZero(t1);
+                }
+
+            }
+        });
         contacts = GameSceneController.contactsStatic;
         chats.getTabs().clear();
         initializeChats();

@@ -24,6 +24,7 @@ public class ChatTab extends Tab {
     private ChatBoxController chatBoxController;
     private int unReadMassages = 0;
     private Date lastUpdate;
+
     public ChatTab(Chat chat, Client client) {
 
         //this.setStyle("-fx-pref-width: 250");
@@ -67,33 +68,13 @@ public class ChatTab extends Tab {
 
     public void addUnReadMassages() {
         unReadMassages++;
-        setText(chat.getName() + "(" + unReadMassages + ")");
+        setText(chat.getName() + "(" + unReadMassages + " UNREAD)");
     }
 
     public void refreshMassages(Chat chat) {
         thisChatTab = this;
         this.chat = chat;
         this.setUserData(chat);
-        //new UpdateSingleChatService(this, chat.getMassages(), client).start();
-/*        for (Massage massage : chat.getMassages()) {
-            boolean exists = false;
-            for (Node node : massages.getChildren()) {
-                if (node instanceof TextMassageSkin && ((TextMassageSkin) node).getMassage().equals(massage)) {
-                    exists = true;
-                }
-            }
-            if (!exists) {
-                boolean isSelf = (massage.getSender().equals(client.getClientProfile()));
-                massages.getChildren().add(new TextMassageSkin(isSelf, massage));
-                if (getTabPane() != null && !getTabPane().getSelectionModel().getSelectedItem().equals(thisChatTab)) {
-                    unReadMassages++;
-                    setText(chat.getName() + "(" + unReadMassages + ")");
-                }
-                chatBoxController.scrollPane.setVvalue(1.0);
-            }
-
-        }*/
-
     }
 
     public Chat getChat() {
@@ -135,4 +116,6 @@ public class ChatTab extends Tab {
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
+
+
 }

@@ -66,13 +66,4 @@ public class UpdateChatService extends Service<ArrayList<ChatTab>> {
 }
 
 
-                /*chats.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Tab> observableValue, Tab tab, Tab t1) {
-                        if (tab != null && t1 != null) {
-                            //System.out.println("Changed from" + tab.getText() + " to " + t1.getText());
-                            makeItZaro(t1);
-                        }
 
-                    }
-                });*/
