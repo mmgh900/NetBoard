@@ -9,11 +9,20 @@ public class Chat implements Serializable {
     protected String name;
     protected ArrayList<Massage> massages;
     protected ArrayList<ClientProfile> members;
+    protected Date lastMassage;
 
 
     public Chat(ClientProfile member1, ClientProfile member2) {
-        this.massages = new ArrayList<>();
+        this.massages = new ArrayList<>() {
+            @Override
+            public boolean add(Massage massage) {
+                boolean result = super.add(massage);
+                lastMassage = massage.getDate();
+                return result;
+            }
+        };
         this.members = new ArrayList<>();
+        this.lastMassage = new Date();
         members.add(member1);
         members.add(member2);
         name = member2.getFirstName();
@@ -65,7 +74,11 @@ public class Chat implements Serializable {
         this.members = members;
     }
 
-    public void addMassage(String text, ClientProfile sender) {
-        massages.add(new Massage(sender, new Date(), text));
+    public Date getLastMassage() {
+        return lastMassage;
+    }
+
+    public void setLastMassage(Date lastMassage) {
+        this.lastMassage = lastMassage;
     }
 }

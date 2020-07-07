@@ -47,6 +47,7 @@ public class Client extends User implements Serializable {
         }
         try {
             this.window = new DefaultWindow(this);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,37 +64,43 @@ public class Client extends User implements Serializable {
 
     @Override
     public void receivePacket(Packet packet) {
-        System.out.println(ANSI_PURPLE + clientProfile.toString() + ": received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
-        if (packet.getPropose().equals(Packet.PacketPropose.PROFILES_IN_SYSTEM)) {
-            respondToProfilesInSystem(packet);
-        }
-        if (packet.getContent() instanceof ServerMassages) {
-            respondToServerMassages(packet);
-        }
-        if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
-            respondToProfileInfo(packet);
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
-            if (respondToRequests(packet, Packet.PacketPropose.RESPOND_PLAY_TOGETHER))
-                return;
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
-            if (respondToRequests(packet, Packet.PacketPropose.RESPOND_ADD_FRIEND))
-                return;
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.START_GAME)) {
-            respondToStartGame(packet);
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
-            respondToUpdateGame(packet);
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
-            System.out.println();
-            updateProfile((ClientProfile) packet.getContent());
-            if (game instanceof ClientGame) {
-                ((ClientGame) game).updateChats();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(ANSI_PURPLE + clientProfile.toString() + ": received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
+                if (packet.getPropose().equals(Packet.PacketPropose.PROFILES_IN_SYSTEM)) {
+                    respondToProfilesInSystem(packet);
+                }
+                if (packet.getContent() instanceof ServerMassages) {
+                    respondToServerMassages(packet);
+                }
+                if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
+                    respondToProfileInfo(packet);
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
+                    if (respondToRequests(packet, Packet.PacketPropose.RESPOND_PLAY_TOGETHER))
+                        return;
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
+                    if (respondToRequests(packet, Packet.PacketPropose.RESPOND_ADD_FRIEND))
+                        return;
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.START_GAME)) {
+                    respondToStartGame(packet);
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
+                    respondToUpdateGame(packet);
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
+                    System.out.println();
+                    updateProfile((ClientProfile) packet.getContent());
+                    if (game instanceof ClientGame) {
+                        ((ClientGame) game).updateChats();
+                    }
+                }
             }
-        }
+        });
+
 
     }
 
@@ -125,12 +132,9 @@ public class Client extends User implements Serializable {
             connection.sendPacket(new Packet(false, packet.getSenderProfile(), this.getClientProfile(), respondPlayTogether));
             return true;
         } else {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
-                }
-            });
+
+            new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
+
         }
         return false;
     }
@@ -144,12 +148,7 @@ public class Client extends User implements Serializable {
 
     private void respondToServerRespondToLogin(ServerMassages serverMassage) {
         if (serverMassage == ServerMassages.LOGIN_SUCCESSFUL) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    window.setTitle(clientProfile.getUsername());
-                }
-            });
+            window.setTitle(clientProfile.getUsername());
             window.getLoginController().goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
             try {
                 window.loadMenuScene();
@@ -166,12 +165,10 @@ public class Client extends User implements Serializable {
 
         if (serverMassage == ServerMassages.SIGN_UP_SUCCESSFUL) {
             //window.getLoginController().goodNews("Sign up successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    window.setTitle(clientProfile.getUsername());
-                }
-            });
+
+
+            window.setTitle(clientProfile.getUsername());
+
             try {
                 window.loadMenuScene();
             } catch (IOException e) {
@@ -197,6 +194,8 @@ public class Client extends User implements Serializable {
         if (game != null && game instanceof ClientGame) {
             ClientGame clientGame = (ClientGame) game;
             clientGame.updateOnlinesList();
+        } else if (game == null) {
+            game = new ClientGame(thisClient);
         }
     }
 

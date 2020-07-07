@@ -206,6 +206,7 @@ public class Server extends User {
         }
 
         foundChat.getMassages().add(massage);
+        foundChat.setLastMassage(massage.getDate());
         sendOneToOne(target, Packet.PacketPropose.CHAT);
 
     }

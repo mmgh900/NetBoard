@@ -1,6 +1,5 @@
 package games;
 
-import Serlizables.Chat;
 import Serlizables.ClientProfile;
 import Serlizables.Packet;
 import Serlizables.Square;
@@ -8,11 +7,9 @@ import controllers.GameSceneController;
 import controllers.ProfileViewWindow;
 import gui.elements.ChatTab;
 import gui.elements.SquareSkin;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import services.UpdateChatService;
 import users.Client;
 import users.Connection;
 
@@ -34,6 +31,7 @@ public class ClientGame extends GameWithUI {
         setCurrentPlayer(Player.NONE);
         this.thisPlayer = thisPlayer;
         this.connection = client.connection;
+        this.client = client;
         initializeTabs();
 
 
@@ -92,7 +90,8 @@ public class ClientGame extends GameWithUI {
     }
 
     public void updateChats() {
-        chats.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+        new UpdateChatService(chats, client).start();
+/*        chats.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
             @Override
             public void changed(ObservableValue<? extends Tab> observableValue, Tab tab, Tab t1) {
                 if (tab != null && t1 != null) {
@@ -116,7 +115,7 @@ public class ClientGame extends GameWithUI {
                 chats.getTabs().add(foundTab);
             }
             foundTab.refreshMassages(chat);
-        }
+        }*/
     }
 
     private void makeItZaro(Tab t1) {
@@ -153,27 +152,16 @@ public class ClientGame extends GameWithUI {
                 @Override
                 protected void updateItem(ClientProfile item, boolean empty) {
                     super.updateItem(item, empty);
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (item != null) {
-                                setText(item.getUsername());
-                            }
-                        }
-                    });
+                    if (item != null) {
+                        setText(item.getUsername());
+                    }
                 }
             };
             cell.setOnMouseClicked(e -> {
                 if (!cell.isEmpty()) {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
                             if (e.getClickCount() == 2) {
                                 new ProfileViewWindow(client, cell.getItem());
                             }
-
-                        }
-                    });
                     e.consume();
                 }
             });
@@ -186,28 +174,18 @@ public class ClientGame extends GameWithUI {
                 @Override
                 protected void updateItem(ClientProfile item, boolean empty) {
                     super.updateItem(item, empty);
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
 
                             if (item != null) {
                                 setText(item.getUsername());
                             }
-                        }
-                    });
                 }
             };
             cell.setOnMouseClicked(e -> {
                 if (!cell.isEmpty()) {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
                             if (e.getClickCount() == 2) {
                                 new ProfileViewWindow(client, cell.getItem());
                             }
 
-                        }
-                    });
                     e.consume();
                 }
             });

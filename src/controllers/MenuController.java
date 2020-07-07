@@ -10,6 +10,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -28,11 +29,26 @@ public class MenuController extends StandardController implements Initializable 
         public void handle(MouseEvent event) {
             if (event.getSource() == singleplayer) {
                 client.game = new SingleplayerGame(client);
+                try {
+                    client.getWindow().loadGameScene();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else if (event.getSource() == multiplayer) {
                 client.game = new TwoPlayerGame(client);
+                try {
+                    client.getWindow().loadGameScene();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else if (event.getSource() == online) {
                 client.game = new ClientGame(client);
                 ((ClientGame) client.game).update();
+                try {
+                    client.getWindow().loadGameScene();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     };

@@ -5,7 +5,6 @@ import Serlizables.SecurityQuestions;
 import controllers.GameSceneController;
 import gui.elements.SquareSkin;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -68,11 +67,7 @@ public abstract class GameWithUI extends Game {
         }
         repaintBoard();
         board.setDisable(false);
-        try {
-            client.getWindow().loadGameScene();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override
@@ -172,10 +167,8 @@ public abstract class GameWithUI extends Game {
     }
 
     public void repaintBoard() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                board.getChildren().clear();
+
+        board.getChildren().clear();
 
                 for (int i = 0; i < 3; i++) {
                     for (int j = 0; j < 3; j++) {
@@ -196,8 +189,7 @@ public abstract class GameWithUI extends Game {
                         board.add(squareSkins[i][j], i, j);
                     }
                 }
-            }
-        });
+
     }
 
     @Override

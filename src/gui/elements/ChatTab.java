@@ -4,14 +4,13 @@ import Serlizables.Chat;
 import Serlizables.Massage;
 import Serlizables.Packet;
 import controllers.ChatBoxController;
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import services.UpdateSingleChatService;
 import users.Client;
 
 import java.io.File;
@@ -25,17 +24,7 @@ public class ChatTab extends Tab {
     private final Client client;
     private ChatBoxController chatBoxController;
     private int unReadMassages = 0;
-    EventHandler<MouseEvent> sendMassage = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
-            String text = chatBoxController.textField.getText();
-            if (!text.isBlank()) {
-                Massage massage = new Massage(client.getClientProfile(), new Date(), chatBoxController.textField.getText());
-                client.connection.sendPacket(new Packet(massage, client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.CHAT));
-            }
-        }
-    };
-
+    private Date lastUpdate;
     public ChatTab(Chat chat, Client client) {
 
         //this.setStyle("-fx-pref-width: 250");
@@ -44,6 +33,7 @@ public class ChatTab extends Tab {
         this.setText(chat.getName());
         this.client = client;
         this.setUserData(chat);
+        this.lastUpdate = new Date();
         FXMLLoader chatBoxLoader = new FXMLLoader();
         AnchorPane anchorPane = null;
 
@@ -64,11 +54,28 @@ public class ChatTab extends Tab {
 
     }
 
+    EventHandler<MouseEvent> sendMassage = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent mouseEvent) {
+            String text = chatBoxController.textField.getText();
+            if (!text.isBlank()) {
+                Massage massage = new Massage(client.getClientProfile(), new Date(), chatBoxController.textField.getText());
+                client.connection.sendPacket(new Packet(massage, client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.CHAT));
+            }
+        }
+    };
+
+    public void addUnReadMassages() {
+        unReadMassages++;
+        setText(chat.getName() + "(" + unReadMassages + ")");
+    }
+
     public void refreshMassages(Chat chat) {
         thisChatTab = this;
         this.chat = chat;
         this.setUserData(chat);
-        for (Massage massage : chat.getMassages()) {
+        new UpdateSingleChatService(this, chat.getMassages(), client).start();
+/*        for (Massage massage : chat.getMassages()) {
             boolean exists = false;
             for (Node node : massages.getChildren()) {
                 if (node instanceof TextMassageSkin && ((TextMassageSkin) node).getMassage().equals(massage)) {
@@ -85,7 +92,7 @@ public class ChatTab extends Tab {
                 chatBoxController.scrollPane.setVvalue(1.0);
             }
 
-        }
+        }*/
 
     }
 
@@ -98,14 +105,34 @@ public class ChatTab extends Tab {
     }
 
     public void readAll() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                unReadMassages = 0;
-                setText(chat.getName());
-            }
-        });
+
+        unReadMassages = 0;
+        setText(chat.getName());
+
 
     }
 
+    public ChatTab getThisChatTab() {
+        return thisChatTab;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public ChatBoxController getChatBoxController() {
+        return chatBoxController;
+    }
+
+    public int getUnReadMassages() {
+        return unReadMassages;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
 }
