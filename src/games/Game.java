@@ -24,28 +24,27 @@ public abstract class Game {
 
     protected Player checkResult() {
         if (squares[0][0].getState() != Player.NONE && squares[0][0].getState() == squares[0][1].getState() && squares[0][0].getState() == squares[0][2].getState()) {
-            currentPlayer = Player.NONE;
+
             return squares[0][0].getState();
         } else if (squares[1][0].getState() != Player.NONE && squares[1][0].getState() == squares[1][1].getState() && squares[1][0].getState() == squares[1][2].getState()) {
-            currentPlayer = Player.NONE;
+
             return squares[1][0].getState();
         } else if (squares[2][0].getState() != Player.NONE && squares[2][0].getState() == squares[2][1].getState() && squares[2][0].getState() == squares[2][2].getState()) {
-            currentPlayer = Player.NONE;
+
             return squares[2][0].getState();
         } else if (squares[0][0].getState() != Player.NONE && squares[0][0].getState() == squares[1][0].getState() && squares[0][0].getState() == squares[2][0].getState()) {
-            currentPlayer = Player.NONE;
+
             return squares[0][0].getState();
         } else if (squares[0][1].getState() != Player.NONE && squares[0][1].getState() == squares[1][1].getState() && squares[0][1].getState() == squares[2][1].getState()) {
-            currentPlayer = Player.NONE;
+
             return squares[0][1].getState();
         } else if (squares[0][2].getState() != Player.NONE && squares[0][2].getState() == squares[1][2].getState() && squares[0][2].getState() == squares[2][2].getState()) {
-            currentPlayer = Player.NONE;
+
             return squares[0][2].getState();
         } else if (squares[0][0].getState() != Player.NONE && squares[0][0].getState() == squares[1][1].getState() && squares[0][0].getState() == squares[2][2].getState()) {
-            currentPlayer = Player.NONE;
+
             return squares[0][0].getState();
         } else if (squares[0][2].getState() != Player.NONE && squares[0][2].getState() == squares[1][1].getState() && squares[0][2].getState() == squares[2][0].getState()) {
-            currentPlayer = Player.NONE;
             return squares[0][2].getState();
         }
 

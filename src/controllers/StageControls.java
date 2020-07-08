@@ -34,9 +34,7 @@ public class StageControls extends StandardController implements Initializable {
         close.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (client != null) {
-                    client.logout();
-                }
+                client.logout();
                 Stage stage = (Stage) close.getScene().getWindow();
                 stage.close();
             }

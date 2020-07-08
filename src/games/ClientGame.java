@@ -3,7 +3,9 @@ package games;
 import Serlizables.ClientProfile;
 import Serlizables.Packet;
 import Serlizables.Square;
+import controllers.ProfileViewWindow;
 import gui.elements.SquareSkin;
+import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import users.Client;
 
@@ -33,8 +35,32 @@ public class ClientGame extends GameWithUI {
         }
     }
 
+    protected void setPlayersInfo(ClientProfile playerXProfile, ClientProfile playerOProfile) {
+        playerOname.setText(playerOProfile.getFirstName());
+        playerXname.setText(playerXProfile.getFirstName());
+        playerOusername.setText("@" + playerOProfile.getUsername().toLowerCase());
+        playerXusername.setText("@" + playerXProfile.getUsername().toLowerCase());
+        client.getWindow().getGameController().playerXViewProfile.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                new ProfileViewWindow(client, playerXProfile);
+            }
+        });
+        client.getWindow().getGameController().playerOViewProfile.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                new ProfileViewWindow(client, playerOProfile);
+            }
+        });
+    }
+
     public void startGame(ClientProfile playerX, ClientProfile playerO) {
-        setPlayersInfo(playerX.getFirstName(), playerO.getFirstName(), "@" + playerX.getUsername().toLowerCase(), "@" + playerO.getUsername().toLowerCase());
+        try {
+            makeUI();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        setPlayersInfo(playerX, playerO);
         board.setDisable(false);
         if (playerX.getUsername().toLowerCase().equals(client.getClientProfile().getUsername().toLowerCase())) {
             thisPlayer = Player.PLAYER_X;

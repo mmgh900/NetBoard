@@ -4,7 +4,6 @@ import Serlizables.Chat;
 import Serlizables.ClientProfile;
 import Serlizables.Massage;
 import Serlizables.SecurityQuestions;
-import controllers.GameController;
 import controllers.ProfileViewWindow;
 import gui.elements.ChatTab;
 import gui.elements.SquareSkin;
@@ -22,8 +21,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import users.Client;
-
-import java.io.IOException;
 
 import static users.Server.ANSI_RED;
 import static users.Server.ANSI_RESET;
@@ -57,25 +54,13 @@ public abstract class GameWithUI extends Game {
     public GameWithUI(Client client) {
         super();
         this.client = client;
-        this.massage = GameController.massageStatic;
-        playerXname = GameController.playerXnameStatic;
-        playerOname = GameController.playerOnameStatic;
-
-        GameController.mainMenuButtonStatic.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                try {
-                    client.getWindow().loadMenuScene();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        playerXusername = GameController.playerXusernameStatic;
-        playerOusername = GameController.playerOusernameStatic;
-
-        playerXsign = GameController.playerXsignStatic;
-        playerOsign = GameController.playerOsignStatic;
+        this.massage = client.getWindow().getGameController().massage;
+        playerXname = client.getWindow().getGameController().playerXname;
+        playerOname = client.getWindow().getGameController().playerOname;
+        playerXusername = client.getWindow().getGameController().playerXusername;
+        playerOusername = client.getWindow().getGameController().playerOusername;
+        playerXsign = client.getWindow().getGameController().playerXsign;
+        playerOsign = client.getWindow().getGameController().playerOsign;
 
         try {
             makeUI();
@@ -170,12 +155,7 @@ public abstract class GameWithUI extends Game {
             }
         }
     }
-/*
-    public void updateChats() {
-        //new UpdateChatService(chats, client).start();
 
-    }
-*/
 
     private void makeItZero(Tab t1) {
         ChatTab tab = (ChatTab) t1;
@@ -215,7 +195,7 @@ public abstract class GameWithUI extends Game {
     }
 
     private void initializeTabs() {
-        chats = GameController.chatsStatic;
+        chats = client.getWindow().getGameController().chats;
 
         ChangeListener<Tab> tabChangeListener = new ChangeListener<Tab>() {
             @Override
@@ -231,7 +211,7 @@ public abstract class GameWithUI extends Game {
 
         chats.getSelectionModel().selectedItemProperty().addListener(tabChangeListener);
 
-        contacts = GameController.contactsStatic;
+        contacts = client.getWindow().getGameController().contacts;
         chats.getTabs().clear();
         initializeChats();
         //updateChats();
@@ -299,10 +279,15 @@ public abstract class GameWithUI extends Game {
 
         contacts.getTabs().add(onlineClientsTab);
         contacts.getTabs().add(friendsTab);
+
+        if (!(this instanceof ClientGame)) {
+            contacts.setDisable(true);
+        }
     }
 
     @Override
     void doAboutResult(Player result) {
+        setCurrentPlayer(Player.NONE);
         if (result != null) {
             board.setDisable(true);
         }
@@ -340,6 +325,8 @@ public abstract class GameWithUI extends Game {
         playerXname.setText(xName);
         playerOusername.setText(oUsername);
         playerXusername.setText(xUsername);
+        client.getWindow().getGameController().playerXViewProfile.setVisible(false);
+        client.getWindow().getGameController().playerOViewProfile.setVisible(false);
     }
 
     abstract void handleClick(MouseEvent mouseEvent);
@@ -349,10 +336,7 @@ public abstract class GameWithUI extends Game {
 
         gameScene = client.getWindow().getGameScene();
         massage.setText("");
-
-        //SplitPane splitPane = (SplitPane) client.getWindow().getGameScene().lookup("#boardContainer");
-        board = GameController.boardStatic;
-        //board.resize(WIDTH, HEIGHT);
+        board = client.getWindow().getGameController().board;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -397,6 +381,8 @@ public abstract class GameWithUI extends Game {
 
                         } else if (squares[i][j].getState() == Player.PLAYER_O) {
                             squareSkins[i][j].setText("O");
+                        } else if (squares[i][j].getState() == Player.NONE) {
+                            squareSkins[i][j].setText("");
                         }
 
                         squareSkins[i][j].setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {

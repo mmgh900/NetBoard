@@ -4,6 +4,7 @@ import Serlizables.Chat;
 import Serlizables.ClientProfile;
 import Serlizables.Packet;
 import games.ClientGame;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -141,5 +142,15 @@ public class ProfileViewWindow extends Stage {
         this.initModality(Modality.APPLICATION_MODAL);
         this.setScene(profileScene);
         this.show();
+    }
+
+    public ProfileViewWindow(Client viewer, ClientProfile profile, Boolean isInGameScene) {
+        this(viewer, profile);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                playTogether.setVisible(false);
+            }
+        });
     }
 }
