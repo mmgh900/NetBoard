@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -31,7 +32,7 @@ public class ProfileViewWindow extends Stage {
     private final Button close;
 
     private final Text username;
-    private final Text name;
+    private final Label name;
     private final Text onlineWins;
     private final Text onlineLosses;
     private final Text singleWins;
@@ -55,7 +56,7 @@ public class ProfileViewWindow extends Stage {
         profileScene = new Scene(profileRoot, 800, 600);
         profileScene.getStylesheets().add(DefaultWindow.defaultStylesheet);
 
-        name = (Text) profileScene.lookup("#name");
+        name = (Label) profileScene.lookup("#name");
         username = (Text) profileScene.lookup("#username");
         onlineWins = (Text) profileScene.lookup("#onlineWins");
         onlineLosses = (Text) profileScene.lookup("#onlineLosses");
@@ -99,15 +100,16 @@ public class ProfileViewWindow extends Stage {
             }
         }
 
+
+        startChat.setVisible(!isAlreadyChatting);
+        addFriend.setVisible(!isAlreadyFriend);
+        playTogether.setVisible(!isPlayingOnline);
         if (viewer.getClientProfile().equals(profile)) {
             playTogether.setVisible(false);
             addFriend.setVisible(false);
             startChat.setVisible(false);
 
         }
-        startChat.setVisible(!isAlreadyChatting);
-        addFriend.setVisible(!isAlreadyFriend);
-        playTogether.setVisible(!isPlayingOnline);
 
         addFriend.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override

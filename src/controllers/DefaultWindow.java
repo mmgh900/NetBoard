@@ -54,7 +54,7 @@ public class DefaultWindow extends Stage {
     public DefaultWindow(Client appUser) throws IOException {
         this.setX(150);
         this.setY(50);
-        this.initStyle(StageStyle.DECORATED);
+        this.initStyle(StageStyle.UNDECORATED);
         this.setResizable(false);
         this.setScene(new Scene(new AnchorPane()));
 

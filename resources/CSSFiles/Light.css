@@ -248,3 +248,10 @@
     -fx-background-color: gainsboro;
     -fx-text-fill: white;
 }
+
+.number-meanings {
+    -fx-font-family: "Arial";
+    -fx-text-fill: dimgrey;
+    -fx-font-size: 20;
+
+}

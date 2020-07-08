@@ -57,7 +57,7 @@ public class ClientProfile implements Serializable {
         singlePlayerWins = 0;
         totalOnlineLosses = 0;
         totalOnlineWins = 0;
-        isOnline = true;
+        isOnline = false;
     }
 
     @Override

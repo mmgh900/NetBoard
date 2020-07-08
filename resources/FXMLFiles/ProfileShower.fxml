@@ -1,154 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="800.0"
-            xmlns="http://javafx.com/javafx/8.0.171" fx:controller="controllers.ProfileShowerController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="600.0"
+            prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171"
+            fx:controller="controllers.ProfileShowerController">
    <children>
-      <VBox prefHeight="300.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+      <VBox prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox prefHeight="118.0" prefWidth="500.0" spacing="20.0" style="-fx-background-color: black;">
+            <HBox alignment="CENTER" prefHeight="400.0" style="-fx-background-color: black;">
                <children>
-                  <StackPane>
+                  <VBox alignment="CENTER" prefHeight="399.0" prefWidth="375.0" spacing="10.0">
                      <children>
-                        <VBox>
+                        <HBox alignment="CENTER" spacing="10.0">
                            <children>
-                              <Region prefHeight="30.0" prefWidth="150.0"/>
+                              <Button id="smallButton" fx:id="addFriend" mnemonicParsing="false" prefHeight="40.0"
+                                      prefWidth="160.0" text="Add Friend">
+                                 <font>
+                                    <Font size="17.0"/>
+                                 </font>
+                              </Button>
+                              <Button id="smallButton" fx:id="playTogether" layoutX="10.0" layoutY="10.0"
+                                      mnemonicParsing="false" prefHeight="40.0" prefWidth="160.0" text="Play Together">
+                                 <font>
+                                    <Font size="18.0"/>
+                                 </font>
+                              </Button>
                            </children>
-                        </VBox>
-                     </children>
-                  </StackPane>
-                  <AnchorPane>
-                     <children>
-                        <StackPane>
+                        </HBox>
+                        <HBox alignment="CENTER" layoutX="10.0" layoutY="126.0" prefHeight="40.0" prefWidth="535.0"
+                              spacing="10.0">
                            <children>
-                              <VBox spacing="5.0">
-                                 <children>
-                                    <Region prefHeight="111.0" prefWidth="258.0"/>
-                                    <HBox spacing="10.0">
-                                       <children>
-                                          <Button id="smallButton" fx:id="addFriend" mnemonicParsing="false"
-                                                  prefHeight="39.0" prefWidth="149.0" text="Add Friend">
-                                             <font>
-                                                <Font size="17.0"/>
-                                             </font>
-                                          </Button>
-                                          <Button id="smallButton" fx:id="playTogether" layoutX="10.0" layoutY="10.0"
-                                                  mnemonicParsing="false" text="Play Together">
-                                             <font>
-                                                <Font size="18.0"/>
-                                             </font>
-                                          </Button>
-                                       </children>
-                                    </HBox>
-                                    <HBox layoutX="10.0" layoutY="126.0" spacing="10.0">
-                                       <children>
-                                          <Button id="smallButton" fx:id="startChat" mnemonicParsing="false"
-                                                  text="StartChat">
-                                             <font>
-                                                <Font size="18.0"/>
-                                             </font>
-                                          </Button>
-                                          <Button id="smallButton" fx:id="close" mnemonicParsing="false" text="Close">
-                                             <font>
-                                                <Font size="18.0"/>
-                                             </font>
-                                          </Button>
-                                       </children>
-                                    </HBox>
-                                    <AnchorPane prefHeight="178.0" prefWidth="338.0">
-                                       <children>
-                                          <Text fx:id="name" fill="#00bbff" layoutX="1.0" layoutY="74.0"
-                                                strokeType="OUTSIDE" strokeWidth="0.0" text="First Name Last Name">
-                                             <font>
-                                                <Font name="Product Sans Bold" size="30.0"/>
-                                             </font>
-                                          </Text>
-                                          <Text fx:id="username" fill="#eaeaea" layoutX="-2.0" layoutY="114.0"
-                                                strokeType="OUTSIDE" strokeWidth="0.0" text="\@kkjj222">
-                                             <font>
-                                                <Font name="Product Sans Bold" size="37.0"/>
-                                             </font>
-                                          </Text>
-                                       </children>
-                                    </AnchorPane>
-                                 </children>
-                              </VBox>
+                              <Button id="smallButton" fx:id="startChat" mnemonicParsing="false" prefHeight="40.0"
+                                      prefWidth="160.0" text="StartChat">
+                                 <font>
+                                    <Font size="18.0"/>
+                                 </font>
+                              </Button>
+                              <Button id="smallButton" fx:id="close" mnemonicParsing="false" prefHeight="40.0"
+                                      prefWidth="160.0" text="Close">
+                                 <font>
+                                    <Font size="18.0"/>
+                                 </font>
+                              </Button>
                            </children>
-                        </StackPane>
-                     </children>
-                  </AnchorPane>
-               </children>
-            </HBox>
-            <HBox spacing="40.0">
-               <children>
-                  <AnchorPane>
-                     <children>
-                        <Text fx:id="onlineWins" fill="#00946f" layoutX="-2.0" layoutY="145.0" strokeType="OUTSIDE"
-                              strokeWidth="0.0" text="25" wrappingWidth="162.40003204345703">
+                        </HBox>
+                        <Label fx:id="name" text="FIRST NAME" textAlignment="CENTER" textFill="#358dff" wrapText="true">
                            <font>
-                              <Font name="Product Sans Bold" size="120.0"/>
+                              <Font name="Product Sans Bold" size="39.0"/>
+                           </font>
+                        </Label>
+                        <Text fx:id="username" fill="#eaeaea" strokeType="OUTSIDE" strokeWidth="0.0" text="\@kkjj222"
+                              textAlignment="CENTER">
+                           <font>
+                              <Font name="Product Sans Bold" size="28.0"/>
                            </font>
                         </Text>
-                        <Text layoutX="1.0" layoutY="181.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ONLINE WINS"
+                     </children>
+                  </VBox>
+                  <ImageView fitHeight="347.0" fitWidth="349.0">
+                     <image>
+                        <Image url="@../Images/Wall%20post%20(1).gif"/>
+                     </image>
+                  </ImageView>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="202.0" prefWidth="822.0" spacing="40.0">
+               <children>
+                  <VBox>
+                     <children>
+                        <Text fx:id="onlineWins" fill="#00946f" strokeType="OUTSIDE" strokeWidth="0.0" text="25"
+                              wrappingWidth="111.40003204345703">
+                           <font>
+                              <Font name="Product Sans Bold" size="96.0"/>
+                           </font>
+                        </Text>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="number-meanings" text="ONLINE WINS"
                               wrappingWidth="121.59999999999991">
                            <font>
                               <Font size="20.0"/>
                            </font>
                         </Text>
                      </children>
-                  </AnchorPane>
-                  <AnchorPane layoutX="10.0" layoutY="10.0">
+                  </VBox>
+                  <VBox>
                      <children>
-                        <Text fx:id="onlineLosses" fill="#b93c3c" layoutX="-1.0" layoutY="135.0" strokeType="OUTSIDE"
-                              strokeWidth="0.0" text="34" wrappingWidth="116.0">
+                        <Text fx:id="onlineLosses" fill="#b93c3c" strokeType="OUTSIDE" strokeWidth="0.0" text="34"
+                              wrappingWidth="116.0">
                            <font>
                               <Font name="Product Sans Bold" size="95.0"/>
                            </font>
                         </Text>
-                        <Text layoutY="163.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ONLINE LOSSES"
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="number-meanings" text="ONLINE LOSSES"
                               wrappingWidth="137.5999755859375">
                            <font>
                               <Font size="20.0"/>
                            </font>
                         </Text>
                      </children>
-                  </AnchorPane>
-                  <AnchorPane layoutX="155.0" layoutY="10.0">
+                  </VBox>
+                  <VBox>
                      <children>
-                        <Text fx:id="singleWins" fill="#00946f" layoutX="-2.0" layoutY="135.0" strokeType="OUTSIDE"
-                              strokeWidth="0.0" text="76" wrappingWidth="116.0">
+                        <Text fx:id="singleWins" fill="#00946f" strokeType="OUTSIDE" strokeWidth="0.0" text="76"
+                              wrappingWidth="116.0">
                            <font>
                               <Font name="Product Sans Bold" size="95.0"/>
                            </font>
                         </Text>
-                        <Text layoutX="-1.0" layoutY="165.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="number-meanings"
                               text="SINGLE PLAYER WINS" wrappingWidth="137.5999755859375">
                            <font>
                               <Font size="20.0"/>
                            </font>
                         </Text>
                      </children>
-                  </AnchorPane>
-                  <AnchorPane layoutX="284.0" layoutY="10.0">
+                  </VBox>
+                  <VBox>
                      <children>
-                        <Text fx:id="singleLosses" fill="#b93c3c" layoutX="-2.0" layoutY="135.0" strokeType="OUTSIDE"
-                              strokeWidth="0.0" text="13" wrappingWidth="116.0">
+                        <Text fx:id="singleLosses" fill="#b93c3c" strokeType="OUTSIDE" strokeWidth="0.0" text="13"
+                              wrappingWidth="106.0">
                            <font>
                               <Font name="Product Sans Bold" size="95.0"/>
                            </font>
                         </Text>
-                        <Text layoutX="-1.0" layoutY="165.0" strokeType="OUTSIDE" strokeWidth="0.0"
-                              text="SINGLE PLAYER LOSSES" wrappingWidth="137.5999755859375">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="number-meanings"
+                              text="SINGLE PLAYER LOSSES" wrappingWidth="166.5999755859375">
                            <font>
                               <Font size="20.0"/>
                            </font>
                         </Text>
                      </children>
-                  </AnchorPane>
+                  </VBox>
                </children>
                <VBox.margin>
                   <Insets left="40.0"/>

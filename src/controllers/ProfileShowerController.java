@@ -2,6 +2,7 @@ package controllers;
 
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 
 import java.net.URL;
@@ -17,7 +18,7 @@ public class ProfileShowerController extends StandardController implements Initi
     public Button close;
     public Button startChat;
     public Text username;
-    public Text name;
+    public Label name;
     public Text onlineWins;
     public Text onlineLosses;
     public Text singleWins;
