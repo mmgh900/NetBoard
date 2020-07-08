@@ -8,7 +8,7 @@ public class ClientProfile implements Serializable {
 
     /*    private final UserInfo userInfo;*/
 
-    private final String username;
+    private String username;
     private String password;
     private String firstName;
     private String lastName;
@@ -37,6 +37,12 @@ public class ClientProfile implements Serializable {
         this.password = password;
     }
 
+    public ClientProfile(String email, SecurityQuestions securityQuestion, String answer) {
+        this.email = email;
+        this.securityQuestion = securityQuestion;
+        this.answer = answer;
+    }
+
     public ClientProfile(String firstName, String lastName, String username, String password, SecurityQuestions securityQuestion, String answer, String email) {
         /*        this.userInfo = new UserInfo(username, password);*/
         this.username = username;
@@ -56,7 +62,11 @@ public class ClientProfile implements Serializable {
 
     @Override
     public String toString() {
-        return "[" + username.toUpperCase() + "]";
+        if (username == null) {
+            return "[GUEST]";
+        } else {
+            return "[" + username.toUpperCase() + "]";
+        }
     }
 
 

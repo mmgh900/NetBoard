@@ -6,7 +6,6 @@ import users.Client;
 
 
 public class ClientMain extends Application {
-    // TODO: 7/7/2020 Add forget password
     // TODO: 7/7/2020 Make threads synchronized
     // TODO: 7/7/2020 Change updateOnline and updateFriends
     // TODO: 7/7/2020 search users by username

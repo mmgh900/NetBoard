@@ -279,10 +279,7 @@ public abstract class GameWithUI extends Game {
 
         contacts.getTabs().add(onlineClientsTab);
         contacts.getTabs().add(friendsTab);
-
-        if (!(this instanceof ClientGame)) {
-            contacts.setDisable(true);
-        }
+        contacts.setDisable(!(this instanceof ClientGame));
     }
 
     @Override

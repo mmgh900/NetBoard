@@ -2,7 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.Cursor?>
+<?import javafx.scene.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
@@ -16,7 +16,7 @@
                <children>
                   <StackPane>
                      <children>
-                        <VBox fx:id="loginForm" alignment="CENTER" prefWidth="500.0" spacing="15.0">
+                        <VBox fx:id="loginForm" alignment="CENTER" prefWidth="500.0" spacing="15.0" visible="false">
                            <children>
                               <Region prefHeight="29.0" prefWidth="500.0"/>
                               <VBox alignment="CENTER">
@@ -80,7 +80,7 @@
                                  <children>
                                     <VBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" spacing="15.0">
                                        <children>
-                                          <Region prefHeight="136.0" prefWidth="500.0"/>
+                                          <Region prefHeight="68.0" prefWidth="500.0"/>
                                           <VBox alignment="CENTER">
                                              <children>
                                                 <ImageView fitHeight="160.0" fitWidth="160.0">
@@ -204,12 +204,90 @@
                               </AnchorPane>
                            </content>
                         </ScrollPane>
+                        <VBox fx:id="recoverPassword" alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="500.0"
+                              spacing="15.0">
+                           <children>
+                              <Region prefHeight="29.0" prefWidth="500.0"/>
+                              <VBox alignment="CENTER">
+                                 <children>
+                                    <ImageView fitHeight="160.0" fitWidth="160.0">
+                                       <image>
+                                          <Image url="@../Images/login.png"/>
+                                       </image>
+                                    </ImageView>
+                                    <Text fill="#009dff" strokeType="OUTSIDE" strokeWidth="0.0" text="Recover Password"
+                                          textAlignment="CENTER" wrappingWidth="387.79998779296875">
+                                       <font>
+                                          <Font name="Product Sans Bold" size="43.0"/>
+                                       </font>
+                                    </Text>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" spacing="5.0">
+                                 <children>
+                                    <Label fx:id="goToLoginRP" styleClass="additional-options" text="LOGIN"
+                                           textFill="#aeaeae">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND"/>
+                                       </cursor>
+                                    </Label>
+                                    <Label fx:id="goToSignUpRP" styleClass="additional-options" text="SIGN UP"
+                                           textFill="#aeaeae">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND"/>
+                                       </cursor>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                                 <children>
+                                    <Label styleClass="form-lable" text="Email" textAlignment="RIGHT"/>
+                                    <TextField fx:id="emailRP" prefHeight="39.0" prefWidth="250.0" promptText="Email"
+                                               styleClass="form"/>
+                                 </children>
+                                 <padding>
+                                    <Insets right="60.0"/>
+                                 </padding>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                                 <children>
+                                    <Label prefHeight="57.0" prefWidth="105.0" styleClass="form-lable"
+                                           text="Squrity Question" textAlignment="RIGHT" wrapText="true"/>
+                                    <ChoiceBox fx:id="questionRP" prefHeight="50.0" prefWidth="250.0"
+                                               styleClass="form"/>
+                                 </children>
+                                 <padding>
+                                    <Insets right="60.0"/>
+                                 </padding>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                                 <children>
+                                    <Label styleClass="form-lable" text="Answer" textAlignment="RIGHT"/>
+                                    <TextField fx:id="answerRP" prefHeight="50.0" prefWidth="250.0" promptText="Answer"
+                                               styleClass="form"/>
+                                 </children>
+                                 <padding>
+                                    <Insets right="60.0"/>
+                                 </padding>
+                              </HBox>
+                              <Button fx:id="recoverPasswordButton" defaultButton="true" mnemonicParsing="false"
+                                      prefHeight="50.0" prefWidth="272.0" text="Recover Passsword">
+                                 <font>
+                                    <Font name="Product Sans Bold" size="26.0"/>
+                                 </font>
+                              </Button>
+                              <Region prefHeight="21.0" prefWidth="500.0"/>
+                           </children>
+                        </VBox>
                      </children>
                   </StackPane>
                   <HBox alignment="CENTER" prefHeight="115.0" prefWidth="500.0">
                      <children>
-                        <Label fx:id="massage" wrapText="true"/>
+                        <Label fx:id="massage" styleClass="massage" wrapText="true"/>
                      </children>
+                     <padding>
+                        <Insets bottom="10.0"/>
+                     </padding>
                   </HBox>
                </children>
             </VBox>

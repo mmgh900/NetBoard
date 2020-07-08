@@ -87,20 +87,15 @@ public class Client extends User implements Serializable {
                 } else if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
                     respondToUpdateGame(packet);
                 } else if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
-
                     ClientProfile updateProfile = (ClientProfile) packet.getContent();
                     game.updateChats(updateProfile);
                     clientProfile = updateProfile;
-
-
-                    /*if (game instanceof ClientGame) {
-                        ((ClientGame) game).updateChats();
-                    }*/
                 } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
                     ClientProfile updateProfile = (ClientProfile) packet.getContent();
                     clientProfile = updateProfile;
                     game.updateFriendsList();
-
+                } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
+                    window.getLoginController().goodNews("YOUR USERNAME AND PASSWORD: " + packet.getContent());
                 }
             }
         }, "Respond to " + packet.getPropose().toString().toLowerCase()).start();
@@ -110,10 +105,12 @@ public class Client extends User implements Serializable {
     private void respondToServerMassages(Packet packet) {
         if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP)) {
             respondToServerRespondToSignUp(packet);
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_LOGIN)) {
+        } else if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_LOGIN)) {
             ServerMassages serverMassage = (ServerMassages) packet.getContent();
             respondToServerRespondToLogin(serverMassage);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_RECOVER_PASS)) {
+            ServerMassages serverMassage = (ServerMassages) packet.getContent();
+            respondToServerRespondToRecoverPass(serverMassage);
         }
     }
 
@@ -172,6 +169,15 @@ public class Client extends User implements Serializable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            window.getLoginController().badNews(serverMassage.toString().toLowerCase().replace("_", " "));
+        }
+    }
+
+    private void respondToServerRespondToRecoverPass(ServerMassages serverMassage) {
+        if (serverMassage == ServerMassages.RECOVER_PASSWORD_SUCCESSFUL) {
+
+            //window.getLoginController().goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
         } else {
             window.getLoginController().badNews(serverMassage.toString().toLowerCase().replace("_", " "));
         }

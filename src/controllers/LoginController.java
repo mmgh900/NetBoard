@@ -22,6 +22,11 @@ public class LoginController extends StandardController implements Initializable
     public PasswordField loginPassword;
     public Button loginButton;
 
+    public TextField emailRP;
+    public ChoiceBox questionRP;
+    public TextField answerRP;
+    public Button recoverPasswordButton;
+
     public TextField firstname;
     public TextField lastname;
     public TextField username;
@@ -33,9 +38,12 @@ public class LoginController extends StandardController implements Initializable
     public Button signupButton;
     public Label massage;
     public Label goToLogin;
+    public Label goToLoginRP;
     public Label goToSignUp;
+    public Label goToSignUpRP;
     public Label goToForgetPassword;
     public VBox loginForm;
+    public VBox recoverPassword;
     public ScrollPane signupForm;
 
 
@@ -82,15 +90,24 @@ public class LoginController extends StandardController implements Initializable
         }
     };
 
+    EventHandler recover = new EventHandler<MouseEvent>() {
+        public void handle(MouseEvent event) {
+            client.setClientProfile(new ClientProfile(emailRP.getText(), (SecurityQuestions) questionRP.getValue(), answerRP.getText()));
+            client.connection.sendPacket(new Packet(client.getClientProfile(), client, Packet.PacketPropose.RECOVER_PASSWORD_REQUEST));
+        }
+    };
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         signupForm.setVisible(true);
         loginForm.setVisible(false);
+        recoverPassword.setVisible(false);
         goToLogin.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 signupForm.setVisible(false);
                 loginForm.setVisible(true);
+                recoverPassword.setVisible(false);
             }
         });
         goToSignUp.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -98,13 +115,45 @@ public class LoginController extends StandardController implements Initializable
             public void handle(MouseEvent mouseEvent) {
                 signupForm.setVisible(true);
                 loginForm.setVisible(false);
+                recoverPassword.setVisible(false);
             }
         });
+        goToLoginRP.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                signupForm.setVisible(false);
+                loginForm.setVisible(true);
+                recoverPassword.setVisible(false);
+            }
+        });
+        goToSignUpRP.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                signupForm.setVisible(true);
+                loginForm.setVisible(false);
+                recoverPassword.setVisible(false);
+            }
+        });
+        goToForgetPassword.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                signupForm.setVisible(false);
+                loginForm.setVisible(false);
+                recoverPassword.setVisible(true);
+            }
+        });
+
+
         loginButton.setOnMouseClicked(login);
         signupButton.setOnMouseClicked(signUp);
+        recoverPasswordButton.setOnMouseClicked(recover);
         question.setItems(FXCollections.observableArrayList(SecurityQuestions.WHAT_IS_THE_NAME_OF_YOUR_FAVORITE_CHILDHOOD_FRIEND, SecurityQuestions.WHAT_WAS_THE_LAST_NAME_OF_YOUR_THIRD_GRADE_TEACHER, SecurityQuestions.WHAT_WAS_THE_NAME_OF_YOUR_SECOND_PET, SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO));
         question.setValue(SecurityQuestions.WHAT_IS_THE_NAME_OF_YOUR_FAVORITE_CHILDHOOD_FRIEND);
         question.setTooltip(new Tooltip("Select a security question"));
+
+        questionRP.setItems(FXCollections.observableArrayList(SecurityQuestions.WHAT_IS_THE_NAME_OF_YOUR_FAVORITE_CHILDHOOD_FRIEND, SecurityQuestions.WHAT_WAS_THE_LAST_NAME_OF_YOUR_THIRD_GRADE_TEACHER, SecurityQuestions.WHAT_WAS_THE_NAME_OF_YOUR_SECOND_PET, SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO));
+        questionRP.setValue(SecurityQuestions.WHAT_IS_THE_NAME_OF_YOUR_FAVORITE_CHILDHOOD_FRIEND);
+        questionRP.setTooltip(new Tooltip("Select a security question"));
     }
 
     public void badNews(String s) {

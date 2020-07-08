@@ -47,8 +47,8 @@ public class Server extends User {
     }
 
     private void addSampleClients() {
-        addUserToSystem(new ClientProfile("Mohammad Mahdi", "Gheysari", "m", "", SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "gheysari.mm@gmail.com"));
-        addUserToSystem(new ClientProfile("Reza", "Ahmadi", "r", "", SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "reaza@gmail.com"));
+        addUserToSystem(new ClientProfile("Mohammad Mahdi", "Gheysari", "m", "1212", SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "gheysari.mm@gmail.com"));
+        addUserToSystem(new ClientProfile("Reza", "Ahmadi", "r", "", SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "reaza1@gmail.com"));
         addUserToSystem(new ClientProfile("Kambiz", "Dirbaz", "k", "", SecurityQuestions.WHO_WAS_YOUR_CHILDHOOD_HERO, "Batman", "reaza@gmail.com"));
     }
 
@@ -84,48 +84,70 @@ public class Server extends User {
                     respondToLogoutRequest(clientProfile);
                     sendAllToAll();
                     writeFile();
-                }
-                if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGIN_REQUEST)) {
+                } else if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGIN_REQUEST)) {
                     ClientProfile clientProfile = (ClientProfile) packet.getContent();
                     respondToLoginRequest(clientProfile);
                     sendAllToAll();
                     //writeFile();
-                }
-                if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.SIGN_UP_REQUEST)) {
+                } else if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.SIGN_UP_REQUEST)) {
                     ClientProfile clientProfile = (ClientProfile) packet.getContent();
                     respondToSignUpRequest(clientProfile);
                     sendAllToAll();
                     //writeFile();
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
                     respondToPlayTogetherRequest(packet);
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_PLAY_TOGETHER)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_PLAY_TOGETHER)) {
                     respondToPlayTogetherRespond(packet);
                     sendAllToAll();
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
                     respondToAddFriend(packet);
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
                     respondToAddFriendRespond(packet);
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
                     updateOneClient((ClientProfile) packet.getContent());
                     sendAllToAll();
                     //writeFile();
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
                     respondToUpdateGame(packet);
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
                     respondToChat(packet);
                     //writeFile();
+                } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
+                    rospondToRecoverPassword(packet);
                 }
 
             }
         }, "Respond to " + packet.getPropose().toString().toLowerCase()).start();
 
+
+    }
+
+    private void rospondToRecoverPassword(Packet packet) {
+        ClientProfile clientProfile = (ClientProfile) packet.getContent();
+        ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
+
+        ClientProfile foundClient = null;
+        for (ClientProfile cip : usersInSystem) {
+            if (clientProfile.getEmail().equalsIgnoreCase(cip.getEmail())) {
+                foundClient = cip;
+            }
+        }
+
+        if (foundClient == null) {
+            serverMassage = ServerMassages.EMAIL_NOT_FOUND;
+        } else if (foundClient.getOnline()) {
+            serverMassage = ServerMassages.ALREADY_LOGED_IN;
+        } else {
+            if (clientProfile.getSecurityQuestion().equals(foundClient.getSecurityQuestion()) && clientProfile.getAnswer().equalsIgnoreCase(foundClient.getAnswer())) {
+
+                serverMassage = ServerMassages.RECOVER_PASSWORD_SUCCESSFUL;
+                connection.sendPacket(new Packet(foundClient.getUsername() + ":" + foundClient.getPassword(), this, Packet.PacketPropose.RECOVER_PASSWORD_REQUEST));
+
+            } else {
+                serverMassage = ServerMassages.WRONG_QUESTION_OR_ANSWER;
+            }
+        }
+        connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_RESPOND_TO_RECOVER_PASS));
 
     }
 
@@ -299,14 +321,20 @@ public class Server extends User {
     private void respondToSignUpRequest(ClientProfile clientProfile) {
         System.out.println("A sign up request received");
         ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
-        ClientProfile foundClient = null;
+        ClientProfile DupplicateByUserName = null;
+        ClientProfile DupplicateByEmail = null;
         for (ClientProfile cip : usersInSystem) {
             if (clientProfile.equals(cip)) {
-                foundClient = cip;
+                DupplicateByUserName = cip;
+            }
+            if (clientProfile.getEmail().equalsIgnoreCase(cip.getEmail())) {
+                DupplicateByEmail = cip;
             }
         }
-        if (foundClient != null) {
+        if (DupplicateByUserName != null) {
             serverMassage = ServerMassages.USERNAME_ALREADY_EXISTS;
+        } else if (DupplicateByEmail != null) {
+            serverMassage = ServerMassages.EMAIL_ALREADY_EXISTS;
         } else {
             addUserToSystem(clientProfile);
             respondToLoginRequest(clientProfile);
@@ -316,28 +344,30 @@ public class Server extends User {
     }
 
     private void respondToLogoutRequest(ClientProfile clientProfile) {
-        System.out.println("A logout request received");
+        if (clientProfile.getOnline()) {
+            System.out.println("A logout request received");
 
-        ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
+            ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
 
-        ClientProfile foundClient = null;
+            ClientProfile foundClient = null;
 
-        for (ClientProfile cip : usersInSystem) {
-            if (clientProfile.getUsername().equalsIgnoreCase(cip.getUsername())) {
-                foundClient = cip;
+            for (ClientProfile cip : usersInSystem) {
+                if (clientProfile.getUsername().equalsIgnoreCase(cip.getUsername())) {
+                    foundClient = cip;
+                }
             }
+
+
+            if (foundClient == null) {
+                serverMassage = ServerMassages.USERNAME_NOT_FOUND;
+            } else {
+                connections.remove(foundClient);
+                usersInSystem.get(usersInSystem.indexOf(foundClient)).setOnline(false);
+                serverMassage = ServerMassages.LOGOUT_SUCCESSFUL;
+
+            }
+            System.out.println(usersInSystem.get(usersInSystem.indexOf(foundClient)).getUsername() + " loged out.");
         }
-
-
-        if (foundClient == null) {
-            serverMassage = ServerMassages.USERNAME_NOT_FOUND;
-        } else {
-            connections.remove(foundClient);
-            usersInSystem.get(usersInSystem.indexOf(foundClient)).setOnline(false);
-            serverMassage = ServerMassages.LOGOUT_SUCCESSFUL;
-
-        }
-        System.out.println(usersInSystem.get(usersInSystem.indexOf(foundClient)).getUsername() + " loged out.");
     }
 
     private void respondToPlayTogetherRespond(Packet packet) {
