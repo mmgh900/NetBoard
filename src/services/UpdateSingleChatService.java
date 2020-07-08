@@ -32,7 +32,7 @@ public class UpdateSingleChatService extends Service<ArrayList<TextMassageSkin>>
                     if (chatTab.getTabPane() != null && !chatTab.getTabPane().getSelectionModel().getSelectedItem().equals(chatTab)) {
                         chatTab.addUnReadMassages();
                     }
-                    chatTab.getChatBoxController().scrollPane.setVvalue(1.0);
+                    chatTab.getChatController().scrollPane.setVvalue(1.0);
                 }
             }
         });

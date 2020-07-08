@@ -31,10 +31,12 @@ public class Client extends User implements Serializable {
     private ArrayList<ClientProfile> otherPlayers;
     private ClientProfile clientProfile;
     private Socket socket;
+    private boolean isClosed;
 
 
     public Client() {
 
+        isClosed = false;
         boolean isConnectionFailed = false;
         try {
             socket = new Socket("localhost", PORT);
@@ -70,28 +72,21 @@ public class Client extends User implements Serializable {
                 System.out.println(ANSI_PURPLE + clientProfile.toString() + ": received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
                 if (packet.getPropose().equals(Packet.PacketPropose.PROFILES_IN_SYSTEM)) {
                     respondToProfilesInSystem(packet);
-                }
-                if (packet.getContent() instanceof ServerMassages) {
+                } else if (packet.getContent() instanceof ServerMassages) {
                     respondToServerMassages(packet);
-                }
-                if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
+                } else if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
                     respondToProfileInfo(packet);
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
                     if (respondToRequests(packet, Packet.PacketPropose.RESPOND_PLAY_TOGETHER))
                         return;
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
                     if (respondToRequests(packet, Packet.PacketPropose.RESPOND_ADD_FRIEND))
                         return;
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.START_GAME)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.START_GAME)) {
                     respondToStartGame(packet);
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
                     respondToUpdateGame(packet);
-                }
-                if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
+                } else if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
 
                     ClientProfile updateProfile = (ClientProfile) packet.getContent();
                     game.updateChats(updateProfile);
@@ -101,6 +96,11 @@ public class Client extends User implements Serializable {
                     /*if (game instanceof ClientGame) {
                         ((ClientGame) game).updateChats();
                     }*/
+                } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
+                    ClientProfile updateProfile = (ClientProfile) packet.getContent();
+                    clientProfile = updateProfile;
+                    game.updateFriendsList();
+
                 }
             }
         }, "Respond to " + packet.getPropose().toString().toLowerCase()).start();
@@ -149,9 +149,12 @@ public class Client extends User implements Serializable {
 
     private void respondToProfileInfo(Packet packet) {
         updateProfile((ClientProfile) packet.getContent());
-        game = new ClientGame(this);
+        if (game == null) {
+            game = new ClientGame(this);
+            game.initializeChats();
+        }
         //game.update();
-        game.initializeChats();
+
     }
 
     private void respondToServerRespondToLogin(ServerMassages serverMassage) {
@@ -205,13 +208,14 @@ public class Client extends User implements Serializable {
         otherPlayers.removeIf(cp -> cp.equals(clientProfile));
         System.out.println(Server.ANSI_GREEN + "\t" + clientProfile.toString() + ": OTHER PLAYERS UPDATED" + ANSI_RESET);
 
-        while (game == null) {
+        while (game == null && !isClosed) {
         }
         game.updateOnlinesList();
     }
 
     @Override
     public void close() throws IOException {
+        isClosed = true;
         if (socket != null) {
             socket.close();
             connection.close();
@@ -254,6 +258,7 @@ public class Client extends User implements Serializable {
             connection.sendPacket(new Packet(clientProfile, clientProfile, Packet.PacketPropose.LOGOUT_REQUEST));
             try {
                 close();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

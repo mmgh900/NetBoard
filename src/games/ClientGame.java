@@ -10,6 +10,7 @@ import users.Client;
 public class ClientGame extends GameWithUI {
 
     private Player thisPlayer;
+    private ClientProfile otherPlayer;
 
     public ClientGame(Client client) {
         super(client);
@@ -37,8 +38,10 @@ public class ClientGame extends GameWithUI {
         board.setDisable(false);
         if (playerX.getUsername().toLowerCase().equals(client.getClientProfile().getUsername().toLowerCase())) {
             thisPlayer = Player.PLAYER_X;
+            otherPlayer = playerO;
         } else if (playerO.getUsername().toLowerCase().equals(client.getClientProfile().getUsername().toLowerCase())) {
             thisPlayer = Player.PLAYER_O;
+            otherPlayer = playerX;
         }
         setCurrentPlayer(Player.PLAYER_X);
     }
@@ -75,5 +78,9 @@ public class ClientGame extends GameWithUI {
         } else if (!isMyTurn()) {
             massage.setText("It's not your turn.");
         }
+    }
+
+    public ClientProfile getOtherPlayer() {
+        return otherPlayer;
     }
 }

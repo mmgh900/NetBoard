@@ -4,7 +4,7 @@ import Serlizables.Chat;
 import Serlizables.ClientProfile;
 import Serlizables.Massage;
 import Serlizables.SecurityQuestions;
-import controllers.GameSceneController;
+import controllers.GameController;
 import controllers.ProfileViewWindow;
 import gui.elements.ChatTab;
 import gui.elements.SquareSkin;
@@ -57,11 +57,11 @@ public abstract class GameWithUI extends Game {
     public GameWithUI(Client client) {
         super();
         this.client = client;
-        this.massage = GameSceneController.massageStatic;
-        playerXname = GameSceneController.playerXnameStatic;
-        playerOname = GameSceneController.playerOnameStatic;
+        this.massage = GameController.massageStatic;
+        playerXname = GameController.playerXnameStatic;
+        playerOname = GameController.playerOnameStatic;
 
-        GameSceneController.mainMenuButtonStatic.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        GameController.mainMenuButtonStatic.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 try {
@@ -71,11 +71,11 @@ public abstract class GameWithUI extends Game {
                 }
             }
         });
-        playerXusername = GameSceneController.playerXusernameStatic;
-        playerOusername = GameSceneController.playerOusernameStatic;
+        playerXusername = GameController.playerXusernameStatic;
+        playerOusername = GameController.playerOusernameStatic;
 
-        playerXsign = GameSceneController.playerXsignStatic;
-        playerOsign = GameSceneController.playerOsignStatic;
+        playerXsign = GameController.playerXsignStatic;
+        playerOsign = GameController.playerOsignStatic;
 
         try {
             makeUI();
@@ -198,7 +198,7 @@ public abstract class GameWithUI extends Game {
                 if (!chatTab.getTabPane().getSelectionModel().getSelectedItem().equals(chatTab)) {
                     chatTab.addUnReadMassages();
                 }
-                chatTab.getChatBoxController().scrollPane.setVvalue(1.0);
+                chatTab.getChatController().scrollPane.setVvalue(1.0);
             }
         });
 
@@ -215,8 +215,9 @@ public abstract class GameWithUI extends Game {
     }
 
     private void initializeTabs() {
-        chats = GameSceneController.chatsStatic;
-        chats.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+        chats = GameController.chatsStatic;
+
+        ChangeListener<Tab> tabChangeListener = new ChangeListener<Tab>() {
             @Override
             public void changed(ObservableValue<? extends Tab> observableValue, Tab tab, Tab t1) {
                 if (tab != null && t1 != null) {
@@ -225,8 +226,12 @@ public abstract class GameWithUI extends Game {
                 }
 
             }
-        });
-        contacts = GameSceneController.contactsStatic;
+        };
+
+
+        chats.getSelectionModel().selectedItemProperty().addListener(tabChangeListener);
+
+        contacts = GameController.contactsStatic;
         chats.getTabs().clear();
         initializeChats();
         //updateChats();
@@ -346,48 +351,34 @@ public abstract class GameWithUI extends Game {
         massage.setText("");
 
         //SplitPane splitPane = (SplitPane) client.getWindow().getGameScene().lookup("#boardContainer");
-        board = GameSceneController.boardStatic;
+        board = GameController.boardStatic;
         //board.resize(WIDTH, HEIGHT);
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                squareSkins[i][j] = new SquareSkin(i, j);
-                SquareSkin squareSkin = squareSkins[i][j];
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        squareSkins[i][j] = new SquareSkin(i, j);
+                        SquareSkin squareSkin = squareSkins[i][j];
 
-                board.add(squareSkin, i, j);
 
-                squareSkin.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    final Timeline timeline = new Timeline();
+                        board.add(squareSkin, i, j);
 
-                    @Override
-                    public void handle(javafx.scene.input.MouseEvent event) {
-                        /*System.out.println("I'm clicked...");
+                        squareSkin.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                            final Timeline timeline = new Timeline();
 
-                          double normalSize = square.getHeight();
-                      timeline.getKeyFrames().addAll(
+                            @Override
+                            public void handle(javafx.scene.input.MouseEvent event) {
+                                handleClick(event);
 
-                                new KeyFrame(Duration.ZERO, // set start position at 0
-                                        new KeyValue(square.backgroundProperty(), Ba),
-                                        new KeyValue(square.prefWidthProperty(), normalSize)
-                                ),
-                                new KeyFrame(new Duration(2000), // set end position at 40s
-                                        new KeyValue(square.maxHeightProperty(), normalSize - 10),
-                                        new KeyValue(square.maxWidthProperty(), normalSize - 10)
-                                ),new KeyFrame(new Duration(4000), // set end position at 40s
-                                        new KeyValue(square.minHeightProperty(), normalSize),
-                                        new KeyValue(square.minWidthProperty(), normalSize)
-                                )
-                        );
+                            }
+                        });
 
-                        // play 40s of animation
-                        timeline.play();*/
-                        handleClick(event);
 
                     }
-                });
-
-
+                }
             }
-        }
+        });
 
 
     }

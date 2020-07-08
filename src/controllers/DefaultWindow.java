@@ -37,7 +37,7 @@ public class DefaultWindow extends Stage {
     private final DefaultWindow thisWindow;
 
     private final Scene gameScene;
-    private final GameSceneController gameSceneController;
+    private final GameController gameController;
 
     private final Scene menuScene;
     private final MenuController menuController;
@@ -64,9 +64,7 @@ public class DefaultWindow extends Stage {
         this.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent windowEvent) {
-                if (client != null) {
                     client.logout();
-                }
             }
         });
 
@@ -80,8 +78,8 @@ public class DefaultWindow extends Stage {
         fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(new File("resources/FXMLFiles/GameScene.fxml").toURL());
         Parent gameRoot = fxmlLoader.load();
-        gameSceneController = fxmlLoader.getController();
-        gameSceneController.rootPane.getChildren().add(newCbox());
+        gameController = fxmlLoader.getController();
+        gameController.rootPane.getChildren().add(newCbox());
 
 
         background.setImage(copyBackground(this));
@@ -170,7 +168,7 @@ public class DefaultWindow extends Stage {
     }
 
     public void loadGameScene() throws IOException {
-        gameSceneController.setClient(client);
+        gameController.setClient(client);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -202,8 +200,8 @@ public class DefaultWindow extends Stage {
         });
     }
 
-    public GameSceneController getGameSceneController() {
-        return gameSceneController;
+    public GameController getGameController() {
+        return gameController;
     }
 
     public MenuController getMenuController() {

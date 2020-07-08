@@ -32,7 +32,7 @@ public class Connection implements Runnable {
 
     }
 
-    public synchronized void sendPacket(Packet packet) {
+    public void sendPacket(Packet packet) {
         if (!isClosed) {
             try {
                 objectOutputStream.reset();
@@ -72,7 +72,7 @@ public class Connection implements Runnable {
 
     }
 
-    public synchronized void close() {
+    public void close() {
         try {
             isClosed = true;
             objectOutputStream.close();
@@ -80,5 +80,9 @@ public class Connection implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Boolean getRunning() {
+        return isRunning;
     }
 }

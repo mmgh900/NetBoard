@@ -3,6 +3,7 @@ package controllers;
 import Serlizables.Chat;
 import Serlizables.ClientProfile;
 import Serlizables.Packet;
+import games.ClientGame;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -82,12 +83,31 @@ public class ProfileViewWindow extends Stage {
         singleWins.setText(profile.getSinglePlayerWins() + "");
         onlineLosses.setText(profile.getTotalOnlineLosses() + "");
         singleLosses.setText(profile.getSinglePlayerLosses() + "");
-        if (viewer.getClientProfile().getUsername().toLowerCase().equals(profile.getUsername().toLowerCase())) {
+
+        boolean isAlreadyFriend = false;
+        for (ClientProfile clientProfile : viewer.getClientProfile().getFriends()) {
+            if (clientProfile.equals(profile)) {
+                isAlreadyFriend = true;
+            }
+        }
+        boolean isPlayingOnline = (viewer.game instanceof ClientGame) && ((ClientGame) viewer.game).getOtherPlayer() != null;
+        boolean isAlreadyChatting = false;
+        for (Chat chat : viewer.getClientProfile().getChats()) {
+            if (chat.getMembers().get(1).equals(profile)) {
+                isAlreadyChatting = true;
+            }
+        }
+
+        if (viewer.getClientProfile().equals(profile)) {
             playTogether.setVisible(false);
             addFriend.setVisible(false);
             startChat.setVisible(false);
 
         }
+        startChat.setVisible(!isAlreadyChatting);
+        addFriend.setVisible(!isAlreadyFriend);
+        playTogether.setVisible(!isPlayingOnline);
+
         addFriend.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {

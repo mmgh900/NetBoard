@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ChatBoxController implements Initializable {
+public class ChatController implements Initializable {
     public Button send;
     public TextField textField;
     public VBox massages;

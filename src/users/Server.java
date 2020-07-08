@@ -44,7 +44,6 @@ public class Server extends User {
         makeClientsInitiallyOffline();
         setUpServerSocket();
 
-
     }
 
     private void addSampleClients() {
@@ -76,48 +75,56 @@ public class Server extends User {
 
     @Override
     public void receivePacket(Packet packet) {
-        System.out.println(ANSI_RED + "[SERVER]: received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
-        if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGOUT_REQUEST)) {
-            ClientProfile clientProfile = (ClientProfile) packet.getContent();
-            respondToLogoutRequest(clientProfile);
-            sendAllToAll();
-        }
-        if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGIN_REQUEST)) {
-            ClientProfile clientProfile = (ClientProfile) packet.getContent();
-            respondToLoginRequest(clientProfile);
-            sendAllToAll();
-            writeFile();
-        }
-        if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.SIGN_UP_REQUEST)) {
-            ClientProfile clientProfile = (ClientProfile) packet.getContent();
-            respondToSignUpRequest(clientProfile);
-            sendAllToAll();
-            writeFile();
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
-            respondToPlayTogetherRequest(packet);
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_PLAY_TOGETHER)) {
-            respondToPlayTogetherRespond(packet);
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
-            respondToAddFriend(packet);
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
-            respondToAddFriendRespond(packet);
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
-            updateOneClient((ClientProfile) packet.getContent());
-            sendAllToAll();
-            writeFile();
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
-            respondToUpdateGame(packet);
-        }
-        if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
-            respondToChat(packet);
-            writeFile();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(ANSI_RED + "[SERVER]: received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
+                if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGOUT_REQUEST)) {
+                    ClientProfile clientProfile = (ClientProfile) packet.getContent();
+                    respondToLogoutRequest(clientProfile);
+                    sendAllToAll();
+                    writeFile();
+                }
+                if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGIN_REQUEST)) {
+                    ClientProfile clientProfile = (ClientProfile) packet.getContent();
+                    respondToLoginRequest(clientProfile);
+                    sendAllToAll();
+                    //writeFile();
+                }
+                if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.SIGN_UP_REQUEST)) {
+                    ClientProfile clientProfile = (ClientProfile) packet.getContent();
+                    respondToSignUpRequest(clientProfile);
+                    sendAllToAll();
+                    //writeFile();
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
+                    respondToPlayTogetherRequest(packet);
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_PLAY_TOGETHER)) {
+                    respondToPlayTogetherRespond(packet);
+                    sendAllToAll();
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
+                    respondToAddFriend(packet);
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
+                    respondToAddFriendRespond(packet);
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
+                    updateOneClient((ClientProfile) packet.getContent());
+                    sendAllToAll();
+                    //writeFile();
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
+                    respondToUpdateGame(packet);
+                }
+                if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
+                    respondToChat(packet);
+                    //writeFile();
+                }
+
+            }
+        }, "Respond to " + packet.getPropose().toString().toLowerCase()).start();
 
 
     }
@@ -148,9 +155,9 @@ public class Server extends User {
 
         if (packet.getContent().equals(true)) {
             sender.getFriends().add(receiver);
-            sendOneToOne(sender);
+            sendOneToOne(sender, Packet.PacketPropose.RESPOND_ADD_FRIEND);
             receiver.getFriends().add(sender);
-            sendOneToOne(receiver);
+            sendOneToOne(receiver, Packet.PacketPropose.RESPOND_ADD_FRIEND);
 
         }
     }
@@ -167,7 +174,16 @@ public class Server extends User {
                 receiver = cip;
             }
         }
-        connections.get(receiver).sendPacket(packet);
+        boolean isAlreadyFriend = false;
+        for (ClientProfile clientProfile : sender.getFriends()) {
+            if (clientProfile.equals(receiver)) {
+                isAlreadyFriend = true;
+            }
+        }
+        if (!isAlreadyFriend) {
+            connections.get(receiver).sendPacket(packet);
+        }
+
     }
 
     private void respondToChat(Packet packet) {
@@ -242,6 +258,7 @@ public class Server extends User {
         }
 
     }
+
     private void sendOneToOne(ClientProfile clientProfile, Packet.PacketPropose customPurpose) {
         Connection foundConnection = connections.get(clientProfile);
         if (clientProfile.getOnline() && foundConnection != null) {
@@ -261,6 +278,8 @@ public class Server extends User {
         }
         if (foundClient == null) {
             serverMassage = ServerMassages.USERNAME_NOT_FOUND;
+        } else if (foundClient.getOnline()) {
+            serverMassage = ServerMassages.ALREADY_LOGED_IN;
         } else {
             if (clientProfile.getPassword().equals(foundClient.getPassword())) {
 
@@ -339,8 +358,12 @@ public class Server extends User {
 
         if (((Boolean) packet.getContent()) == true) {
             serverGame = new ServerGame(this, playerX, playerO, connections.get(playerX), connections.get(playerO));
+            playerO.setPlayingOnline(true);
+            playerX.setPlayingOnline(true);
             connections.get(playerX).sendPacket(new Packet(clientProfiles, this, Packet.PacketPropose.START_GAME));
             connections.get(playerO).sendPacket(new Packet(clientProfiles, this, Packet.PacketPropose.START_GAME));
+
+
         }
     }
 
@@ -367,6 +390,7 @@ public class Server extends User {
             e.printStackTrace();
         }
     }
+
     public void readFile() {
         try ( // Create an input stream for file clientProfiles.dat
               ObjectInputStream input = new ObjectInputStream(new FileInputStream(file))) {

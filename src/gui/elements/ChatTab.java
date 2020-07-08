@@ -3,7 +3,7 @@ package gui.elements;
 import Serlizables.Chat;
 import Serlizables.Massage;
 import Serlizables.Packet;
-import controllers.ChatBoxController;
+import controllers.ChatController;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
@@ -21,9 +21,20 @@ public class ChatTab extends Tab {
     private Chat chat;
     private final VBox massages;
     private final Client client;
-    private ChatBoxController chatBoxController;
+    private ChatController chatController;
     private int unReadMassages = 0;
     private Date lastUpdate;
+    EventHandler<MouseEvent> sendMassage = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent mouseEvent) {
+            String text = chatController.textField.getText();
+            if (!text.isBlank()) {
+                Massage massage = new Massage(client.getClientProfile(), new Date(), chatController.textField.getText());
+                client.connection.sendPacket(new Packet(massage, client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.CHAT));
+                chatController.textField.clear();
+            }
+        }
+    };
 
     public ChatTab(Chat chat, Client client) {
 
@@ -40,31 +51,19 @@ public class ChatTab extends Tab {
         try {
             chatBoxLoader.setLocation(new File("resources/FXMLFiles/ChatBox.fxml").toURL());
             anchorPane = chatBoxLoader.load();
-            chatBoxController = chatBoxLoader.getController();
+            chatController = chatBoxLoader.getController();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         setContent(anchorPane);
-        massages = chatBoxController.massages;
-        chatBoxController.send.setOnMouseClicked(sendMassage);
-        chatBoxController.send.setStyle("-fx-font-size: 15");
-        chatBoxController.send.setText(chat.getName().substring(0, 1));
+        massages = chatController.massages;
+        chatController.send.setOnMouseClicked(sendMassage);
+        chatController.send.setStyle("-fx-font-size: 15");
+        chatController.send.setText(chat.getName().substring(0, 1));
         refreshMassages(chat);
 
     }
-
-    EventHandler<MouseEvent> sendMassage = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
-            String text = chatBoxController.textField.getText();
-            if (!text.isBlank()) {
-                Massage massage = new Massage(client.getClientProfile(), new Date(), chatBoxController.textField.getText());
-                client.connection.sendPacket(new Packet(massage, client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.CHAT));
-                chatBoxController.textField.clear();
-            }
-        }
-    };
 
     public void addUnReadMassages() {
         unReadMassages++;
@@ -101,8 +100,8 @@ public class ChatTab extends Tab {
         return client;
     }
 
-    public ChatBoxController getChatBoxController() {
-        return chatBoxController;
+    public ChatController getChatController() {
+        return chatController;
     }
 
     public int getUnReadMassages() {

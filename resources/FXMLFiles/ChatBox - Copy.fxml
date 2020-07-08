@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Text?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="700.0" prefWidth="1260.0"
             style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171"
-            fx:controller="controllers.ChatBoxController">
+            fx:controller="controllers.ChatController">
    <children>
       <ScrollPane disable="true" hbarPolicy="NEVER" prefHeight="700.0" prefWidth="310.0"
                   style="-fx-background: black; -fx-background-color: black;">

@@ -22,7 +22,15 @@ public class ClientProfile implements Serializable {
     private int totalOnlineLosses;
     private int singlePlayerWins;
     private int singlePlayerLosses;
+    private boolean isPlayingOnline;
 
+    public boolean isPlayingOnline() {
+        return isPlayingOnline;
+    }
+
+    public void setPlayingOnline(boolean playingOnline) {
+        isPlayingOnline = playingOnline;
+    }
 
     public ClientProfile(String username, String password) {
         this.username = username;
@@ -120,6 +128,7 @@ public class ClientProfile implements Serializable {
     public void setSinglePlayerWins(int singlePlayerWins) {
         this.singlePlayerWins = singlePlayerWins;
     }
+
 
     public ArrayList<Chat> getChats() {
         return chats;
