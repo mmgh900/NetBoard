@@ -32,6 +32,7 @@ public class Client extends User implements Serializable {
     private ClientProfile clientProfile;
     private Socket socket;
     private boolean isClosed;
+    private int loadingCount = 0;
 
 
     public Client() {
