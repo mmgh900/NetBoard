@@ -133,9 +133,8 @@ public class Server extends User {
         } else {
             if (clientProfile.getSecurityQuestion().equals(foundClient.getSecurityQuestion()) && clientProfile.getAnswer().equalsIgnoreCase(foundClient.getAnswer())) {
 
-                serverMassage = ServerMassages.RECOVER_PASSWORD_SUCCESSFUL;
                 connection.sendPacket(new Packet(foundClient.getUsername() + ":" + foundClient.getPassword(), this, Packet.PacketPropose.RECOVER_PASSWORD_REQUEST));
-
+                return;
             } else {
                 serverMassage = ServerMassages.WRONG_QUESTION_OR_ANSWER;
             }

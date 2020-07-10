@@ -47,6 +47,7 @@ public class DefaultWindow extends Stage {
     private static final double BLUR_AMOUNT = 70;
     private static final Effect frostEffect = new GaussianBlur(BLUR_AMOUNT);
 
+
     FXMLLoader fxmlLoader = new FXMLLoader();
 
     public DefaultWindow(Client appUser) throws IOException {
@@ -162,6 +163,7 @@ public class DefaultWindow extends Stage {
             @Override
             public void run() {
                 thisWindow.setScene(gameScene);
+
             }
         });
 
@@ -173,6 +175,7 @@ public class DefaultWindow extends Stage {
             @Override
             public void run() {
                 thisWindow.setScene(menuScene);
+
 
             }
         });

@@ -4,6 +4,7 @@ import games.GameWithUI;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
@@ -21,6 +22,7 @@ public class MenuController extends StandardController implements Initializable 
     public Button online;
     public Text username;
     public Text name;
+    public ImageView menuImage;
 
     //Set the actions to change the game mode
     EventHandler handleClicksOnMenuOptions = new EventHandler<MouseEvent>() {

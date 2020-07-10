@@ -70,7 +70,7 @@ public class GameController extends StandardController implements Initializable 
 
                             if (item != null) {
                                 if (item.getOnline()) {
-                                    setText(item.getUsername() + "(ONLINE)");
+                                    setText(item.getUsername() + " (Online)");
                                 } else {
                                     setText(item.getUsername() + "(OFFLINE)");
                                 }
