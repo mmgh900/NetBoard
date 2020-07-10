@@ -36,97 +36,87 @@ public class DefaultWindow extends Stage {
 
     private final DefaultWindow thisWindow;
 
-    private final Scene gameScene;
-    private final GameController gameController;
-
-    private final Scene menuScene;
-    private final MenuController menuController;
-
-    private final Scene loginScene;
-    private final LoginController loginController;
+    //Blur effect variables
     private static final ImageView background = new ImageView();
+    private Scene gameScene;
+    private GameController gameController;
+    private Scene menuScene;
+    private MenuController menuController;
+    private Scene loginScene;
+    private LoginController loginController;
     private static final double BLUR_AMOUNT = 70;
-
     private static final Effect frostEffect = new GaussianBlur(BLUR_AMOUNT);
 
     FXMLLoader fxmlLoader = new FXMLLoader();
 
     public DefaultWindow(Client appUser) throws IOException {
-        this.setX(150);
-        this.setY(50);
-        this.initStyle(StageStyle.UNDECORATED);
-        this.setResizable(false);
+        this.client = appUser;
+        this.thisWindow = this;
+
+        applyWindowSetting();
+        makeScenes();
+
+        //Loading scene
+        // TODO: 7/9/2020 Make proper loading scene
         this.setScene(new Scene(new AnchorPane()));
 
-        this.client = appUser;
-        this.setTitle("TicTocToe");
-        this.thisWindow = this;
-        this.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent windowEvent) {
-                    client.logout();
-            }
-        });
+        this.show();
+    }
 
-
+    private void makeScenes() throws IOException {
         fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(new File("resources/FXMLFiles/Menu.fxml").toURL());
         Parent menuRoot = fxmlLoader.load();
         menuController = fxmlLoader.getController();
         menuController.rootPane.getChildren().add(newCbox());
+        menuController.setClient(client);
+        menuScene = new Scene(menuRoot, 1260, 700);
+        menuScene.getStylesheets().add(defaultStylesheet);
+
 
         fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(new File("resources/FXMLFiles/GameScene.fxml").toURL());
         Parent gameRoot = fxmlLoader.load();
         gameController = fxmlLoader.getController();
+        gameController.setClient(client);
         gameController.rootPane.getChildren().add(newCbox());
-
-
-        background.setImage(copyBackground(this));
-        background.setOpacity(50);
-
+        gameScene = new Scene(gameRoot, 1260, 700);
+        gameScene.getStylesheets().add(defaultStylesheet);
 
         fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(new File("resources/FXMLFiles/Login.fxml").toURL());
         Parent loginRoot = fxmlLoader.load();
         loginController = fxmlLoader.getController();
+        loginController.setClient(client);
+
         HBox hBox = (HBox) loginController.rootPane.getChildren().get(0);
         VBox cBox = newCbox();
-        loginController.rootPane.getChildren().setAll(background, hBox, cBox);
+        loginScene = new Scene(loginRoot, 1260, 700);
+        loginScene.getStylesheets().add(defaultStylesheet);
+
+        //Making blur effect
+        //background.setImage(copyBackground(this));
+        loginController.rootPane.getChildren().setAll(hBox, cBox);
         loginController.rootPane.setStyle("-fx-background-color: white");
         makeSmoke(thisWindow);
         background.setImage(copyBackground(thisWindow));
         background.setEffect(frostEffect);
         background.setOpacity(0);
-        makeDraggable(thisWindow, cBox, loginController.rootPane);
-        /*thisWindow.focusedProperty().addListener(new ChangeListener<Boolean>() {
+    }
+
+    private void applyWindowSetting() {
+        this.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
-                if (thisWindow.isFocused()) {
-                    thisWindow.hide();
-                    background.setImage(copyBackground(thisWindow));
-                    background.setEffect(frostEffect);
-                    thisWindow.show();
-                }
+            public void handle(WindowEvent windowEvent) {
+                client.logout();
             }
-        });*/
+        });
 
-
-        menuScene = new Scene(menuRoot, 1260, 700);
-        gameScene = new Scene(gameRoot, 1260, 700);
-        loginScene = new Scene(loginRoot, 1260, 700);
-
-
-        menuScene.getStylesheets().add(defaultStylesheet);
-        gameScene.getStylesheets().add(defaultStylesheet);
-        loginScene.getStylesheets().add(defaultStylesheet);
-
-
-        this.show();
-
-
-        //primaryStage.setResizable(false);
-        //primaryStage.initStyle(StageStyle.UNDECORATED);
+        this.setTitle("Net Board");
+        this.setX(150);
+        this.setY(50);
+        this.initStyle(StageStyle.UNDECORATED);
+        this.setResizable(false);
 
     }
 
@@ -168,7 +158,6 @@ public class DefaultWindow extends Stage {
     }
 
     public void loadGameScene() throws IOException {
-        gameController.setClient(client);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -179,18 +168,17 @@ public class DefaultWindow extends Stage {
     }
 
     public void loadMenuScene() throws IOException {
-        menuController.setClient(client);
+        menuController.updateProfileUiGraphics();
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 thisWindow.setScene(menuScene);
-                menuController.updateProfileUiGraphics();
+
             }
         });
     }
 
     public void loadLoginScene() throws IOException {
-        loginController.setClient(client);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {

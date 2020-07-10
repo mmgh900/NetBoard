@@ -29,7 +29,7 @@ public class ChatTab extends Tab {
         public void handle(MouseEvent mouseEvent) {
             String text = chatController.textField.getText();
             if (!text.isBlank()) {
-                Massage massage = new Massage(client.getClientProfile(), new Date(), chatController.textField.getText());
+                Massage massage = new Massage(chat, client.getClientProfile(), new Date(), chatController.textField.getText());
                 client.connection.sendPacket(new Packet(massage, client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.CHAT));
                 chatController.textField.clear();
             }

@@ -6,7 +6,6 @@ import Serlizables.ServerMassages;
 import Serlizables.Square;
 import controllers.DefaultWindow;
 import controllers.GetRespondWindow;
-import games.ClientGame;
 import games.GameWithUI;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
@@ -16,6 +15,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static users.Server.ANSI_PURPLE;
 import static users.Server.ANSI_RESET;
@@ -28,34 +29,27 @@ public class Client extends User implements Serializable {
     private final Client thisClient = this;
     public Button mainMenu;
     public Text loginSceneMassage;
-    private ArrayList<ClientProfile> otherPlayers;
+    private final int loadingCount = 0;
     private ClientProfile clientProfile;
     private Socket socket;
     private boolean isClosed;
-    private int loadingCount = 0;
+    private final ExecutorService pool;
+    private ArrayList<ClientProfile> onlineClients;
 
 
     public Client() {
 
         isClosed = false;
-        boolean isConnectionFailed = false;
-        try {
-            socket = new Socket("localhost", PORT);
-            //game = new games.ClientGame(appUser, games.Game.Player.PLAYER_O, connection);
-            connection = new Connection(socket, this);
-            new Thread(connection, "guest connection").start();
-
-        } catch (IOException e) {
-            isConnectionFailed = true;
-        }
+        boolean isConnected = makeConnection();
+        pool = Executors.newFixedThreadPool(5);
         try {
             this.window = new DefaultWindow(this);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (isConnectionFailed) {
-            window.getLoginController().badNews("There was a problem in connecting to the server. Try again later");
+        if (!isConnected) {
+            window.getLoginController().badNews("No server");
         }
         try {
             window.loadLoginScene();
@@ -63,144 +57,111 @@ public class Client extends User implements Serializable {
             e.printStackTrace();
         }
 
+        game = new GameWithUI(this);
+    }
+
+    public boolean makeConnection() {
+        try {
+            socket = new Socket("localhost", PORT);
+            connection = new Connection(socket, this);
+            new Thread(connection, "guest connection").start();
+
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public void receivePacket(Packet packet) {
-        new Thread(new Runnable() {
+        /*pool.execute(new Thread(() -> {*/
+        System.out.println(ANSI_PURPLE + clientProfile.toString() + ": received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
+        if (packet.getContent() instanceof ServerMassages) {
+            respondToServerMassages(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
+            if (respondToRequests(packet, Packet.PacketPropose.RESPOND_PLAY_TOGETHER))
+                return;
+        } else if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
+            if (respondToRequests(packet, Packet.PacketPropose.RESPOND_ADD_FRIEND))
+                return;
+        } else if (packet.getPropose().equals(Packet.PacketPropose.START_GAME)) {
+            respondToStartGame(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
+            respondToUpdateGame(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
+            ClientProfile updateProfile = (ClientProfile) packet.getContent();
+            window.getGameController().updateChats(updateProfile);
+            clientProfile = updateProfile;
+        } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
+            ClientProfile updateProfile = (ClientProfile) packet.getContent();
+            clientProfile = updateProfile;
+            window.getGameController().updateFriendsList();
+        } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
+            window.getLoginController().goodNews("YOUR USERNAME AND PASSWORD: " + packet.getContent());
+        } else if (packet.getPropose().equals(Packet.PacketPropose.LOAD_PACKET)) {
+            respondToLoadPacket(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
+            respondToProfileInfo(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.PROFILES_IN_SYSTEM)) {
+            respondToProfilesInSystem(packet);
+        }
+        /*}, "Respond to " + packet.getPropose().toString().toLowerCase()));*/
+    }
+
+    private void respondToProfileInfo(Packet packet) {
+        ClientProfile clientProfile1 = (ClientProfile) packet.getContent();
+        if (clientProfile1.equals(clientProfile)) {
+            clientProfile = clientProfile1;
+            return;
+        }
+        game.getGameController().aClientChangedStatus(clientProfile1);
+        for (ClientProfile clientProfile2 : onlineClients) {
+            if (clientProfile2.equals(clientProfile1)) {
+                clientProfile2 = clientProfile1;
+            }
+        }
+        for (ClientProfile clientProfile2 : clientProfile.getFriends()) {
+            if (clientProfile2.equals(clientProfile1)) {
+                clientProfile2 = clientProfile1;
+            }
+        }
+    }
+
+    private void respondToLoadPacket(Packet packet) {
+        onlineClients = (ArrayList<ClientProfile>) packet.getContents()[1];
+        clientProfile = (ClientProfile) packet.getContents()[0];
+
+        game.load();
+        Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                System.out.println(ANSI_PURPLE + clientProfile.toString() + ": received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
-                if (packet.getPropose().equals(Packet.PacketPropose.PROFILES_IN_SYSTEM)) {
-                    respondToProfilesInSystem(packet);
-                } else if (packet.getContent() instanceof ServerMassages) {
-                    respondToServerMassages(packet);
-                } else if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
-                    respondToProfileInfo(packet);
-                } else if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
-                    if (respondToRequests(packet, Packet.PacketPropose.RESPOND_PLAY_TOGETHER))
-                        return;
-                } else if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
-                    if (respondToRequests(packet, Packet.PacketPropose.RESPOND_ADD_FRIEND))
-                        return;
-                } else if (packet.getPropose().equals(Packet.PacketPropose.START_GAME)) {
-                    respondToStartGame(packet);
-                } else if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
-                    respondToUpdateGame(packet);
-                } else if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
-                    ClientProfile updateProfile = (ClientProfile) packet.getContent();
-                    game.updateChats(updateProfile);
-                    clientProfile = updateProfile;
-                } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
-                    ClientProfile updateProfile = (ClientProfile) packet.getContent();
-                    clientProfile = updateProfile;
-                    game.updateFriendsList();
-                } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
-                    window.getLoginController().goodNews("YOUR USERNAME AND PASSWORD: " + packet.getContent());
-                }
+                window.setTitle(clientProfile.getUsername());
             }
-        }, "Respond to " + packet.getPropose().toString().toLowerCase()).start();
+        });
+
+        window.getLoginController().goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
+        try {
+            window.loadMenuScene();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
     private void respondToServerMassages(Packet packet) {
-        if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP)) {
-            respondToServerRespondToSignUp(packet);
-        } else if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_LOGIN)) {
-            ServerMassages serverMassage = (ServerMassages) packet.getContent();
-            respondToServerRespondToLogin(serverMassage);
-        } else if (packet.getPropose().equals(Packet.PacketPropose.SERVER_RESPOND_TO_RECOVER_PASS)) {
-            ServerMassages serverMassage = (ServerMassages) packet.getContent();
-            respondToServerRespondToRecoverPass(serverMassage);
-        }
+        ServerMassages serverMassage = (ServerMassages) packet.getContent();
+        window.getLoginController().badNews(serverMassage.toString().toLowerCase().replace("_", " "));
     }
 
     private void respondToUpdateGame(Packet packet) {
         Square[][] squares = (Square[][]) packet.getContent();
-        ClientGame clientGame = (ClientGame) game;
-        clientGame.updateGame(squares);
+        game.updateGame(squares);
     }
 
     private void respondToStartGame(Packet packet) {
-        ClientGame clientGame = (ClientGame) game;
         ClientProfile[] clientProfiles = (ClientProfile[]) packet.getContent();
-        clientGame.startGame(clientProfiles[0], clientProfiles[1]);
+        game.startGame(clientProfiles[0], clientProfiles[1]);
 
-    }
-
-    private boolean respondToRequests(Packet packet, Packet.PacketPropose respondPlayTogether) {
-        if (!(game instanceof ClientGame)) {
-            connection.sendPacket(new Packet(false, packet.getSenderProfile(), this.getClientProfile(), respondPlayTogether));
-            return true;
-        } else {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
-                }
-            });
-
-
-        }
-        return false;
-    }
-
-    private void respondToProfileInfo(Packet packet) {
-        updateProfile((ClientProfile) packet.getContent());
-        if (game == null) {
-            game = new ClientGame(this);
-            game.initializeChats();
-        }
-        //game.update();
-
-    }
-
-    private void respondToServerRespondToLogin(ServerMassages serverMassage) {
-        if (serverMassage == ServerMassages.LOGIN_SUCCESSFUL) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    window.setTitle(clientProfile.getUsername());
-                }
-            });
-
-            window.getLoginController().goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
-            try {
-                window.loadMenuScene();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            window.getLoginController().badNews(serverMassage.toString().toLowerCase().replace("_", " "));
-        }
-    }
-
-    private void respondToServerRespondToRecoverPass(ServerMassages serverMassage) {
-        if (serverMassage == ServerMassages.RECOVER_PASSWORD_SUCCESSFUL) {
-
-            //window.getLoginController().goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
-        } else {
-            window.getLoginController().badNews(serverMassage.toString().toLowerCase().replace("_", " "));
-        }
-    }
-
-    private void respondToServerRespondToSignUp(Packet packet) {
-        ServerMassages serverMassage = (ServerMassages) packet.getContent();
-
-        if (serverMassage == ServerMassages.SIGN_UP_SUCCESSFUL) {
-            //window.getLoginController().goodNews("Sign up successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
-
-
-            window.setTitle(clientProfile.getUsername());
-
-            try {
-                window.loadMenuScene();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            window.getLoginController().badNews(serverMassage.toString().toLowerCase().replace("_", " "));
-        }
     }
 
     private void respondToProfilesInSystem(Packet packet) {
@@ -211,13 +172,38 @@ public class Client extends User implements Serializable {
                 e.printStackTrace();
             }
         }
-        otherPlayers = (ArrayList) packet.getContent();
-        otherPlayers.removeIf(cp -> cp.equals(clientProfile));
-        System.out.println(Server.ANSI_GREEN + "\t" + clientProfile.toString() + ": OTHER PLAYERS UPDATED" + ANSI_RESET);
-
-        while (game == null && !isClosed) {
+        onlineClients = (ArrayList) packet.getContent();
+        if (game.getOtherPlayer() != null && onlineClients.contains(game.getOtherPlayer())) {
+            int indexOfOpponent = onlineClients.indexOf(game.getOtherPlayer());
+            game.setOtherPlayer(onlineClients.get(indexOfOpponent));
+            if (onlineClients.size() == 1) {
+                System.out.println("NOW has ; " + game.getOtherPlayer().getTicTacToeStatistics().getSinglePlayerLosses());
+            }
         }
-        game.updateOnlinesList();
+        for (ClientProfile clientProfile1 : onlineClients) {
+            if (clientProfile.getFriends().contains(clientProfile1)) {
+                int index = onlineClients.indexOf(clientProfile1);
+                clientProfile.getFriends().set(index, onlineClients.get(index));
+                game.getGameController().friends.getItems().set(index, onlineClients.get(index));
+            }
+            int index = onlineClients.indexOf(clientProfile1);
+            onlineClients.indexOf(clientProfile1);
+            game.getGameController().onlineContacts.getItems().set(index, clientProfile1);
+
+        }
+
+        System.out.println(Server.ANSI_GREEN + "\t" + clientProfile.toString() + ": OTHER PLAYERS UPDATED" + ANSI_RESET);
+    }
+
+    private boolean respondToRequests(Packet packet, Packet.PacketPropose respondPlayTogether) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
+            }
+        });
+        return true;
+
     }
 
     @Override
@@ -231,28 +217,20 @@ public class Client extends User implements Serializable {
     }
 
 
-    public Socket getSocket() {
-        return socket;
-    }
-
     public DefaultWindow getWindow() {
         return window;
-    }
-
-
-    public Client getThisClient() {
-        return thisClient;
     }
 
     public ClientProfile getClientProfile() {
         return clientProfile;
     }
 
-    public ArrayList<ClientProfile> getOtherPlayers() {
-        return otherPlayers;
+    public ArrayList<ClientProfile> getOnlineClients() {
+        return onlineClients;
     }
 
     public void sendProfileToServer() {
+        System.out.println(clientProfile.toString() + " now has " + clientProfile.getTicTacToeStatistics().getSinglePlayerLosses());
         connection.sendPacket(new Packet(clientProfile, thisClient, Packet.PacketPropose.PROFILE_INFO));
     }
 
@@ -271,10 +249,6 @@ public class Client extends User implements Serializable {
             }
         }
 
-    }
-
-    private void updateProfile(ClientProfile clientProfile) {
-        this.clientProfile = clientProfile;
     }
 
 

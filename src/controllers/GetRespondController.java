@@ -15,6 +15,34 @@ import java.util.ResourceBundle;
 
 public class GetRespondController extends StandardController implements Initializable {
 
+    private Client receiver;
+    private ClientProfile sender;
+    private Packet.PacketPropose packetPropose;
+
+    public Client getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(Client receiver) {
+        this.receiver = receiver;
+    }
+
+    public ClientProfile getSender() {
+        return sender;
+    }
+
+    public void setSender(ClientProfile sender) {
+        this.sender = sender;
+    }
+
+    public Packet.PacketPropose getPacketPropose() {
+        return packetPropose;
+    }
+
+    public void setPacketPropose(Packet.PacketPropose packetPropose) {
+        this.packetPropose = packetPropose;
+    }
+
     public Button decline;
     public Button accept;
     public Text massage;
@@ -24,43 +52,32 @@ public class GetRespondController extends StandardController implements Initiali
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         decline.setStyle("-fx-background-color: red");
+        decline.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                ((Stage) decline.getScene().getWindow()).close();
+                respondToChoice(false);
+            }
+        });
+
+        accept.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                ((Stage) decline.getScene().getWindow()).close();
+                respondToChoice(true);
+            }
+        });
     }
 
-    public void setToFriendRequest(ClientProfile sender, Client receiver) {
+
+    public void setMassage() {
         massage.setText(receiver.getClientProfile().getFirstName() + ", you have received a add friend request from @" + sender.getUsername().toUpperCase());
-        decline.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                receiver.connection.sendPacket(new Packet(false, sender, receiver.getClientProfile(), Packet.PacketPropose.RESPOND_ADD_FRIEND));
-                ((Stage) decline.getScene().getWindow()).close();
-            }
-        });
-
-        accept.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                receiver.connection.sendPacket(new Packet(true, sender, receiver.getClientProfile(), Packet.PacketPropose.RESPOND_ADD_FRIEND));
-                ((Stage) decline.getScene().getWindow()).close();
-            }
-        });
     }
 
-    public void setToPlayRequest(ClientProfile sender, Client receiver) {
-        massage.setText(receiver.getClientProfile().getFirstName() + ", you have received a play request from @" + sender.getUsername().toUpperCase());
-        decline.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                receiver.connection.sendPacket(new Packet(false, sender, receiver.getClientProfile(), Packet.PacketPropose.RESPOND_PLAY_TOGETHER));
-                ((Stage) decline.getScene().getWindow()).close();
-            }
-        });
-
-        accept.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                receiver.connection.sendPacket(new Packet(true, sender, receiver.getClientProfile(), Packet.PacketPropose.RESPOND_PLAY_TOGETHER));
-                ((Stage) decline.getScene().getWindow()).close();
-            }
-        });
+    public void respondToChoice(boolean answer) {
+        receiver.connection.sendPacket(new Packet(answer, sender, receiver.getClientProfile(), packetPropose));
+        if (packetPropose.equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
+            receiver.game.startGame(sender, receiver.getClientProfile());
+        }
     }
 }

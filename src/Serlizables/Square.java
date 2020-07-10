@@ -1,6 +1,6 @@
 package Serlizables;
 
-import games.Game;
+import games.GameWithUI;
 
 import java.io.Serializable;
 
@@ -17,21 +17,21 @@ public class Square implements Serializable {
     public static final int SIZE = 150;
     private final int x;
     private final int y;
-    private Game.Player state;
+    private GameWithUI.Player state;
 
     public Square(int x, int y) {
         this.x = x;
         this.y = y;
-        this.state = Game.Player.NONE;
+        this.state = GameWithUI.Player.NONE;
 
 
     }
 
-    public Game.Player getState() {
+    public GameWithUI.Player getState() {
         return state;
     }
 
-    public void setState(Game.Player state) {
+    public void setState(GameWithUI.Player state) {
         this.state = state;
     }
 

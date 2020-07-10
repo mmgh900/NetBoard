@@ -1,7 +1,6 @@
 package users;
 
 import Serlizables.*;
-import games.ServerGame;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -29,13 +28,13 @@ public class Server extends User {
     private ArrayList<ClientProfile> usersInSystem = new ArrayList<>();
     private ServerSocket serverSocket = null;
     private Socket socket = null;
-    private ServerGame serverGame;
+    //private ServerGame serverGame;
 
     public Server() throws Exception {
         if (!file.exists()) {
             throw new Exception("Couldn't find file");
         }
-        addSampleClients();
+        //addSampleClients();
 
         readFile();
         for (ClientProfile clientProfile : usersInSystem) {
@@ -58,66 +57,60 @@ public class Server extends User {
 
     }
 
-    private ArrayList<ClientProfile> cloneUsersInSystem() {
-        ArrayList<ClientProfile> clientProfiles = new ArrayList<ClientProfile>();
+    private ArrayList<ClientProfile> makeOnlineClientsPack(ClientProfile clientProfile) {
+        ArrayList<ClientProfile> onlineClientsPack = new ArrayList<ClientProfile>();
 
         for (ClientProfile cp : usersInSystem) {
-            ClientProfile clientProfile = new ClientProfile(cp.getFirstName(), cp.getLastName(), cp.getUsername(), cp.getPassword(), cp.getSecurityQuestion(), cp.getAnswer(), cp.getEmail());
-            clientProfile.setSinglePlayerWins(cp.getSinglePlayerWins());
-            clientProfile.setSinglePlayerLosses(cp.getSinglePlayerLosses());
-            clientProfile.setTotalOnlineWins(cp.getTotalOnlineWins());
-            clientProfile.setTotalOnlineLosses(cp.getTotalOnlineLosses());
-            clientProfile.setOnline(cp.getOnline());
-            clientProfiles.add(clientProfile);
+            if (cp.getOnline() && !cp.equals(clientProfile)) {
+                onlineClientsPack.add(cp.makeSafeClone());
+            }
         }
-        return clientProfiles;
+        return onlineClientsPack;
     }
 
     @Override
     public void receivePacket(Packet packet) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(ANSI_RED + "[SERVER]: received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
-                if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGOUT_REQUEST)) {
-                    ClientProfile clientProfile = (ClientProfile) packet.getContent();
-                    respondToLogoutRequest(clientProfile);
-                    sendAllToAll();
-                    writeFile();
-                } else if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGIN_REQUEST)) {
-                    ClientProfile clientProfile = (ClientProfile) packet.getContent();
-                    respondToLoginRequest(clientProfile);
-                    sendAllToAll();
-                    //writeFile();
-                } else if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.SIGN_UP_REQUEST)) {
-                    ClientProfile clientProfile = (ClientProfile) packet.getContent();
-                    respondToSignUpRequest(clientProfile);
-                    sendAllToAll();
-                    //writeFile();
-                } else if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
-                    respondToPlayTogetherRequest(packet);
-                } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_PLAY_TOGETHER)) {
-                    respondToPlayTogetherRespond(packet);
-                    sendAllToAll();
-                } else if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
-                    respondToAddFriend(packet);
-                } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
-                    respondToAddFriendRespond(packet);
-                } else if (packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
-                    updateOneClient((ClientProfile) packet.getContent());
-                    sendAllToAll();
-                    //writeFile();
-                } else if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
-                    respondToUpdateGame(packet);
-                } else if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
-                    respondToChat(packet);
-                    //writeFile();
-                } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
-                    rospondToRecoverPassword(packet);
-                }
 
+        System.out.println(ANSI_RED + "[SERVER]: received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
+        if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGOUT_REQUEST)) {
+            if (!(packet.getContent() instanceof ClientProfile) || packet.getContent() == null) {
+                try {
+                    throw new Exception("Invalid data");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }, "Respond to " + packet.getPropose().toString().toLowerCase()).start();
+            ClientProfile clientProfile = (ClientProfile) packet.getContent();
+            respondToLogoutRequest(clientProfile);
+            writeFile();
+        } else if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGIN_REQUEST)) {
+            ClientProfile clientProfile = (ClientProfile) packet.getContent();
+            respondToLoginRequest(clientProfile);
+            //writeFile();
+        } else if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.SIGN_UP_REQUEST)) {
+            ClientProfile clientProfile = (ClientProfile) packet.getContent();
+            respondToSignUpRequest(clientProfile);
+            //writeFile();
+        } else if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
+            respondToPlayTogetherRequest(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_PLAY_TOGETHER)) {
+            respondToPlayTogetherRespond(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
+            respondToAddFriend(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
+            respondToAddFriendRespond(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
+            updateOneClient((ClientProfile) packet.getContent());
+            sendAllToAll();
+            writeFile();
+        } else if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
+            respondToUpdateGame(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
+            respondToChat(packet);
+            //writeFile();
+        } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
+            rospondToRecoverPassword(packet);
+        }
 
 
     }
@@ -152,14 +145,23 @@ public class Server extends User {
     }
 
     private void respondToUpdateGame(Packet packet) {
-        ClientProfile foundClient = null;
-        for (ClientProfile cip : usersInSystem) {
-            if (packet.getSenderProfile().equals(cip)) {
-                foundClient = cip;
+        Connection foundConnection = null;
+        for (Map.Entry<ClientProfile, Connection> activeConnections : connections.entrySet()) {
+            if (activeConnections.getKey().equals(packet.getReceiverProfile())) {
+                activeConnections.getKey().equals(packet.getReceiverProfile());
+                foundConnection = activeConnections.getValue();
             }
-
         }
-        serverGame.updateGame((Square[][]) packet.getContent(), foundClient);
+        if (foundConnection == null) {
+            try {
+                throw new Exception("Failed to find game update target");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            foundConnection.sendPacket(packet);
+        }
+
     }
 
     private void respondToAddFriendRespond(Packet packet) {
@@ -253,33 +255,26 @@ public class Server extends User {
 
     private void updateOneClient(ClientProfile clientProfile) {
         System.out.println("A client update");
-        ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
-        ClientProfile foundClient = null;
-        for (ClientProfile cip : usersInSystem) {
-            if (clientProfile.getUsername().equalsIgnoreCase(cip.getUsername())) {
-                cip = clientProfile;
+        if (!connections.containsKey(clientProfile)) {
+            try {
+                throw new Exception("Failed to find update target");
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(1);
             }
         }
+        ClientProfile foundClient = null;
+
+        for (ClientProfile cip : usersInSystem) {
+            if (clientProfile.equals(cip)) {
+                int index = usersInSystem.indexOf(cip);
+                usersInSystem.set(index, clientProfile);
+                foundClient = usersInSystem.get(index);
+            }
+        }
+        System.out.println(clientProfile.toString() + " now has " + foundClient.getTicTacToeStatistics().getSinglePlayerLosses());
     }
 
-    private void sendAllToAll() {
-        ArrayList<ClientProfile> clientsInfo = new ArrayList<>();
-        clientsInfo = cloneUsersInSystem();
-        for (ClientProfile clientProfile : clientsInfo) {
-            clientProfile.clearSecurityInfo();
-        }
-        for (Map.Entry<ClientProfile, Connection> connectionHashMap : connections.entrySet()) {
-            connectionHashMap.getValue().sendPacket(new Packet(clientsInfo, this, Packet.PacketPropose.PROFILES_IN_SYSTEM));
-        }
-    }
-
-    private void sendOneToOne(ClientProfile clientProfile) {
-        Connection foundConnection = connections.get(clientProfile);
-        if (clientProfile.getOnline() && foundConnection != null) {
-            foundConnection.sendPacket(new Packet(clientProfile, this, Packet.PacketPropose.PROFILE_INFO));
-        }
-
-    }
 
     private void sendOneToOne(ClientProfile clientProfile, Packet.PacketPropose customPurpose) {
         Connection foundConnection = connections.get(clientProfile);
@@ -291,7 +286,7 @@ public class Server extends User {
 
     private void respondToLoginRequest(ClientProfile clientProfile) {
         System.out.println("A login request received");
-        ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
+        ServerMassages serverMassage;
         ClientProfile foundClient = null;
         for (ClientProfile cip : usersInSystem) {
             if (clientProfile.equals(cip)) {
@@ -304,23 +299,32 @@ public class Server extends User {
             serverMassage = ServerMassages.ALREADY_LOGED_IN;
         } else {
             if (clientProfile.getPassword().equals(foundClient.getPassword())) {
-
                 usersInSystem.get(usersInSystem.indexOf(foundClient)).setOnline(true);
-                serverMassage = ServerMassages.LOGIN_SUCCESSFUL;
                 connections.put(foundClient, connection);
-                sendOneToOne(foundClient);
+                connection.sendPacket(new Packet(foundClient, makeOnlineClientsPack(foundClient), this, Packet.PacketPropose.LOAD_PACKET));
+
+                sendUpdatedProfile(foundClient);
+                return;
 
             } else {
                 serverMassage = ServerMassages.WRONG_PASSWORD;
                 System.out.println("getPassword() was: " + foundClient.getPassword() + "but client entered: " + clientProfile.getPassword());
             }
         }
-        connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_RESPOND_TO_LOGIN));
+        connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_ERROR_IN_LOGIN));
+    }
+
+    private void sendUpdatedProfile(ClientProfile clientProfile) {
+        for (Map.Entry<ClientProfile, Connection> activeConnections : connections.entrySet()) {
+            if (!activeConnections.getKey().equals(clientProfile)) {
+                activeConnections.getValue().sendPacket(new Packet(clientProfile.makeSafeClone(), this, Packet.PacketPropose.PROFILE_INFO));
+            }
+        }
     }
 
     private void respondToSignUpRequest(ClientProfile clientProfile) {
         System.out.println("A sign up request received");
-        ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
+        ServerMassages serverMassage;
         ClientProfile DupplicateByUserName = null;
         ClientProfile DupplicateByEmail = null;
         for (ClientProfile cip : usersInSystem) {
@@ -338,35 +342,51 @@ public class Server extends User {
         } else {
             addUserToSystem(clientProfile);
             respondToLoginRequest(clientProfile);
+            return;
 
         }
         connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP));
     }
 
     private void respondToLogoutRequest(ClientProfile clientProfile) {
+
         if (clientProfile.getOnline()) {
             System.out.println("A logout request received");
-
-            ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
-
             ClientProfile foundClient = null;
 
             for (ClientProfile cip : usersInSystem) {
-                if (clientProfile.getUsername().equalsIgnoreCase(cip.getUsername())) {
-                    foundClient = cip;
+                if (clientProfile.equals(cip)) {
+                    int index = usersInSystem.indexOf(cip);
+                    usersInSystem.set(index, clientProfile);
+                    foundClient = usersInSystem.get(index);
                 }
             }
-
+            System.out.println(clientProfile.toString() + " now has " + foundClient.getTicTacToeStatistics().getSinglePlayerLosses());
 
             if (foundClient == null) {
-                serverMassage = ServerMassages.USERNAME_NOT_FOUND;
+                try {
+                    throw new Exception("Client did not found");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             } else {
                 connections.remove(foundClient);
-                usersInSystem.get(usersInSystem.indexOf(foundClient)).setOnline(false);
-                serverMassage = ServerMassages.LOGOUT_SUCCESSFUL;
+                foundClient.setOnline(false);
+                sendUpdatedProfile(foundClient);
+                System.out.println(usersInSystem.get(usersInSystem.indexOf(foundClient)).getUsername() + " loged out. and is online: " + foundClient.getOnline());
+                for (ClientProfile clientProfile1 : usersInSystem) {
+                    System.out.println(clientProfile1.getUsername() + ":" + clientProfile1.getPassword() + "\t" + clientProfile1.getOnline());
+                }
 
             }
-            System.out.println(usersInSystem.get(usersInSystem.indexOf(foundClient)).getUsername() + " loged out.");
+            System.out.println(clientProfile.toString() + " now has " + foundClient.getTicTacToeStatistics().getSinglePlayerLosses());
+
+        } else {
+            try {
+                throw new Exception("Client is already offline");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -377,33 +397,38 @@ public class Server extends User {
         System.out.println("A play together respond received");
         for (Map.Entry<ClientProfile, Connection> connectionHashMap : connections.entrySet()) {
             if (connectionHashMap.getKey().getUsername().equalsIgnoreCase(packet.getReceiverProfile().getUsername())) {
-                playerO = connectionHashMap.getKey();
+                int index = usersInSystem.indexOf(connectionHashMap.getKey());
+                playerO = usersInSystem.get(index);
             }
             if (connectionHashMap.getKey().getUsername().equalsIgnoreCase(packet.getSenderProfile().getUsername())) {
-                playerX = connectionHashMap.getKey();
+                int index = usersInSystem.indexOf(connectionHashMap.getKey());
+                playerX = usersInSystem.get(index);
             }
         }
         clientProfiles[0] = playerX;
         clientProfiles[1] = playerO;
 
         if (((Boolean) packet.getContent()) == true) {
-            serverGame = new ServerGame(this, playerX, playerO, connections.get(playerX), connections.get(playerO));
             playerO.setPlayingOnline(true);
             playerX.setPlayingOnline(true);
             connections.get(playerX).sendPacket(new Packet(clientProfiles, this, Packet.PacketPropose.START_GAME));
             connections.get(playerO).sendPacket(new Packet(clientProfiles, this, Packet.PacketPropose.START_GAME));
-
-
         }
     }
 
     private void respondToPlayTogetherRequest(Packet packet) {
         System.out.println("A play together request received");
-        for (Map.Entry<ClientProfile, Connection> connectionHashMap : connections.entrySet()) {
-            if (connectionHashMap.getKey().getUsername().equalsIgnoreCase(packet.getReceiverProfile().getUsername())) {
-                System.out.println("Found target of play request. sending packet ...");
-                connectionHashMap.getValue().sendPacket(packet);
-                return;
+
+        Connection foundConnection = connections.get(packet.getReceiverProfile());
+        if (packet.getReceiverProfile().getOnline() && foundConnection != null) {
+            System.out.println("Found target of play request. sending packet ...");
+            foundConnection.sendPacket(packet);
+            return;
+        } else {
+            try {
+                throw new Exception("Error in finding play request target");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -457,6 +482,7 @@ public class Server extends User {
             }
             // new thread for a client
             connection = new Connection(socket, this);
+
             pool.execute(new Thread(connection, socket.toString()));
         }
     }
@@ -475,10 +501,16 @@ public class Server extends User {
             }
         }
         usersInSystem.add(clientProfile);
-        sendAllToAll();
         writeFile();
         return true;
     }
 
+    private void sendAllToAll() {
+        ArrayList<ClientProfile> clientsInfo = new ArrayList<>();
+        for (Map.Entry<ClientProfile, Connection> connectionHashMap : connections.entrySet()) {
+            int index = usersInSystem.indexOf(connectionHashMap.getKey());
+            connectionHashMap.getValue().sendPacket(new Packet(makeOnlineClientsPack(usersInSystem.get(index)), this, Packet.PacketPropose.PROFILES_IN_SYSTEM));
+        }
+    }
 
 }

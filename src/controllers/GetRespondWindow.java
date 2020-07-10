@@ -41,11 +41,16 @@ public class GetRespondWindow extends Stage {
         scene = new Scene(root, 600, 200);
         scene.getStylesheets().add(DefaultWindow.defaultStylesheet);
 
+        getRespondController.setSender(sender);
+        getRespondController.setReceiver(receiver);
         if (purpose.equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
-            getRespondController.setToFriendRequest(sender, receiver);
+            getRespondController.setPacketPropose(Packet.PacketPropose.RESPOND_ADD_FRIEND);
         } else if (purpose.equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
-            getRespondController.setToPlayRequest(sender, receiver);
+            getRespondController.setPacketPropose(Packet.PacketPropose.RESPOND_PLAY_TOGETHER);
         }
+        getRespondController.setMassage();
+
+
         this.initStyle(StageStyle.UNDECORATED);
         this.initModality(Modality.APPLICATION_MODAL);
         this.setScene(scene);

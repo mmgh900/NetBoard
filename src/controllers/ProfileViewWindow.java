@@ -3,7 +3,6 @@ package controllers;
 import Serlizables.Chat;
 import Serlizables.ClientProfile;
 import Serlizables.Packet;
-import games.ClientGame;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -81,10 +80,10 @@ public class ProfileViewWindow extends Stage {
 
         name.setText(profile.getFirstName() + " " + profile.getLastName());
         username.setText("@" + profile.getUsername());
-        onlineWins.setText(profile.getTotalOnlineWins() + "");
-        singleWins.setText(profile.getSinglePlayerWins() + "");
-        onlineLosses.setText(profile.getTotalOnlineLosses() + "");
-        singleLosses.setText(profile.getSinglePlayerLosses() + "");
+        onlineWins.setText(profile.getTicTacToeStatistics().getTotalOnlineWins() + "");
+        singleWins.setText(profile.getTicTacToeStatistics().getSinglePlayerWins() + "");
+        onlineLosses.setText(profile.getTicTacToeStatistics().getTotalOnlineLosses() + "");
+        singleLosses.setText(profile.getTicTacToeStatistics().getSinglePlayerLosses() + "");
 
         boolean isAlreadyFriend = false;
         for (ClientProfile clientProfile : viewer.getClientProfile().getFriends()) {
@@ -92,7 +91,7 @@ public class ProfileViewWindow extends Stage {
                 isAlreadyFriend = true;
             }
         }
-        boolean isPlayingOnline = (viewer.game instanceof ClientGame) && ((ClientGame) viewer.game).getOtherPlayer() != null;
+        boolean isPlayingOnline = viewer.getClientProfile().isPlayingOnline();
         boolean isAlreadyChatting = false;
         for (Chat chat : viewer.getClientProfile().getChats()) {
             if (chat.getMembers().get(1).equals(profile)) {
@@ -103,7 +102,7 @@ public class ProfileViewWindow extends Stage {
 
         startChat.setVisible(!isAlreadyChatting);
         addFriend.setVisible(!isAlreadyFriend);
-        playTogether.setVisible(!isPlayingOnline);
+        playTogether.setVisible(!isPlayingOnline && profile.getOnline());
         if (viewer.getClientProfile().equals(profile)) {
             playTogether.setVisible(false);
             addFriend.setVisible(false);
@@ -125,9 +124,10 @@ public class ProfileViewWindow extends Stage {
                 thisWindow.close();
                 Chat newChat = new Chat(viewer.getClientProfile(), profile);
                 viewer.getClientProfile().getChats().add(newChat);
-                viewer.game.addChatTab(newChat);
+                viewer.getWindow().getGameController().addChatTab(newChat);
                 viewer.sendProfileToServer();
-                viewer.game.update();
+                // TODO: 7/9/2020 Rewrite update chat
+                //viewer.game.getGameController().updateChats(viewer.getClientProfile());
             }
         });
 
@@ -135,7 +135,7 @@ public class ProfileViewWindow extends Stage {
             @Override
             public void handle(MouseEvent event) {
                 thisWindow.close();
-                viewer.connection.sendPacket(new Packet(viewer.getClientProfile(), viewer.getClientProfile(), profile, Packet.PacketPropose.PLAY_TOGETHER_REQUEST));
+                viewer.connection.sendPacket(new Packet(Packet.PacketPropose.PLAY_TOGETHER_REQUEST, viewer.getClientProfile().makeSafeClone(), profile));
             }
         });
 

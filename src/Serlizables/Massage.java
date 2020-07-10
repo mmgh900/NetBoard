@@ -5,18 +5,19 @@ import java.util.Date;
 import java.util.Objects;
 
 public class Massage implements Serializable {
-    private ClientProfile sender;
-    private Date date;
-    private String content;
+    private final Chat chat;
+    private final ClientProfile sender;
+    private final Date date;
+    private final String content;
 
-    public Massage() {
-    }
 
-    public Massage(ClientProfile sender, Date date, String content) {
+    public Massage(Chat chat, ClientProfile sender, Date date, String content) {
+        this.chat = chat;
         this.sender = sender;
         this.date = date;
         this.content = content;
     }
+
 
     @Override
     public boolean equals(Object o) {

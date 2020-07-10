@@ -6,6 +6,8 @@ import java.util.Objects;
 
 public class ClientProfile implements Serializable {
 
+
+
     /*    private final UserInfo userInfo;*/
 
     private String username;
@@ -18,10 +20,8 @@ public class ClientProfile implements Serializable {
     private SecurityQuestions securityQuestion;
     private String answer;
     private Boolean isOnline;
-    private int totalOnlineWins;
-    private int totalOnlineLosses;
-    private int singlePlayerWins;
-    private int singlePlayerLosses;
+    private GameStatistics ticTacToeStatistics;
+
     private boolean isPlayingOnline;
 
     public boolean isPlayingOnline() {
@@ -44,7 +44,6 @@ public class ClientProfile implements Serializable {
     }
 
     public ClientProfile(String firstName, String lastName, String username, String password, SecurityQuestions securityQuestion, String answer, String email) {
-        /*        this.userInfo = new UserInfo(username, password);*/
         this.username = username;
         this.password = password;
         this.firstName = firstName;
@@ -53,10 +52,7 @@ public class ClientProfile implements Serializable {
         this.answer = answer;
         this.email = email;
         this.chats = new ArrayList<>();
-        singlePlayerLosses = 0;
-        singlePlayerWins = 0;
-        totalOnlineLosses = 0;
-        totalOnlineWins = 0;
+        ticTacToeStatistics = new GameStatistics(0, 0, 0, 0);
         isOnline = false;
     }
 
@@ -69,11 +65,6 @@ public class ClientProfile implements Serializable {
         }
     }
 
-
-
-/*    public UserInfo getUserInfo() {
-        return userInfo;
-    }*/
 
     public String getFirstName() {
         return firstName;
@@ -95,29 +86,6 @@ public class ClientProfile implements Serializable {
         isOnline = online;
     }
 
-    public int getTotalOnlineWins() {
-        return totalOnlineWins;
-    }
-
-    public void setTotalOnlineWins(int totalOnlineWins) {
-        this.totalOnlineWins = totalOnlineWins;
-    }
-
-    public int getTotalOnlineLosses() {
-        return totalOnlineLosses;
-    }
-
-    public void setTotalOnlineLosses(int totalOnlineLosses) {
-        this.totalOnlineLosses = totalOnlineLosses;
-    }
-
-    public int getSinglePlayerLosses() {
-        return singlePlayerLosses;
-    }
-
-    public void setSinglePlayerLosses(int singlePlayerLosses) {
-        this.singlePlayerLosses = singlePlayerLosses;
-    }
 
     public SecurityQuestions getSecurityQuestion() {
         return securityQuestion;
@@ -131,14 +99,26 @@ public class ClientProfile implements Serializable {
         return email;
     }
 
-    public int getSinglePlayerWins() {
-        return singlePlayerWins;
+
+    public ClientProfile(String username, String firstName, String lastName, String email, String answer, Boolean isOnline, GameStatistics ticTacToeStatistics, boolean isPlayingOnline) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.answer = answer;
+        this.isOnline = isOnline;
+        this.ticTacToeStatistics = ticTacToeStatistics;
+        this.isPlayingOnline = isPlayingOnline;
     }
 
-    public void setSinglePlayerWins(int singlePlayerWins) {
-        this.singlePlayerWins = singlePlayerWins;
+    public GameStatistics getTicTacToeStatistics() {
+        return ticTacToeStatistics;
     }
 
+    public ClientProfile makeSafeClone() {
+        ClientProfile clone = new ClientProfile(username, firstName, lastName, email, answer, isOnline, ticTacToeStatistics, isPlayingOnline);
+        return clone;
+    }
 
     public ArrayList<Chat> getChats() {
         return chats;

@@ -1,8 +1,6 @@
 package controllers;
 
-import games.ClientGame;
-import games.SingleplayerGame;
-import games.TwoPlayerGame;
+import games.GameWithUI;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -28,27 +26,16 @@ public class MenuController extends StandardController implements Initializable 
     EventHandler handleClicksOnMenuOptions = new EventHandler<MouseEvent>() {
         public void handle(MouseEvent event) {
             if (event.getSource() == singleplayer) {
-                client.game = new SingleplayerGame(client);
-                try {
-                    client.getWindow().loadGameScene();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                client.game.startGame(GameWithUI.GameMode.SINGLE_PLAYER);
             } else if (event.getSource() == multiplayer) {
-                client.game = new TwoPlayerGame(client);
-                try {
-                    client.getWindow().loadGameScene();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                client.game.startGame(GameWithUI.GameMode.MULTIPLAYER);
             } else if (event.getSource() == online) {
-                client.game = new ClientGame(client);
-                ((ClientGame) client.game).update();
-                try {
-                    client.getWindow().loadGameScene();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                client.game.startGame(GameWithUI.GameMode.NONE);
+            }
+            try {
+                client.getWindow().loadGameScene();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     };
