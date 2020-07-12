@@ -9,15 +9,23 @@ public class Massage implements Serializable {
     private final ClientProfile sender;
     private final Date date;
     private final String content;
+    private final MassageType massageType;
 
-
-    public Massage(Chat chat, ClientProfile sender, Date date, String content) {
+    public Massage(Chat chat, ClientProfile sender, Date date, String content, MassageType massageType) {
         this.chat = chat;
         this.sender = sender;
         this.date = date;
         this.content = content;
+        this.massageType = massageType;
     }
 
+    public MassageType getMassageType() {
+        return massageType;
+    }
+
+    public Chat getChat() {
+        return chat;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -27,6 +35,10 @@ public class Massage implements Serializable {
             return false;
         Massage massage = (Massage) o;
         return getSender().equals(massage.getSender()) && getDate().equals(massage.getDate()) && getContent().equals(massage.getContent());
+    }
+
+    public enum MassageType implements Serializable {
+        TEXT, IMAGE, FILE
     }
 
     @Override
@@ -45,6 +57,4 @@ public class Massage implements Serializable {
     public String getContent() {
         return content;
     }
-
-
 }

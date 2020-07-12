@@ -116,6 +116,8 @@ public class ProfileViewWindow extends Stage {
             public void handle(MouseEvent mouseEvent) {
                 thisWindow.close();
                 viewer.connection.sendPacket(new Packet(viewer.getClientProfile(), viewer.getClientProfile(), profile, Packet.PacketPropose.ADD_FRIEND_REQUEST));
+
+                addChatWhenSendingRequest(viewer, profile);
             }
         });
 
@@ -138,21 +140,7 @@ public class ProfileViewWindow extends Stage {
                 thisWindow.close();
                 viewer.connection.sendPacket(new Packet(Packet.PacketPropose.PLAY_TOGETHER_REQUEST, viewer.getClientProfile().makeSafeClone(), profile));
 
-                Chat foundChat = null;
-                ChatTab foundChatTab = null;
-                for (Chat chat : viewer.getClientProfile().getChats()) {
-                    if (profile.equals(chat.getMembers().get(1))) {
-                        int index = viewer.getClientProfile().getChats().indexOf(foundChat);
-                        foundChat = viewer.getClientProfile().getChats().get(index);
-                        foundChatTab = (ChatTab) viewer.game.getGameController().chats.getTabs().get(index);
-                    }
-                }
-                if (foundChat == null) {
-                    foundChat = new Chat(viewer.getClientProfile(), profile);
-                    viewer.getClientProfile().getChats().add(foundChat);
-                    foundChatTab = new ChatTab(foundChat, viewer);
-                    viewer.game.getGameController().chats.getTabs().add(foundChatTab);
-                }
+                addChatWhenSendingRequest(viewer, profile);
             }
         });
 
@@ -161,6 +149,24 @@ public class ProfileViewWindow extends Stage {
         this.initModality(Modality.APPLICATION_MODAL);
         this.setScene(profileScene);
         this.show();
+    }
+
+    private void addChatWhenSendingRequest(Client viewer, ClientProfile profile) {
+        Chat foundChat = null;
+        ChatTab foundChatTab = null;
+        for (Chat chat : viewer.getClientProfile().getChats()) {
+            if (profile.equals(chat.getMembers().get(1))) {
+                int index = viewer.getClientProfile().getChats().indexOf(chat);
+                foundChat = viewer.getClientProfile().getChats().get(index);
+                foundChatTab = (ChatTab) viewer.game.getGameController().chats.getTabs().get(index);
+            }
+        }
+        if (foundChat == null) {
+            foundChat = new Chat(viewer.getClientProfile(), profile);
+            viewer.getClientProfile().getChats().add(foundChat);
+            foundChatTab = new ChatTab(foundChat, viewer);
+            viewer.game.getGameController().chats.getTabs().add(foundChatTab);
+        }
     }
 
     public ProfileViewWindow(Client viewer, ClientProfile profile, Boolean isInGameScene) {

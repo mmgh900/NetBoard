@@ -15,6 +15,7 @@ public class ChatController implements Initializable {
     public TextField textField;
     public VBox massages;
     public ScrollPane scrollPane;
+    public Button sendFile;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

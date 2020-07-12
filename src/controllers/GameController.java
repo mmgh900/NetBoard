@@ -6,6 +6,7 @@ import Serlizables.Massage;
 import Serlizables.Square;
 import games.GameWithUI;
 import gui.elements.ChatTab;
+import gui.elements.ImageMassageSkin;
 import gui.elements.SquareSkin;
 import gui.elements.TextMassageSkin;
 import javafx.application.Platform;
@@ -300,7 +301,7 @@ public class GameController extends StandardController implements Initializable 
             client.getClientProfile().getChats().add(chat);
             addChatTab(chat);
             for (Massage massage : clientProfile.getChats().get(i).getMassages()) {
-                addMassageToChat(massage, chat, client.getClientProfile().getChats().indexOf(chat));
+                addMassageToChat(massage);
             }
         }
 
@@ -312,7 +313,7 @@ public class GameController extends StandardController implements Initializable 
             if (numberOfLocalMassages < numberOfServerMassages) {
                 for (int j = numberOfLocalMassages; j < numberOfServerMassages; j++) {
                     client.getClientProfile().getChats().get(i).getMassages().add(clientProfile.getChats().get(i).getMassages().get(j));
-                    addMassageToChat(clientProfile.getChats().get(i).getMassages().get(j), client.getClientProfile().getChats().get(i), i);
+                    addMassageToChat(clientProfile.getChats().get(i).getMassages().get(j));
                     //System.out.println(ANSI_RED + "\t" + clientProfile.toString() + "numberOfLocalMassages= " + numberOfLocalMassages + " numberOfServerMassages= " + numberOfServerMassages + " so massage added" + ANSI_RESET);
                 }
             } else if (numberOfLocalMassages == numberOfServerMassages) {
@@ -331,7 +332,7 @@ public class GameController extends StandardController implements Initializable 
         for (Chat chat : client.getClientProfile().getChats()) {
             addChatTab(chat);
             for (Massage massage : chat.getMassages()) {
-                addMassageToChat(massage, chat, client.getClientProfile().getChats().indexOf(chat));
+                addMassageToChat(massage);
             }
         }
 
@@ -402,13 +403,20 @@ public class GameController extends StandardController implements Initializable 
 
     }
 
-    public void addMassageToChat(Massage massage, Chat chat, int chatIndex) {
+    public void addMassageToChat(Massage massage) {
+        Chat chat = massage.getChat();
+        int chatIndex = client.getClientProfile().getChats().indexOf(chat);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 ChatTab chatTab = (ChatTab) chats.getTabs().get(chatIndex);
                 boolean isSelf = (massage.getSender().equals(client.getClientProfile()));
-                chatTab.getMassages().getChildren().add(new TextMassageSkin(isSelf, massage));
+                if (massage.getMassageType().equals(Massage.MassageType.TEXT)) {
+                    chatTab.getMassages().getChildren().add(new TextMassageSkin(isSelf, massage));
+                } else if (massage.getMassageType().equals(Massage.MassageType.IMAGE)) {
+                    chatTab.getMassages().getChildren().add(new ImageMassageSkin(isSelf, massage));
+                }
+
                 if (!chatTab.getTabPane().getSelectionModel().getSelectedItem().equals(chatTab)) {
                     chatTab.addUnReadMassages();
                 }

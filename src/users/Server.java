@@ -110,6 +110,20 @@ public class Server extends User {
             //writeFile();
         } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
             rospondToRecoverPassword(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.FILE)) {
+            ClientProfile sender = null;
+            ClientProfile receiver = null;
+
+            for (ClientProfile cip : usersInSystem) {
+                if (packet.getSenderProfile().equals(cip)) {
+                    sender = cip;
+                }
+                if (packet.getReceiverProfile().equals(cip)) {
+                    receiver = cip;
+                }
+            }
+
+            connections.get(receiver).sendPacket(packet);
         }
 
 
@@ -482,6 +496,26 @@ public class Server extends User {
             connection = new Connection(socket, this);
 
             pool.execute(new Thread(connection, socket.toString()));
+
+            /*try {
+                Stage stage = new Stage();
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.showOpenDialog(stage);
+                stage.show();
+                File file = new File(fileChooser.getInitialFileName());
+                if (!file.exists()) {
+                    throw new Exception("file is not found");
+                }
+                FileInputStream fileInputStream = new FileInputStream(file);
+                byte[] bytes = fileInputStream.readAllBytes();
+                System.out.println("File length = " + file.length() + " and bytes length = " + bytes.length);
+                connection.sendPacket(new Packet(bytes, this, Packet.PacketPropose.FILE));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
+
+
         }
     }
 

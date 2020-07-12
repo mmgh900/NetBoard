@@ -35,6 +35,16 @@
                         </Lighting>
                      </effect>
                   </TextField>
+                  <Button id="smallButton" fx:id="sendFile" layoutX="327.0" layoutY="20.0" mnemonicParsing="false"
+                          prefHeight="39.0" prefWidth="69.0">
+                     <graphic>
+                        <ImageView fitHeight="23.0" fitWidth="20.0">
+                           <image>
+                              <Image url="@../Images/paperclip.png"/>
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                   <Button id="smallButton" fx:id="send" mnemonicParsing="false" prefHeight="39.0" prefWidth="69.0">
                      <graphic>
                         <ImageView fitHeight="23.0" fitWidth="20.0">

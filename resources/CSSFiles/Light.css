@@ -255,3 +255,18 @@
     -fx-font-size: 20;
 
 }
+
+.request {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-fill: white;
+    -fx-font-size: 20;
+    -fx-font-family: "Product Sans";
+    -fx-wrap-text: true;
+    -fx-max-width: 350;
+}
+
+.request:hover {
+    -fx-background-color: transparent;
+    -fx-underline: true;
+}

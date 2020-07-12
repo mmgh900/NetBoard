@@ -59,10 +59,6 @@ public class Connection implements Runnable {
                 }
             } catch (EOFException | SocketException e) {
                 isRunning = false;
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }

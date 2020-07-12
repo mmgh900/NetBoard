@@ -2,17 +2,20 @@ package users;
 
 import Serlizables.*;
 import controllers.DefaultWindow;
-import controllers.GetRespondChatBox;
 import games.GameWithUI;
 import gui.elements.ChatTab;
+import gui.elements.GetRespondChatBox;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.text.Text;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,6 +25,7 @@ import static users.Server.ANSI_RESET;
 
 public class Client extends User implements Serializable {
 
+    private String downloadPath = "resources/ClientsFiles";
     public GameWithUI game;
     private DefaultWindow window;
     private final Client thisClient = this;
@@ -102,6 +106,25 @@ public class Client extends User implements Serializable {
             respondToProfileInfo(packet);
         } else if (packet.getPropose().equals(Packet.PacketPropose.PROFILES_IN_SYSTEM)) {
             respondToProfilesInSystem(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.FILE)) {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        File file = new File(downloadPath + "/" + packet.getFileName());
+                        FileOutputStream fileOutputStream = new FileOutputStream(file);
+                        fileOutputStream.write((byte[]) packet.getContent());
+                        ChatTab chatTab = giveAChat(packet.getSenderProfile());
+                        Massage massage = new Massage(chatTab.getChat(), packet.getSenderProfile(), new Date(), file.getPath(), Massage.MassageType.IMAGE);
+                        int index = clientProfile.getChats().indexOf(chatTab.getChat());
+                        chatTab.getChat().getMassages().add(massage);
+                        game.getGameController().addMassageToChat(massage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
         }
         /*}, "Respond to " + packet.getPropose().toString().toLowerCase()));*/
     }
@@ -128,6 +151,18 @@ public class Client extends User implements Serializable {
     private void respondToLoadPacket(Packet packet) {
         onlineClients = (ArrayList<ClientProfile>) packet.getContents()[1];
         clientProfile = (ClientProfile) packet.getContents()[0];
+        downloadPath = downloadPath + "/" + clientProfile.getUsername();
+        File file = new File(downloadPath);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        if (!file.exists()) {
+            try {
+                throw new IOException("Error in finding / making client directory");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         game.load();
         Platform.runLater(new Runnable() {
@@ -198,11 +233,11 @@ public class Client extends User implements Serializable {
             @Override
             public void run() {
                 //new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
-                Chat foundChat = null;
+                /*Chat foundChat = null;
                 ChatTab foundChatTab = null;
                 for (Chat chat : clientProfile.getChats()) {
                     if (packet.getSenderProfile().equals(chat.getMembers().get(1))) {
-                        int index = clientProfile.getChats().indexOf(foundChat);
+                        int index = clientProfile.getChats().indexOf(chat);
                         foundChat = clientProfile.getChats().get(index);
                         foundChatTab = (ChatTab) game.getGameController().chats.getTabs().get(index);
                     }
@@ -212,12 +247,32 @@ public class Client extends User implements Serializable {
                     clientProfile.getChats().add(foundChat);
                     foundChatTab = new ChatTab(foundChat, thisClient);
                     game.getGameController().chats.getTabs().add(foundChatTab);
-                }
-                foundChatTab.getMassages().getChildren().add(new GetRespondChatBox(thisClient, packet.getSenderProfile(), propose, foundChatTab));
+                }*/
+                ChatTab chatTab = giveAChat(packet.getSenderProfile());
+                chatTab.getMassages().getChildren().add(new GetRespondChatBox(thisClient, packet.getSenderProfile(), propose, chatTab));
             }
         });
         return true;
 
+    }
+
+    public ChatTab giveAChat(ClientProfile senderProfile) {
+        Chat foundChat = null;
+        ChatTab foundChatTab = null;
+        for (Chat chat : clientProfile.getChats()) {
+            if (senderProfile.equals(chat.getMembers().get(1))) {
+                int index = clientProfile.getChats().indexOf(chat);
+                foundChat = clientProfile.getChats().get(index);
+                foundChatTab = (ChatTab) game.getGameController().chats.getTabs().get(index);
+            }
+        }
+        if (foundChat == null) {
+            foundChat = new Chat(clientProfile, senderProfile);
+            clientProfile.getChats().add(foundChat);
+            foundChatTab = new ChatTab(foundChat, thisClient);
+            game.getGameController().chats.getTabs().add(foundChatTab);
+        }
+        return foundChatTab;
     }
 
     @Override
