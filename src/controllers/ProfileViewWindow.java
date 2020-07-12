@@ -3,6 +3,7 @@ package controllers;
 import Serlizables.Chat;
 import Serlizables.ClientProfile;
 import Serlizables.Packet;
+import gui.elements.ChatTab;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -136,6 +137,22 @@ public class ProfileViewWindow extends Stage {
             public void handle(MouseEvent event) {
                 thisWindow.close();
                 viewer.connection.sendPacket(new Packet(Packet.PacketPropose.PLAY_TOGETHER_REQUEST, viewer.getClientProfile().makeSafeClone(), profile));
+
+                Chat foundChat = null;
+                ChatTab foundChatTab = null;
+                for (Chat chat : viewer.getClientProfile().getChats()) {
+                    if (profile.equals(chat.getMembers().get(1))) {
+                        int index = viewer.getClientProfile().getChats().indexOf(foundChat);
+                        foundChat = viewer.getClientProfile().getChats().get(index);
+                        foundChatTab = (ChatTab) viewer.game.getGameController().chats.getTabs().get(index);
+                    }
+                }
+                if (foundChat == null) {
+                    foundChat = new Chat(viewer.getClientProfile(), profile);
+                    viewer.getClientProfile().getChats().add(foundChat);
+                    foundChatTab = new ChatTab(foundChat, viewer);
+                    viewer.game.getGameController().chats.getTabs().add(foundChatTab);
+                }
             }
         });
 

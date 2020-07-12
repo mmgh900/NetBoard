@@ -45,6 +45,9 @@ public class GameWithUI {
     }
 
     public void startGame(GameMode gameMode1) {
+        otherPlayer = null;
+
+
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -52,7 +55,7 @@ public class GameWithUI {
                 gameMode = gameMode1;
                 gameController.clearGameScene();
                 gameController.makeNewBoardSkin();
-                otherPlayer = null;
+
                 for (int i = 0; i < squares.length; i++) {
                     for (int j = 0; j < squares[i].length; j++) {
                         squares[i][j] = new Square(i, j);
@@ -80,6 +83,9 @@ public class GameWithUI {
     }
 
     public void setOtherPlayer(ClientProfile otherPlayer) {
+        if (otherPlayer == null) {
+            throw new NullPointerException("Client profile is null");
+        }
         this.otherPlayer = otherPlayer;
     }
 
@@ -96,12 +102,20 @@ public class GameWithUI {
 
         if (playerX.equals(client.getClientProfile())) {
             thisPlayer = Player.PLAYER_X;
-            otherPlayer = playerO;
+            setOtherPlayer(playerO);
             gameController.setPlayersInfo(client.getClientProfile(), otherPlayer);
+            System.out.println("Player X = " + client.getClientProfile() + "(this player) Player Y = " + otherPlayer + "(other player)");
         } else if (playerO.equals(client.getClientProfile())) {
             thisPlayer = Player.PLAYER_O;
-            otherPlayer = playerX;
+            setOtherPlayer(playerX);
             gameController.setPlayersInfo(otherPlayer, client.getClientProfile());
+            System.out.println("Player X = " + otherPlayer + "(other player) Player Y = " + client.getClientProfile() + "(this player)");
+        } else {
+            try {
+                throw new Exception(client.getClientProfile().toString() + " this player was neither " + playerX.toString() + " nor " + playerO.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -177,31 +191,34 @@ public class GameWithUI {
     }
 
     public void doForResult(Player result) {
-        gameController.doAboutResult(result);
-        if (gameMode == GameMode.SINGLE_PLAYER) {
-            if (result == Player.PLAYER_X) {
-                client.getClientProfile().getTicTacToeStatistics().addSinglePlayerWins();
-                client.sendProfileToServer();
-            } else if (result == Player.PLAYER_O) {
-                client.getClientProfile().getTicTacToeStatistics().addSinglePlayerLosses();
-                client.sendProfileToServer();
-            }
+        if (result != null) {
+            gameController.doAboutResult(result);
+            if (gameMode == GameMode.SINGLE_PLAYER) {
+                if (result == Player.PLAYER_X) {
+                    client.getClientProfile().getTicTacToeStatistics().addSinglePlayerWins();
+                    client.sendProfileToServer();
+                } else if (result == Player.PLAYER_O) {
+                    client.getClientProfile().getTicTacToeStatistics().addSinglePlayerLosses();
+                    client.sendProfileToServer();
+                }
 
-        } else if (gameMode == GameMode.MULTIPLAYER) {
+            } else if (gameMode == GameMode.MULTIPLAYER) {
 
-        } else if (gameMode == GameMode.ONLINE) {
-            client.getClientProfile().setPlayingOnline(false);
-            otherPlayer.setPlayingOnline(false);
+            } else if (gameMode == GameMode.ONLINE) {
+                client.getClientProfile().setPlayingOnline(false);
+                otherPlayer.setPlayingOnline(false);
 
-            if (result == thisPlayer) {
-                client.getClientProfile().getTicTacToeStatistics().addTotalOnlineWins();
-                client.sendProfileToServer();
-            } else if (result != Player.NONE && result != null) {
-                client.getClientProfile().getTicTacToeStatistics().addTotalOnlineLosses();
-                client.sendProfileToServer();
+                if (result == thisPlayer) {
+                    client.getClientProfile().getTicTacToeStatistics().addTotalOnlineWins();
+                    client.sendProfileToServer();
+                } else if (result != Player.NONE && result != null) {
+                    client.getClientProfile().getTicTacToeStatistics().addTotalOnlineLosses();
+                    client.sendProfileToServer();
+                }
             }
         }
-    }
+        }
+
 
     public void handleClick(MouseEvent mouseEvent) {
         SquareSkin squareSkin = (SquareSkin) mouseEvent.getSource();
@@ -251,6 +268,9 @@ public class GameWithUI {
 
             }
         } else if (gameMode == GameMode.ONLINE) {
+            if (otherPlayer == null) {
+                throw new NullPointerException("other player is null");
+            }
             if (isMyTurn() && square.getState().equals(Player.NONE)) {
                 gameController.massage.setText("");
                 square.setState(getCurrentPlayer());

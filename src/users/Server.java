@@ -34,7 +34,7 @@ public class Server extends User {
         if (!file.exists()) {
             throw new Exception("Couldn't find file");
         }
-        //addSampleClients();
+        addSampleClients();
 
         readFile();
         for (ClientProfile clientProfile : usersInSystem) {
@@ -153,7 +153,7 @@ public class Server extends User {
         }
         if (foundConnection == null) {
             try {
-                throw new Exception("Failed to find game update target");
+                throw new Exception("Failed to find game update target:" + packet.getReceiverProfile());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -395,11 +395,11 @@ public class Server extends User {
         ClientProfile[] clientProfiles = new ClientProfile[2];
         System.out.println("A play together respond received");
         for (Map.Entry<ClientProfile, Connection> connectionHashMap : connections.entrySet()) {
-            if (connectionHashMap.getKey().getUsername().equalsIgnoreCase(packet.getReceiverProfile().getUsername())) {
+            if (connectionHashMap.getKey().equals(packet.getReceiverProfile())) {
                 int index = usersInSystem.indexOf(connectionHashMap.getKey());
                 playerO = usersInSystem.get(index);
             }
-            if (connectionHashMap.getKey().getUsername().equalsIgnoreCase(packet.getSenderProfile().getUsername())) {
+            if (connectionHashMap.getKey().equals(packet.getSenderProfile())) {
                 int index = usersInSystem.indexOf(connectionHashMap.getKey());
                 playerX = usersInSystem.get(index);
             }
@@ -407,11 +407,10 @@ public class Server extends User {
         clientProfiles[0] = playerX;
         clientProfiles[1] = playerO;
 
-        if (((Boolean) packet.getContent()) == true) {
+        if (((Boolean) packet.getContent())) {
             playerO.setPlayingOnline(true);
             playerX.setPlayingOnline(true);
             connections.get(playerX).sendPacket(new Packet(clientProfiles, this, Packet.PacketPropose.START_GAME));
-            connections.get(playerO).sendPacket(new Packet(clientProfiles, this, Packet.PacketPropose.START_GAME));
         }
     }
 

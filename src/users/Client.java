@@ -1,12 +1,10 @@
 package users;
 
-import Serlizables.ClientProfile;
-import Serlizables.Packet;
-import Serlizables.ServerMassages;
-import Serlizables.Square;
+import Serlizables.*;
 import controllers.DefaultWindow;
-import controllers.GetRespondWindow;
+import controllers.GetRespondChatBox;
 import games.GameWithUI;
+import gui.elements.ChatTab;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.text.Text;
@@ -195,11 +193,27 @@ public class Client extends User implements Serializable {
         System.out.println(Server.ANSI_GREEN + "\t" + clientProfile.toString() + ": OTHER PLAYERS UPDATED" + ANSI_RESET);
     }
 
-    private boolean respondToRequests(Packet packet, Packet.PacketPropose respondPlayTogether) {
+    private boolean respondToRequests(Packet packet, Packet.PacketPropose propose) {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
+                //new GetRespondWindow(thisClient, packet.getSenderProfile(), packet.getPropose());
+                Chat foundChat = null;
+                ChatTab foundChatTab = null;
+                for (Chat chat : clientProfile.getChats()) {
+                    if (packet.getSenderProfile().equals(chat.getMembers().get(1))) {
+                        int index = clientProfile.getChats().indexOf(foundChat);
+                        foundChat = clientProfile.getChats().get(index);
+                        foundChatTab = (ChatTab) game.getGameController().chats.getTabs().get(index);
+                    }
+                }
+                if (foundChat == null) {
+                    foundChat = new Chat(clientProfile, packet.getSenderProfile());
+                    clientProfile.getChats().add(foundChat);
+                    foundChatTab = new ChatTab(foundChat, thisClient);
+                    game.getGameController().chats.getTabs().add(foundChatTab);
+                }
+                foundChatTab.getMassages().getChildren().add(new GetRespondChatBox(thisClient, packet.getSenderProfile(), propose, foundChatTab));
             }
         });
         return true;

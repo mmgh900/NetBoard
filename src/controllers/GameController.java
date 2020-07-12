@@ -334,6 +334,7 @@ public class GameController extends StandardController implements Initializable 
                 addMassageToChat(massage, chat, client.getClientProfile().getChats().indexOf(chat));
             }
         }
+
     }
 
     public void doAboutResult(GameWithUI.Player result) {
