@@ -1,7 +1,6 @@
 package users;
 
-import Serlizables.ClientProfile;
-import Serlizables.Packet;
+import serlizables.Packet;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -12,10 +11,8 @@ import java.net.SocketException;
 
 public class Connection implements Runnable {
     private final User sender;
-    private ClientProfile receiver;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
-    private Boolean isRunning;
     private Boolean isClosed;
 
 
@@ -48,7 +45,7 @@ public class Connection implements Runnable {
 
     @Override
     public void run() {
-        isRunning = true;
+        Boolean isRunning = true;
         while (isRunning) {
             try {
                 Object object = objectInputStream.readObject();
@@ -59,10 +56,6 @@ public class Connection implements Runnable {
                 }
             } catch (EOFException | SocketException e) {
                 isRunning = false;
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -82,7 +75,4 @@ public class Connection implements Runnable {
         }
     }
 
-    public Boolean getRunning() {
-        return isRunning;
-    }
 }

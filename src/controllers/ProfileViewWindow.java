@@ -1,94 +1,76 @@
 package controllers;
 
-import Serlizables.Chat;
-import Serlizables.ClientProfile;
-import Serlizables.Packet;
-import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import serlizables.Chat;
+import serlizables.ClientProfile;
 import users.Client;
 
 import java.io.File;
 import java.io.IOException;
 
 public class ProfileViewWindow extends Stage {
+
     private final Client viewer;
-    private final ClientProfile profile;
+    private ClientProfile profile;
+
     private final Stage thisWindow;
 
-    private final Button addFriend;
-    private final Button startChat;
-    private final Button playTogether;
-    private final Button close;
-
-    private final Text username;
-    private final Label name;
-    private final Text onlineWins;
-    private final Text onlineLosses;
-    private final Text singleWins;
-    private final Text singleLosses;
-
-    private final Scene profileScene;
+    private final FXMLLoader fxmlLoader = new FXMLLoader();
     private Parent profileRoot;
-    private FXMLLoader fxmlLoader;
+    private Scene profileScene = null;
+    private ProfileShowerController profileShowerController;
 
-    public ProfileViewWindow(Client viewer, ClientProfile profile) {
+    //Constructor
+    public ProfileViewWindow(Client viewer, ClientProfile clientProfile) {
+
+        //Assign fields
         this.viewer = viewer;
-        this.profile = profile;
+        this.profile = clientProfile;
         thisWindow = this;
 
+        //Initialize window
+        getTheUpdatedProfile(profile);
+        loadWindow(profile);
+        checkButtonsVisibility(viewer, profile);
+        putOnClickListeners(viewer, profile);
 
-        try {
-            profileRoot = FXMLLoader.load(new File("resources/FXMLFiles/ProfileShower.fxml").toURL());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        profileScene = new Scene(profileRoot, 800, 600);
-        profileScene.getStylesheets().add(DefaultWindow.defaultStylesheet);
+        //set stage settings and show it
+        this.initStyle(StageStyle.UNDECORATED);
+        this.initModality(Modality.APPLICATION_MODAL);
+        this.setScene(profileScene);
+        this.show();
+    }
 
-        name = (Label) profileScene.lookup("#name");
-        username = (Text) profileScene.lookup("#username");
-        onlineWins = (Text) profileScene.lookup("#onlineWins");
-        onlineLosses = (Text) profileScene.lookup("#onlineLosses");
-        singleWins = (Text) profileScene.lookup("#singleWins");
-        singleLosses = (Text) profileScene.lookup("#singleLosses");
-        startChat = ProfileShowerController.startChatStatic;
-        addFriend = ProfileShowerController.addFriendStatic;
-
-        playTogether = ProfileShowerController.playTogetherStatic;
-        close = ProfileShowerController.closeStatic;
-        close.setStyle("-fx-background-color: red");
-        if (close == null) {
-            System.out.println("it's not here");
-        }
-
-        close.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                thisWindow.close();
-            }
+    //Defines button functionality
+    private void putOnClickListeners(Client viewer, ClientProfile profile) {
+        profileShowerController.addFriend.setOnMouseClicked(mouseEvent -> {
+            thisWindow.close();
+            viewer.giveAChatTab(profile).sendFriendRequestMassage();
         });
 
-        name.setText(profile.getFirstName() + " " + profile.getLastName());
-        username.setText("@" + profile.getUsername());
-        onlineWins.setText(profile.getTicTacToeStatistics().getTotalOnlineWins() + "");
-        singleWins.setText(profile.getTicTacToeStatistics().getSinglePlayerWins() + "");
-        onlineLosses.setText(profile.getTicTacToeStatistics().getTotalOnlineLosses() + "");
-        singleLosses.setText(profile.getTicTacToeStatistics().getSinglePlayerLosses() + "");
+        profileShowerController.startChat.setOnMouseClicked(mouseEvent -> {
+            thisWindow.close();
+            viewer.giveAChatTab(profile);
+        });
 
+        profileShowerController.playTogether.setOnMouseClicked(event -> {
+            thisWindow.close();
+            viewer.giveAChatTab(profile).sendPlayRequestMassage();
+        });
+    }
+
+    //Defines which buttons should be visible
+    private void checkButtonsVisibility(Client viewer, ClientProfile profile) {
         boolean isAlreadyFriend = false;
         for (ClientProfile clientProfile : viewer.getClientProfile().getFriends()) {
             if (clientProfile.equals(profile)) {
                 isAlreadyFriend = true;
+                break;
             }
         }
         boolean isPlayingOnline = viewer.getClientProfile().isPlayingOnline();
@@ -96,63 +78,67 @@ public class ProfileViewWindow extends Stage {
         for (Chat chat : viewer.getClientProfile().getChats()) {
             if (chat.getMembers().get(1).equals(profile)) {
                 isAlreadyChatting = true;
+                break;
             }
         }
 
 
-        startChat.setVisible(!isAlreadyChatting);
-        addFriend.setVisible(!isAlreadyFriend);
-        playTogether.setVisible(!isPlayingOnline && profile.getOnline());
+        profileShowerController.startChat.setVisible(!isAlreadyChatting);
+        profileShowerController.addFriend.setVisible(!isAlreadyFriend);
+        profileShowerController.playTogether.setVisible(!isPlayingOnline && profile.getOnline());
         if (viewer.getClientProfile().equals(profile)) {
-            playTogether.setVisible(false);
-            addFriend.setVisible(false);
-            startChat.setVisible(false);
+            profileShowerController.playTogether.setVisible(false);
+            profileShowerController.addFriend.setVisible(false);
+            profileShowerController.startChat.setVisible(false);
 
         }
-
-        addFriend.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                thisWindow.close();
-                viewer.connection.sendPacket(new Packet(viewer.getClientProfile(), viewer.getClientProfile(), profile, Packet.PacketPropose.ADD_FRIEND_REQUEST));
-            }
-        });
-
-        startChat.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                thisWindow.close();
-                Chat newChat = new Chat(viewer.getClientProfile(), profile);
-                viewer.getClientProfile().getChats().add(newChat);
-                viewer.getWindow().getGameController().addChatTab(newChat);
-                viewer.sendProfileToServer();
-                // TODO: 7/9/2020 Rewrite update chat
-                //viewer.game.getGameController().updateChats(viewer.getClientProfile());
-            }
-        });
-
-        playTogether.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                thisWindow.close();
-                viewer.connection.sendPacket(new Packet(Packet.PacketPropose.PLAY_TOGETHER_REQUEST, viewer.getClientProfile().makeSafeClone(), profile));
-            }
-        });
-
-
-        this.initStyle(StageStyle.UNDECORATED);
-        this.initModality(Modality.APPLICATION_MODAL);
-        this.setScene(profileScene);
-        this.show();
     }
 
-    public ProfileViewWindow(Client viewer, ClientProfile profile, Boolean isInGameScene) {
-        this(viewer, profile);
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                playTogether.setVisible(false);
+    //Loads the window(stage) and set the scene
+    private void loadWindow(ClientProfile profile) {
+        try {
+            fxmlLoader.setLocation(new File("resources/FXMLFiles/ProfileShower.fxml").toURL());
+            profileRoot = fxmlLoader.load();
+            profileShowerController = fxmlLoader.getController();
+            if (profileShowerController == null) {
+                throw new NullPointerException("controller is null");
             }
-        });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        profileScene = new Scene(profileRoot, 800, 600);
+        profileScene.getStylesheets().add(DefaultWindow.defaultStylesheet);
+
+
+        profileShowerController.close.setStyle("-fx-background-color: red");
+        if (profileShowerController.close == null) {
+            System.out.println("it's not here");
+        }
+
+        profileShowerController.close.setOnMouseClicked(event -> thisWindow.close());
+
+        profileShowerController.name.setText(profile.getFirstName() + " " + profile.getLastName());
+        profileShowerController.username.setText("@" + profile.getUsername());
+        profileShowerController.onlineWins.setText(profile.getTicTacToeStatistics().getTotalOnlineWins() + "");
+        profileShowerController.singleWins.setText(profile.getTicTacToeStatistics().getSinglePlayerWins() + "");
+        profileShowerController.onlineLosses.setText(profile.getTicTacToeStatistics().getTotalOnlineLosses() + "");
+        profileShowerController.singleLosses.setText(profile.getTicTacToeStatistics().getSinglePlayerLosses() + "");
     }
+
+    //Checks to see if a updated version of profile is available in online clients array
+    private void getTheUpdatedProfile(ClientProfile profile) {
+        ClientProfile foundProfile = null;
+        for (ClientProfile clientProfile : viewer.getOnlineClients()) {
+            if (clientProfile.equals(profile)) {
+                foundProfile = clientProfile;
+            }
+        }
+        if (foundProfile != null) {
+            this.profile = foundProfile;
+        }
+
+    }
+
+
 }

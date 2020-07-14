@@ -1,6 +1,6 @@
 package users;
 
-import Serlizables.Packet;
+import serlizables.Packet;
 
 import java.io.IOException;
 

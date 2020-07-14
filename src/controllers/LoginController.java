@@ -1,8 +1,5 @@
 package controllers;
 
-import Serlizables.ClientProfile;
-import Serlizables.Packet;
-import Serlizables.SecurityQuestions;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
@@ -12,6 +9,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import serlizables.ClientProfile;
+import serlizables.Packet;
+import serlizables.SecurityQuestions;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -23,7 +23,7 @@ public class LoginController extends StandardController implements Initializable
     public Button loginButton;
 
     public TextField emailRP;
-    public ChoiceBox questionRP;
+    public ChoiceBox<SecurityQuestions> questionRP;
     public TextField answerRP;
     public Button recoverPasswordButton;
 
@@ -32,7 +32,7 @@ public class LoginController extends StandardController implements Initializable
     public TextField username;
     public TextField email;
     public TextField answer;
-    public ChoiceBox question;
+    public ChoiceBox<SecurityQuestions> question;
     public PasswordField password;
     public PasswordField confirmpassword;
     public Button signupButton;
@@ -47,7 +47,7 @@ public class LoginController extends StandardController implements Initializable
     public ScrollPane signupForm;
 
 
-    EventHandler signUp = new EventHandler<MouseEvent>() {
+    EventHandler<MouseEvent> signUp = new EventHandler<>() {
         public void handle(MouseEvent event) {
             String firstNameS = firstname.getText();
             String lastNameS = lastname.getText();
@@ -56,7 +56,7 @@ public class LoginController extends StandardController implements Initializable
             String confirmPasswordS = confirmpassword.getText();
             String emailS = email.getText();
             String answerS = answer.getText();
-            SecurityQuestions securityQuestionS = (SecurityQuestions) question.getValue();
+            SecurityQuestions securityQuestionS = question.getValue();
 
             if (firstNameS.isBlank() || lastNameS.isBlank() || usernameS.isBlank() || passwordS.isBlank() || confirmPasswordS.isBlank() || emailS.isBlank() || answerS.isBlank() || securityQuestionS == null) {
                 badNews("Please fill all the text fields");
@@ -82,17 +82,15 @@ public class LoginController extends StandardController implements Initializable
             client.connection.sendPacket(new Packet(client.getClientProfile(), client, Packet.PacketPropose.SIGN_UP_REQUEST));
         }
     };
-
-    EventHandler login = new EventHandler<MouseEvent>() {
+    EventHandler<MouseEvent> login = new EventHandler<>() {
         public void handle(MouseEvent event) {
             client.setClientProfile(new ClientProfile(loginUsername.getText(), loginPassword.getText()));
             client.connection.sendPacket(new Packet(client.getClientProfile(), client, Packet.PacketPropose.LOGIN_REQUEST));
         }
     };
-
-    EventHandler recover = new EventHandler<MouseEvent>() {
+    EventHandler<MouseEvent> recover = new EventHandler<>() {
         public void handle(MouseEvent event) {
-            client.setClientProfile(new ClientProfile(emailRP.getText(), (SecurityQuestions) questionRP.getValue(), answerRP.getText()));
+            client.setClientProfile(new ClientProfile(emailRP.getText(), questionRP.getValue(), answerRP.getText()));
             client.connection.sendPacket(new Packet(client.getClientProfile(), client, Packet.PacketPropose.RECOVER_PASSWORD_REQUEST));
         }
     };
@@ -102,45 +100,12 @@ public class LoginController extends StandardController implements Initializable
         signupForm.setVisible(true);
         loginForm.setVisible(false);
         recoverPassword.setVisible(false);
-        goToLogin.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                signupForm.setVisible(false);
-                loginForm.setVisible(true);
-                recoverPassword.setVisible(false);
-            }
-        });
-        goToSignUp.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                signupForm.setVisible(true);
-                loginForm.setVisible(false);
-                recoverPassword.setVisible(false);
-            }
-        });
-        goToLoginRP.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                signupForm.setVisible(false);
-                loginForm.setVisible(true);
-                recoverPassword.setVisible(false);
-            }
-        });
-        goToSignUpRP.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                signupForm.setVisible(true);
-                loginForm.setVisible(false);
-                recoverPassword.setVisible(false);
-            }
-        });
-        goToForgetPassword.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                signupForm.setVisible(false);
-                loginForm.setVisible(false);
-                recoverPassword.setVisible(true);
-            }
+        loadForms(goToLogin, goToSignUp);
+        loadForms(goToLoginRP, goToSignUpRP);
+        goToForgetPassword.setOnMouseClicked(mouseEvent -> {
+            signupForm.setVisible(false);
+            loginForm.setVisible(false);
+            recoverPassword.setVisible(true);
         });
 
 
@@ -156,33 +121,39 @@ public class LoginController extends StandardController implements Initializable
         questionRP.setTooltip(new Tooltip("Select a security question"));
     }
 
+    private void loadForms(Label goToLoginRP, Label goToSignUpRP) {
+        goToLoginRP.setOnMouseClicked(mouseEvent -> {
+            signupForm.setVisible(false);
+            loginForm.setVisible(true);
+            recoverPassword.setVisible(false);
+        });
+        goToSignUpRP.setOnMouseClicked(mouseEvent -> {
+            signupForm.setVisible(true);
+            loginForm.setVisible(false);
+            recoverPassword.setVisible(false);
+        });
+    }
+
     public void badNews(String s) {
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                String s1 = s.substring(0, 1).toUpperCase();
-                String massageCapitalized = s1 + s.substring(1).toLowerCase();
+        Platform.runLater(() -> {
+            String s1 = s.substring(0, 1).toUpperCase();
+            String massageCapitalized = s1 + s.substring(1).toLowerCase();
 
-                massage.setTextFill(Color.RED);
-                massage.setText(massageCapitalized);
-            }
+            massage.setTextFill(Color.RED);
+            massage.setText(massageCapitalized);
         });
 
 
     }
-
     public void goodNews(String s) {
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                String s1 = s.substring(0, 1).toUpperCase();
-                String massageCapitalized = s1 + s.substring(1).toLowerCase();
+        Platform.runLater(() -> {
+            String s1 = s.substring(0, 1).toUpperCase();
+            String massageCapitalized = s1 + s.substring(1).toLowerCase();
 
-                massage.setTextFill(Color.GREEN);
-                massage.setText(massageCapitalized);
-            }
+            massage.setTextFill(Color.GREEN);
+            massage.setText(massageCapitalized);
         });
 
 
