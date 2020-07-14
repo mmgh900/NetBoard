@@ -1,53 +1,51 @@
 package games;
 
-import Serlizables.Square;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
+import serlizables.Square;
 
 import java.util.Random;
 
+/**
+ * This class extends service in javafx library and implements it to do ai calculation in background
+ * to prevent from application crash causing by a sleep in javafx application main thread
+ */
 public class TicTacToeAiService extends Service<Square> {
 
-    private final GameWithUI game;
+    private final TicTacToe game;
     private final Random random = new Random();
-    private Square square;
 
-    public TicTacToeAiService(GameWithUI game) {
+    public TicTacToeAiService(TicTacToe game) {
         this.game = game;
-        game.setCurrentPlayer(GameWithUI.Player.PLAYER_O);
+        game.setCurrentPlayer(TicTacToe.Player.PLAYER_O);
 
 
-        this.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent workerStateEvent) {
+        this.setOnSucceeded(workerStateEvent -> {
 
 
-                ((Square) workerStateEvent.getSource().getValue()).setState(GameWithUI.Player.PLAYER_O);
-                game.gameController.repaintBoard(game.squares);
-                GameWithUI.Player result = game.checkResult(game.squares);
+            ((Square) workerStateEvent.getSource().getValue()).setState(TicTacToe.Player.PLAYER_O);
+            game.gameController.repaintBoard(game.squares);
+            TicTacToe.Player result = game.checkResult(game.squares);
 
-                if (result == null) {
-                    game.setCurrentPlayer(GameWithUI.Player.PLAYER_X);
-                } else {
+            if (result == null) {
+                game.setCurrentPlayer(TicTacToe.Player.PLAYER_X);
+            } else {
 
-                    game.doForResult(result);
-                }
-                if (result == GameWithUI.Player.PLAYER_O) {
-                    game.getGameController().playerOusername.setText("XD");
-                } else {
-                    game.getGameController().playerOusername.setText(":|");
-                }
+                game.doForResult(result);
+            }
+            if (result == TicTacToe.Player.PLAYER_O) {
+                game.getGameController().playerOusername.setText("XD");
+            } else {
+                game.getGameController().playerOusername.setText(":|");
             }
         });
     }
 
     @Override
     protected Task<Square> createTask() {
-        Task<Square> task = new Task<Square>() {
+        return new Task<>() {
             @Override
-            protected Square call() throws Exception {
+            protected Square call() {
                 int thinkingTime = random.nextInt(3) + 2;
 
                 for (int i = 0; i < thinkingTime; i++) {
@@ -67,7 +65,6 @@ public class TicTacToeAiService extends Service<Square> {
 
             }
         };
-        return task;
     }
 
     public Square ai() {
@@ -88,10 +85,10 @@ public class TicTacToeAiService extends Service<Square> {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 Square sq = squaresClone[i][j];
-                if (sq.getState().equals(GameWithUI.Player.NONE)) {
-                    sq.setState(GameWithUI.Player.PLAYER_O);
+                if (sq.getState().equals(TicTacToe.Player.NONE)) {
+                    sq.setState(TicTacToe.Player.PLAYER_O);
                     int score = minMax(squaresClone, 0, false);
-                    sq.setState(GameWithUI.Player.NONE);
+                    sq.setState(TicTacToe.Player.NONE);
                     if (score > bestScore) {
                         bestScore = score;
                         bestMove = new int[]{i, j};
@@ -103,13 +100,13 @@ public class TicTacToeAiService extends Service<Square> {
     }
 
     private int minMax(Square[][] squares, int depth, boolean isMaximizing) {
-        GameWithUI.Player result = game.checkResult(squares);
+        TicTacToe.Player result = game.checkResult(squares);
         if (result != null) {
-            if (result.equals(GameWithUI.Player.PLAYER_X)) {
+            if (result.equals(TicTacToe.Player.PLAYER_X)) {
                 return -1;
-            } else if (result.equals(GameWithUI.Player.PLAYER_O)) {
+            } else if (result.equals(TicTacToe.Player.PLAYER_O)) {
                 return 1;
-            } else if (result.equals(GameWithUI.Player.NONE)) {
+            } else if (result.equals(TicTacToe.Player.NONE)) {
                 return 0;
             }
         }
@@ -119,10 +116,10 @@ public class TicTacToeAiService extends Service<Square> {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     Square sq = squares[i][j];
-                    if (sq.getState().equals(GameWithUI.Player.NONE)) {
-                        sq.setState(GameWithUI.Player.PLAYER_O);
+                    if (sq.getState().equals(TicTacToe.Player.NONE)) {
+                        sq.setState(TicTacToe.Player.PLAYER_O);
                         int score = minMax(squares, depth + 1, false);
-                        sq.setState(GameWithUI.Player.NONE);
+                        sq.setState(TicTacToe.Player.NONE);
                         bestScore = Integer.max(score, bestScore);
 
                     }
@@ -135,10 +132,10 @@ public class TicTacToeAiService extends Service<Square> {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     Square sq = squares[i][j];
-                    if (sq.getState().equals(GameWithUI.Player.NONE)) {
-                        sq.setState(GameWithUI.Player.PLAYER_X);
+                    if (sq.getState().equals(TicTacToe.Player.NONE)) {
+                        sq.setState(TicTacToe.Player.PLAYER_X);
                         int score = minMax(squares, depth + 1, true);
-                        sq.setState(GameWithUI.Player.NONE);
+                        sq.setState(TicTacToe.Player.NONE);
                         worstScore = Integer.min(score, worstScore);
                     }
                 }

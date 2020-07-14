@@ -1,4 +1,4 @@
-package Serlizables;
+package serlizables;
 
 import java.io.Serializable;
 

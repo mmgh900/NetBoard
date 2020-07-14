@@ -1,8 +1,5 @@
 package controllers;
 
-import Serlizables.ClientProfile;
-import Serlizables.Packet;
-import Serlizables.SecurityQuestions;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
@@ -12,6 +9,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import serlizables.ClientProfile;
+import serlizables.Packet;
+import serlizables.SecurityQuestions;
 
 import java.net.URL;
 import java.util.ResourceBundle;

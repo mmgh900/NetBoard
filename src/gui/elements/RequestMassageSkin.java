@@ -1,15 +1,13 @@
 package gui.elements;
 
-import Serlizables.Massage;
-import Serlizables.Packet;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import serlizables.Massage;
+import serlizables.Packet;
 import users.Client;
 
 public class RequestMassageSkin extends MassageSkin {
@@ -64,40 +62,27 @@ public class RequestMassageSkin extends MassageSkin {
         this.setPrefWidth(395);
         this.setMaxWidth(395);
 
-        decline.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                massageText.setText("Request declined.");
-                massage.setContent("Request declined.");
-                massage.setFinished(true);
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        vBox.getChildren().remove(hBox2);
-                        decline.setOnMouseClicked(null);
-                        accept.setOnMouseClicked(null);
-                    }
-                });
-                respondToChoice(false);
-            }
+        decline.setOnMouseClicked(event -> {
+            massageText.setText("Request declined.");
+            massage.setContent("Request declined.");
+            massage.setFinished(true);
+            Platform.runLater(() -> {
+                vBox.getChildren().remove(hBox2);
+                decline.setOnMouseClicked(null);
+                accept.setOnMouseClicked(null);
+            });
+            respondToChoice(false);
         });
-        accept.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                massageText.setText("Request accepted.");
-                massage.setContent("Request accepted.");
-                massage.setFinished(true);
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        vBox.getChildren().remove(hBox2);
-                        decline.setOnMouseClicked(null);
-                        accept.setOnMouseClicked(null);
-                    }
-                });
-                respondToChoice(true);
-            }
+        accept.setOnMouseClicked(event -> {
+            massageText.setText("Request accepted.");
+            massage.setContent("Request accepted.");
+            massage.setFinished(true);
+            Platform.runLater(() -> {
+                vBox.getChildren().remove(hBox2);
+                decline.setOnMouseClicked(null);
+                accept.setOnMouseClicked(null);
+            });
+            respondToChoice(true);
         });
     }
 

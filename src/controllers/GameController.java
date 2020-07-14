@@ -1,9 +1,6 @@
 package controllers;
 
-import Serlizables.Chat;
-import Serlizables.ClientProfile;
-import Serlizables.Square;
-import games.GameWithUI;
+import games.TicTacToe;
 import gui.elements.ChatTab;
 import gui.elements.SquareSkin;
 import javafx.application.Platform;
@@ -17,6 +14,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+import serlizables.Chat;
+import serlizables.ClientProfile;
+import serlizables.Square;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -89,7 +89,7 @@ public class GameController extends StandardController implements Initializable 
 
         mainMenuButton.setOnMouseClicked(event -> client.getWindow().loadMenuScene());
         reset.setOnMouseClicked(mouseEvent -> {
-            if (client.game.getGameMode() != GameWithUI.GameMode.ONLINE) {
+            if (client.game.getGameMode() != TicTacToe.GameMode.ONLINE) {
                 client.game.startGame(client.game.getGameMode());
             }
         });
@@ -107,9 +107,9 @@ public class GameController extends StandardController implements Initializable 
 
         Platform.runLater(() -> {
             winPath.setVisible(false);
-            board.setDisable((client.game.getGameMode() == GameWithUI.GameMode.NONE));
-            reset.setVisible(((client.game.getGameMode() == GameWithUI.GameMode.MULTIPLAYER) || (client.game.getGameMode() == GameWithUI.GameMode.SINGLE_PLAYER)));
-            contacts.setDisable((client.game.getGameMode() == GameWithUI.GameMode.MULTIPLAYER) || (client.game.getGameMode() == GameWithUI.GameMode.SINGLE_PLAYER));
+            board.setDisable((client.game.getGameMode() == TicTacToe.GameMode.NONE));
+            reset.setVisible(((client.game.getGameMode() == TicTacToe.GameMode.MULTIPLAYER) || (client.game.getGameMode() == TicTacToe.GameMode.SINGLE_PLAYER)));
+            contacts.setDisable((client.game.getGameMode() == TicTacToe.GameMode.MULTIPLAYER) || (client.game.getGameMode() == TicTacToe.GameMode.SINGLE_PLAYER));
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     squareSkins[i][j] = new SquareSkin(i, j);
@@ -137,11 +137,11 @@ public class GameController extends StandardController implements Initializable 
         Platform.runLater(() -> {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
-                    if (squares[i][j].getState().equals(GameWithUI.Player.PLAYER_X)) {
+                    if (squares[i][j].getState().equals(TicTacToe.Player.PLAYER_X)) {
                         squareSkins[i][j].setText("X");
-                    } else if (squares[i][j].getState().equals(GameWithUI.Player.PLAYER_O)) {
+                    } else if (squares[i][j].getState().equals(TicTacToe.Player.PLAYER_O)) {
                         squareSkins[i][j].setText("O");
-                    } else if (squares[i][j].getState().equals(GameWithUI.Player.NONE)) {
+                    } else if (squares[i][j].getState().equals(TicTacToe.Player.NONE)) {
                         squareSkins[i][j].setText("");
                     }
                 }
@@ -151,20 +151,20 @@ public class GameController extends StandardController implements Initializable 
         });
     }
 
-    public void setCurrentPlayer(GameWithUI.Player currentPlayer) {
-        if (currentPlayer == GameWithUI.Player.PLAYER_O) {
+    public void setCurrentPlayer(TicTacToe.Player currentPlayer) {
+        if (currentPlayer == TicTacToe.Player.PLAYER_O) {
             playerOsign.setFill(Color.web("#1a73e8"));
             playerOname.setFill(Color.web("#1a73e8"));
 
             playerXsign.setFill(Color.GREY);
             playerXname.setFill(Color.GREY);
-        } else if (currentPlayer == GameWithUI.Player.PLAYER_X) {
+        } else if (currentPlayer == TicTacToe.Player.PLAYER_X) {
             playerXsign.setFill(Color.web("#1a73e8"));
             playerXname.setFill(Color.web("#1a73e8"));
 
             playerOsign.setFill(Color.GREY);
             playerOname.setFill(Color.GREY);
-        } else if (currentPlayer == GameWithUI.Player.NONE) {
+        } else if (currentPlayer == TicTacToe.Player.NONE) {
             playerOsign.setFill(Color.GREY);
             playerOname.setFill(Color.GREY);
             playerXsign.setFill(Color.GREY);
@@ -241,15 +241,15 @@ public class GameController extends StandardController implements Initializable 
 
     }
 
-    public void doAboutResult(GameWithUI.Player result) {
-        setCurrentPlayer(GameWithUI.Player.NONE);
+    public void doAboutResult(TicTacToe.Player result) {
+        setCurrentPlayer(TicTacToe.Player.NONE);
         if (client.game.getWinPathNumbers() != null) {
             markPath(client.game.getWinPathNumbers()[0], client.game.getWinPathNumbers()[1], client.game.getWinPathNumbers()[2], client.game.getWinPathNumbers()[3]);
         }
         if (result != null) {
             board.setDisable(true);
         }
-        if (result == GameWithUI.Player.NONE) {
+        if (result == TicTacToe.Player.NONE) {
             massage.setText("Draw");
             massage.setFill(Color.PURPLE);
             playerXsign.setFill(Color.PURPLE);
@@ -257,7 +257,7 @@ public class GameController extends StandardController implements Initializable 
             playerOsign.setFill(Color.PURPLE);
             playerOname.setFill(Color.PURPLE);
         }
-        if (result == GameWithUI.Player.PLAYER_X) {
+        if (result == TicTacToe.Player.PLAYER_X) {
             massage.setText("Player X won.");
             massage.setFill(Color.GREENYELLOW);
             playerXsign.setFill(Color.GREENYELLOW);
@@ -266,7 +266,7 @@ public class GameController extends StandardController implements Initializable 
             playerOsign.setFill(Color.GREY);
             playerOname.setFill(Color.GREY);
         }
-        if (result == GameWithUI.Player.PLAYER_O) {
+        if (result == TicTacToe.Player.PLAYER_O) {
             massage.setText("Player O won.");
             massage.setFill(Color.GREENYELLOW);
             playerOsign.setFill(Color.GREENYELLOW);

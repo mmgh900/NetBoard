@@ -1,9 +1,9 @@
 package users;
 
-import Serlizables.ClientProfile;
-import Serlizables.Packet;
-import Serlizables.SecurityQuestions;
-import Serlizables.ServerMassages;
+import serlizables.ClientProfile;
+import serlizables.Packet;
+import serlizables.SecurityQuestions;
+import serlizables.ServerMassages;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static Serlizables.Packet.PacketPropose.RESPOND_ADD_FRIEND;
+import static serlizables.Packet.PacketPropose.RESPOND_ADD_FRIEND;
 
 
 public class Server extends User {
@@ -47,7 +47,7 @@ public class Server extends User {
         }
 
         //Adds sample clients and resets server save file (Recommended to keep commented)
-        addSampleClients();
+        //addSampleClients();
 
         //Fill usersInSystem array list from server save file
         readFile();
@@ -203,7 +203,7 @@ public class Server extends User {
      */
     private void respondToRecoverPassword(Packet packet) {
         ClientProfile clientProfile = (ClientProfile) packet.getContent();
-        ServerMassages serverMassage = ServerMassages.UNKNOWN_ERROR;
+        ServerMassages serverMassage;
 
         ClientProfile foundClient = null;
         for (ClientProfile cip : usersInSystem) {
@@ -219,13 +219,13 @@ public class Server extends User {
         } else {
             if (clientProfile.getSecurityQuestion().equals(foundClient.getSecurityQuestion()) && clientProfile.getAnswer().equalsIgnoreCase(foundClient.getAnswer())) {
 
-                connection.sendPacket(new Packet(foundClient.getUsername() + ":" + foundClient.getPassword(), this, Packet.PacketPropose.RECOVER_PASSWORD_REQUEST));
+                connection.sendPacket(new Packet(foundClient.getUsername() + ":" + foundClient.getPassword(), Packet.PacketPropose.RECOVER_PASSWORD_REQUEST));
                 return;
             } else {
                 serverMassage = ServerMassages.WRONG_QUESTION_OR_ANSWER;
             }
         }
-        connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_RESPOND_TO_RECOVER_PASS));
+        connection.sendPacket(new Packet(serverMassage, Packet.PacketPropose.SERVER_RESPOND_TO_RECOVER_PASS));
 
     }
 
@@ -277,13 +277,13 @@ public class Server extends User {
             sender.getFriends().add(receiver);
             Connection foundConnection = connections.get(sender);
             if (sender.getOnline() && foundConnection != null) {
-                foundConnection.sendPacket(new Packet(sender, this, RESPOND_ADD_FRIEND));
+                foundConnection.sendPacket(new Packet(sender, RESPOND_ADD_FRIEND));
             }
             assert receiver != null;
             receiver.getFriends().add(sender);
             Connection foundConnection2 = connections.get(receiver);
             if (sender.getOnline() && foundConnection2 != null) {
-                foundConnection2.sendPacket(new Packet(receiver, this, RESPOND_ADD_FRIEND));
+                foundConnection2.sendPacket(new Packet(receiver, RESPOND_ADD_FRIEND));
             }
 
 
@@ -316,7 +316,7 @@ public class Server extends User {
         if (((Boolean) packet.getContent())) {
             playerO.setPlayingOnline(true);
             playerX.setPlayingOnline(true);
-            connections.get(playerX).sendPacket(new Packet(clientProfiles, this, Packet.PacketPropose.START_GAME));
+            connections.get(playerX).sendPacket(new Packet(clientProfiles, Packet.PacketPropose.START_GAME));
         }
     }
 
@@ -413,7 +413,7 @@ public class Server extends User {
             return;
 
         }
-        connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP));
+        connection.sendPacket(new Packet(serverMassage, Packet.PacketPropose.SERVER_RESPOND_TO_SIGNUP));
     }
 
     /**
@@ -438,7 +438,7 @@ public class Server extends User {
             if (clientProfile.getPassword().equals(foundClient.getPassword())) {
                 usersInSystem.get(usersInSystem.indexOf(foundClient)).setOnline(true);
                 connections.put(foundClient, connection);
-                connection.sendPacket(new Packet(foundClient, makeOnlineClientsPack(foundClient), this, Packet.PacketPropose.LOAD_PACKET));
+                connection.sendPacket(new Packet(foundClient, makeOnlineClientsPack(foundClient), Packet.PacketPropose.LOAD_PACKET));
                 usersInSystem.get(usersInSystem.indexOf(foundClient)).getSavedMassages().clear();
 
                 sendUpdatedProfile(foundClient);
@@ -449,7 +449,7 @@ public class Server extends User {
                 System.out.println("getPassword() was: " + foundClient.getPassword() + "but client entered: " + clientProfile.getPassword());
             }
         }
-        connection.sendPacket(new Packet(serverMassage, this, Packet.PacketPropose.SERVER_ERROR_IN_LOGIN));
+        connection.sendPacket(new Packet(serverMassage, Packet.PacketPropose.SERVER_ERROR_IN_LOGIN));
     }
 
     /**
@@ -460,7 +460,7 @@ public class Server extends User {
     private void sendUpdatedProfile(ClientProfile clientProfile) {
         for (Map.Entry<ClientProfile, Connection> activeConnections : connections.entrySet()) {
             if (!activeConnections.getKey().equals(clientProfile)) {
-                activeConnections.getValue().sendPacket(new Packet(clientProfile.makeSafeClone(), this, Packet.PacketPropose.PROFILE_INFO));
+                activeConnections.getValue().sendPacket(new Packet(clientProfile.makeSafeClone(), Packet.PacketPropose.PROFILE_INFO));
             }
         }
     }
@@ -523,10 +523,9 @@ public class Server extends User {
     }
 
     private void sendAllToAll() {
-        ArrayList<ClientProfile> clientsInfo = new ArrayList<>();
         for (Map.Entry<ClientProfile, Connection> connectionHashMap : connections.entrySet()) {
             int index = usersInSystem.indexOf(connectionHashMap.getKey());
-            connectionHashMap.getValue().sendPacket(new Packet(makeOnlineClientsPack(usersInSystem.get(index)), this, Packet.PacketPropose.PROFILES_IN_SYSTEM));
+            connectionHashMap.getValue().sendPacket(new Packet(makeOnlineClientsPack(usersInSystem.get(index)), Packet.PacketPropose.PROFILES_IN_SYSTEM));
         }
     }
 

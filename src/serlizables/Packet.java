@@ -1,7 +1,6 @@
-package Serlizables;
+package serlizables;
 
 import users.Client;
-import users.Server;
 
 import java.io.Serializable;
 
@@ -45,30 +44,19 @@ public class Packet implements Serializable {
         this.propose = propose;
     }
 
-    public Packet(Serializable content, Server sender, PacketPropose propose) {
+    public Packet(Serializable content, PacketPropose propose) {
 
         this.contents[0] = content;
         this.propose = propose;
     }
 
-    public Packet(Serializable content, Serializable content2, Server sender, PacketPropose propose) {
+    public Packet(Serializable content, Serializable content2, PacketPropose propose) {
         this.contents = new Serializable[2];
         this.contents[0] = content;
         this.contents[1] = content2;
         this.propose = propose;
     }
 
-
-    public Packet(PacketPropose propose, ClientProfile senderProfile) {
-        this.propose = propose;
-        this.senderProfile = senderProfile;
-    }
-
-    public Packet(PacketPropose request, ClientProfile senderProfile, ClientProfile receiverProfile) {
-        this.propose = request;
-        this.senderProfile = senderProfile;
-        this.receiverProfile = receiverProfile;
-    }
 
     public Serializable getContent() {
         return contents[0];

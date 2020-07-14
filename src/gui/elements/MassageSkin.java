@@ -1,18 +1,15 @@
 package gui.elements;
 
-import Serlizables.Massage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
+import serlizables.Massage;
 import users.Client;
 
 public abstract class MassageSkin extends StackPane {
     protected Massage massage;
     protected Client client;
     protected boolean isSelf;
-
-    private MassageSkin() {
-    }
 
     public MassageSkin(Massage massage, Client client) {
         this.massage = massage;

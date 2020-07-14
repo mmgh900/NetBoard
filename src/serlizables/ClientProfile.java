@@ -1,4 +1,4 @@
-package Serlizables;
+package serlizables;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -121,18 +121,11 @@ public class ClientProfile implements Serializable {
     }
 
     public ClientProfile makeSafeClone() {
-        ClientProfile clone = new ClientProfile(username, firstName, lastName, email, answer, isOnline, ticTacToeStatistics, isPlayingOnline);
-        return clone;
+        return new ClientProfile(username, firstName, lastName, email, answer, isOnline, ticTacToeStatistics, isPlayingOnline);
     }
 
     public ArrayList<Chat> getChats() {
         return chats;
-    }
-
-    public void clearSecurityInfo() {
-        this.securityQuestion = null;
-        this.password = null;
-        this.answer = null;
     }
 
     public String getUsername() {

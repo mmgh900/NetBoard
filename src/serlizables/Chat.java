@@ -1,4 +1,4 @@
-package Serlizables;
+package serlizables;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -55,32 +55,17 @@ public class Chat implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
 
     public ArrayList<Massage> getMassages() {
         return massages;
-    }
-
-    public void setMassages(ArrayList<Massage> massages) {
-        this.massages = massages;
     }
 
     public ArrayList<ClientProfile> getMembers() {
         return members;
     }
 
-    public void setMembers(ArrayList<ClientProfile> members) {
-        this.members = members;
-    }
-
     public Date getLastMassage() {
         return lastMassage;
     }
 
-    public void setLastMassage(Date lastMassage) {
-        this.lastMassage = lastMassage;
-    }
 }

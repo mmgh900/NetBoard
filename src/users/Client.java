@@ -1,13 +1,11 @@
 package users;
 
-import Serlizables.*;
 import controllers.DefaultWindow;
-import games.GameWithUI;
+import games.TicTacToe;
 import gui.elements.ChatTab;
 import javafx.application.Platform;
-import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
-import javafx.scene.text.Text;
+import serlizables.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,12 +20,9 @@ import static users.Server.ANSI_RESET;
 public class Client extends User implements Serializable {
 
     public String downloadPath = "resources/ClientsFiles";
-    public GameWithUI game;
+    public TicTacToe game;
     private DefaultWindow window;
     private final Client thisClient = this;
-    public Button mainMenu;
-    public Text loginSceneMassage;
-    private final int loadingCount = 0;
     private ClientProfile clientProfile;
     private Socket socket;
     private ArrayList<ClientProfile> onlineClients;
@@ -36,7 +31,6 @@ public class Client extends User implements Serializable {
     public Client() {
 
         boolean isConnected = makeConnection();
-        //pool = Executors.newFixedThreadPool(5);
         try {
             this.window = new DefaultWindow(this);
 
@@ -48,7 +42,7 @@ public class Client extends User implements Serializable {
         }
         window.loadLoginScene();
 
-        game = new GameWithUI(this);
+        game = new TicTacToe(this);
     }
 
     public boolean makeConnection() {
@@ -65,26 +59,17 @@ public class Client extends User implements Serializable {
 
     @Override
     public void receivePacket(Packet packet) {
-        //pool.execute(new Thread(() -> {
         System.out.println(ANSI_PURPLE + clientProfile.toString() + ": received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
         if (packet.getContent() instanceof ServerMassages) {
             respondToServerMassages(packet);
-        } /*else if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
-            respondToRequests(packet, Packet.PacketPropose.RESPOND_PLAY_TOGETHER);
-        } else if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
-            respondToRequests(packet, Packet.PacketPropose.RESPOND_ADD_FRIEND);
-        }*/ else if (packet.getPropose().equals(Packet.PacketPropose.START_GAME)) {
+        } else if (packet.getPropose().equals(Packet.PacketPropose.START_GAME)) {
             respondToStartGame(packet);
         } else if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
             respondToUpdateGame(packet);
         } else if (packet.getPropose().equals(Packet.PacketPropose.MASSAGE)) {
-            //ClientProfile updateProfile = (ClientProfile) packet.getContent();
             giveAChatTab(packet.getSenderProfile()).receiveMassage(packet);
-            //window.getGameController().updateChats(updateProfile);
-            //clientProfile = updateProfile;
         } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
-            ClientProfile updateProfile = (ClientProfile) packet.getContent();
-            clientProfile = updateProfile;
+            clientProfile = (ClientProfile) packet.getContent();
             window.getGameController().updateFriendsList();
         } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
             window.getLoginController().goodNews("YOUR USERNAME AND PASSWORD: " + packet.getContent());
@@ -94,28 +79,10 @@ public class Client extends User implements Serializable {
             respondToProfileInfo(packet);
         } else if (packet.getPropose().equals(Packet.PacketPropose.PROFILES_IN_SYSTEM)) {
             respondToProfilesInSystem(packet);
-        } /*else if (packet.getPropose().equals(Packet.PacketPropose.FILE)) {
-            respondToFile(packet);
-
-
-        }*/
-        //}, "Respond to " + packet.getPropose().toString().toLowerCase()));
+        }
     }
 
-    /*private void respondToFile(Packet packet) {
-        try {
-            File file = new File(downloadPath + "/" + packet.getFileName());
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            fileOutputStream.write((byte[]) packet.getContent());
-            ChatTab chatTab = giveAChat(packet.getSenderProfile());
-            Massage massage = new Massage(chatTab.getChat(), packet.getSenderProfile(), new Date(), file.getPath(), Massage.MassageType.IMAGE);
-            int index = clientProfile.getChats().indexOf(chatTab.getChat());
-            chatTab.getChat().getMassages().add(massage);
-            game.getGameController().addMassageToChat(massage);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-12    }*/
+
 
     private void respondToProfileInfo(Packet packet) {
         ClientProfile clientProfile1 = (ClientProfile) packet.getContent();
@@ -124,18 +91,27 @@ public class Client extends User implements Serializable {
             return;
         }
         game.getGameController().aClientChangedStatus(clientProfile1);
+
+        int index = -1;
+
         for (ClientProfile clientProfile2 : onlineClients) {
             if (clientProfile2.equals(clientProfile1)) {
-                clientProfile2 = clientProfile1;
+                index = onlineClients.indexOf(clientProfile2);
             }
         }
+        if (index != -1) {
+            onlineClients.set(index, clientProfile1);
+        }
+
         for (ClientProfile clientProfile2 : clientProfile.getFriends()) {
             if (clientProfile2.equals(clientProfile1)) {
-                clientProfile2 = clientProfile1;
+                index = onlineClients.indexOf(clientProfile2);
             }
         }
+        if (index != -1) {
+            onlineClients.set(index, clientProfile1);
+        }
     }
-
     private void respondToLoadPacket(Packet packet) {
         onlineClients = (ArrayList<ClientProfile>) packet.getContents()[1];
         clientProfile = (ClientProfile) packet.getContents()[0];
@@ -154,12 +130,7 @@ public class Client extends User implements Serializable {
 
         game.load();
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                window.setTitle(clientProfile.getUsername());
-            }
-        });
+        Platform.runLater(() -> window.setTitle(clientProfile.getUsername()));
 
         window.getLoginController().goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
 
@@ -169,19 +140,16 @@ public class Client extends User implements Serializable {
         for (Packet packet1 : clientProfile.getSavedMassages()) {
             packet.
         }*/
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                for (Packet packet1 : clientProfile.getSavedMassages()) {
-                    giveAChatTab(packet1.getSenderProfile()).receiveMassage(packet1);
-                }
-                clientProfile.getSavedMassages().clear();
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            for (Packet packet1 : clientProfile.getSavedMassages()) {
+                giveAChatTab(packet1.getSenderProfile()).receiveMassage(packet1);
+            }
+            clientProfile.getSavedMassages().clear();
         }).start();
 
     }
@@ -211,7 +179,7 @@ public class Client extends User implements Serializable {
                 e.printStackTrace();
             }
         }
-        onlineClients = (ArrayList) packet.getContent();
+        onlineClients = (ArrayList<ClientProfile>) packet.getContent();
         if (game.getOtherPlayer() != null && onlineClients.contains(game.getOtherPlayer())) {
             int indexOfOpponent = onlineClients.indexOf(game.getOtherPlayer());
             game.setOtherPlayer(onlineClients.get(indexOfOpponent));
@@ -233,37 +201,6 @@ public class Client extends User implements Serializable {
 
         System.out.println(Server.ANSI_GREEN + "\t" + clientProfile.toString() + ": OTHER PLAYERS UPDATED" + ANSI_RESET);
     }
-
-/*    private void respondToRequests(Packet packet, Packet.PacketPropose propose) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-
-                ChatTab chatTab = giveAChat(packet.getSenderProfile());
-
-                Massage.MassageType massageType = null;
-                String massageContent = null;
-                if (propose.equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
-                    massageContent = getClientProfile().getFirstName() + ", @" + packet.getSenderProfile().getUsername().toUpperCase() + " wants to be your friend";
-                    massageType = Massage.MassageType.FRIEND_REQUEST;
-
-                } else if (propose.equals(Packet.PacketPropose.RESPOND_PLAY_TOGETHER)) {
-                    massageContent = getClientProfile().getFirstName() + ", @" + packet.getSenderProfile().getUsername().toUpperCase() + " wants to play";
-                    massageType = Massage.MassageType.PLAY_REQUEST;
-                }
-
-                if (massageType == null) {
-                    throw new NullPointerException("Massage type is null");
-                }
-
-                Massage massage = new Massage(chatTab.getChat(), packet.getSenderProfile(), new Date(), massageContent, massageType);
-                chatTab.getChat().getMassages().add(massage);
-                chatTab.getMassages().getChildren().add(new RequestMassageSkin(massage, thisClient));
-                System.out.println("Getting request proses is done");
-            }
-        });
-
-    }*/
 
     public ChatTab giveAChatTab(ClientProfile otherSide) {
         ChatTab foundChatTab = null;

@@ -1,8 +1,5 @@
 package gui.elements;
 
-import Serlizables.Chat;
-import Serlizables.Massage;
-import Serlizables.Packet;
 import controllers.ChatController;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -12,6 +9,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import serlizables.Chat;
+import serlizables.Massage;
+import serlizables.Packet;
 import users.Client;
 
 import java.io.File;
@@ -31,20 +31,10 @@ public class ChatTab extends Tab {
 
     private int unReadMassages = 0;
 
-    private Date lastUpdate;
+    private final Date lastUpdate;
 
-    EventHandler<MouseEvent> sendMassage = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
-            sendTextMassage();
-        }
-    };
-    EventHandler<MouseEvent> sendFile = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
-            sendFileMassage();
-        }
-    };
+    EventHandler<MouseEvent> sendMassage = mouseEvent -> sendTextMassage();
+    EventHandler<MouseEvent> sendFile = mouseEvent -> sendFileMassage();
 
     public ChatTab(Chat chat, Client client) {
         this.chat = chat;
@@ -78,22 +68,17 @@ public class ChatTab extends Tab {
             addMassageToChat(massage);
         }
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                client.game.getGameController().chats.getTabs().add(thisChatTab);
-            }
-        });
+        Platform.runLater(() -> client.game.getGameController().chats.getTabs().add(thisChatTab));
 
 
     }
 
-
+    //Send methods
     private void sendFileMassage() {
         //Getting the file and make a byte array out of it
         byte[] bytes = null;
         File selectedFile = null;
-        FileInputStream fileInputStream = null;
+        FileInputStream fileInputStream;
         try {
             FileChooser fileChooser = new FileChooser();
             selectedFile = fileChooser.showOpenDialog(chatController.sendFile.getScene().getWindow());
@@ -115,11 +100,11 @@ public class ChatTab extends Tab {
         Massage massage = new Massage(chat, client.getClientProfile(), new Date(), selectedFile.getPath(), Massage.MassageType.IMAGE);
         chat.getMassages().add(massage);
         addMassageToChat(massage);
+        assert bytes != null;
         System.out.println("File length = " + selectedFile.length() + " and bytes length = " + bytes.length);
         client.connection.sendPacket(new Packet(massage, bytes, selectedFile.getName(), client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.MASSAGE));
         client.sendProfileToServer();
     }
-
     private void sendTextMassage() {
         String text = chatController.textField.getText();
         if (text.isBlank() || text.isEmpty()) {
@@ -157,6 +142,16 @@ public class ChatTab extends Tab {
         client.sendProfileToServer();
     }
 
+    public void sendPlayRequestMassage() {
+        String string = "Play together request from " + chat.getMembers().get(0) + " to " + chat.getMembers().get(1);
+        Massage massage = new Massage(chat, client.getClientProfile(), new Date(), string, Massage.MassageType.PLAY_REQUEST);
+        chat.getMassages().add(massage);
+        addMassageToChat(massage);
+        client.connection.sendPacket(new Packet(massage, client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.MASSAGE));
+        client.sendProfileToServer();
+    }
+
+    //Receive methods
     public void receiveMassage(Packet packet) {
         if (packet.getFile() != null) {
             try {
@@ -176,14 +171,6 @@ public class ChatTab extends Tab {
         client.sendProfileToServer();
     }
 
-    public void sendPlayRequestMassage() {
-        String string = "Play together request from " + chat.getMembers().get(0) + " to " + chat.getMembers().get(1);
-        Massage massage = new Massage(chat, client.getClientProfile(), new Date(), string, Massage.MassageType.PLAY_REQUEST);
-        chat.getMassages().add(massage);
-        addMassageToChat(massage);
-        client.connection.sendPacket(new Packet(massage, client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.MASSAGE));
-        client.sendProfileToServer();
-    }
 
     public void addMassageToChat(Massage massage) {
         if (massage.getContent().isBlank() && massage.getContent().isEmpty()) {
@@ -209,12 +196,7 @@ public class ChatTab extends Tab {
         }
 
         MassageSkin finalMassageSkin = massageSkin;
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                getMassages().getChildren().add(finalMassageSkin);
-            }
-        });
+        Platform.runLater(() -> getMassages().getChildren().add(finalMassageSkin));
 
         if (client.game.getGameController().chats.getSelectionModel().getSelectedItem() != null) {
             if (!client.game.getGameController().chats.getSelectionModel().getSelectedItem().equals(thisChatTab)) {
@@ -225,7 +207,6 @@ public class ChatTab extends Tab {
 
 
     }
-
 
     public void addUnReadMassages() {
         unReadMassages++;
@@ -262,16 +243,8 @@ public class ChatTab extends Tab {
         return chatController;
     }
 
-    public int getUnReadMassages() {
-        return unReadMassages;
-    }
-
     public Date getLastUpdate() {
         return lastUpdate;
-    }
-
-    public void setLastUpdate(Date lastUpdate) {
-        this.lastUpdate = lastUpdate;
     }
 
 

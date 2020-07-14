@@ -1,13 +1,13 @@
 package controllers;
 
-import Serlizables.Chat;
-import Serlizables.ClientProfile;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import serlizables.Chat;
+import serlizables.ClientProfile;
 import users.Client;
 
 import java.io.File;

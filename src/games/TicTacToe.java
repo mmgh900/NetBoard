@@ -1,15 +1,15 @@
 package games;
 
-import Serlizables.ClientProfile;
-import Serlizables.Packet;
-import Serlizables.Square;
 import controllers.GameController;
 import gui.elements.SquareSkin;
 import javafx.application.Platform;
 import javafx.scene.input.MouseEvent;
+import serlizables.ClientProfile;
+import serlizables.Packet;
+import serlizables.Square;
 import users.Client;
 
-public class GameWithUI {
+public class TicTacToe {
     protected Square[][] squares = new Square[3][3];
     protected GameController gameController;
 
@@ -21,7 +21,7 @@ public class GameWithUI {
 
     private int[] winPathNumbers;
 
-    public GameWithUI(Client client) {
+    public TicTacToe(Client client) {
         gameController = client.getWindow().getGameController();
         currentPlayer = Player.NONE;
         gameMode = GameMode.NONE;
@@ -33,12 +33,7 @@ public class GameWithUI {
     }
 
     public void load() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                gameController.initializeTabs();
-            }
-        });
+        Platform.runLater(() -> gameController.initializeTabs());
 
     }
 
@@ -46,32 +41,25 @@ public class GameWithUI {
         otherPlayer = null;
 
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                winPathNumbers = null;
-                gameMode = gameMode1;
-                gameController.clearGameScene();
-                gameController.makeNewBoardSkin();
+        Platform.runLater(() -> {
+            winPathNumbers = null;
+            gameMode = gameMode1;
+            gameController.clearGameScene();
+            gameController.makeNewBoardSkin();
 
-                for (int i = 0; i < squares.length; i++) {
-                    for (int j = 0; j < squares[i].length; j++) {
-                        squares[i][j] = new Square(i, j);
-                    }
+            for (int i = 0; i < squares.length; i++) {
+                for (int j = 0; j < squares[i].length; j++) {
+                    squares[i][j] = new Square(i, j);
                 }
-
-                if (gameMode == GameMode.SINGLE_PLAYER) {
-                    gameController.setPlayersInfo(client.getClientProfile().getFirstName(), "Computer AI", "@" + client.getClientProfile().getUsername().toLowerCase(), "");
-                } else if (gameMode == GameMode.MULTIPLAYER) {
-                    gameController.setPlayersInfo("Player X", "Player O", "", "");
-
-                } else if (gameMode == GameMode.ONLINE) {
-
-                } else if (gameMode == GameMode.NONE) {
-
-                }
-                setCurrentPlayer(Player.PLAYER_X);
             }
+
+            if (gameMode == GameMode.SINGLE_PLAYER) {
+                gameController.setPlayersInfo(client.getClientProfile().getFirstName(), "Computer AI", "@" + client.getClientProfile().getUsername().toLowerCase(), "");
+            } else if (gameMode == GameMode.MULTIPLAYER) {
+                gameController.setPlayersInfo("Player X", "Player O", "", "");
+
+            }
+            setCurrentPlayer(Player.PLAYER_X);
         });
 
     }
@@ -163,11 +151,12 @@ public class GameWithUI {
             for (int j = 0; j < 3; j++) {
                 if (squares[i][j].getState() == Player.NONE) {
                     draw = false;
+                    break;
                 }
             }
         }
 
-        if (draw == true) {
+        if (draw) {
             currentPlayer = Player.NONE;
             winPathNumbers = null;
             return Player.NONE;
@@ -196,7 +185,6 @@ public class GameWithUI {
                     client.sendProfileToServer();
                 }
 
-            } else if (gameMode == GameMode.MULTIPLAYER) {
 
             } else if (gameMode == GameMode.ONLINE) {
                 client.getClientProfile().setPlayingOnline(false);
@@ -205,14 +193,13 @@ public class GameWithUI {
                 if (result == thisPlayer) {
                     client.getClientProfile().getTicTacToeStatistics().addTotalOnlineWins();
                     client.sendProfileToServer();
-                } else if (result != Player.NONE && result != null) {
+                } else if (result != Player.NONE) {
                     client.getClientProfile().getTicTacToeStatistics().addTotalOnlineLosses();
                     client.sendProfileToServer();
                 }
             }
         }
-        }
-
+    }
 
     public void handleClick(MouseEvent mouseEvent) {
         SquareSkin squareSkin = (SquareSkin) mouseEvent.getSource();

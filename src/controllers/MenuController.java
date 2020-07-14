@@ -1,6 +1,6 @@
 package controllers;
 
-import games.GameWithUI;
+import games.TicTacToe;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -27,11 +27,11 @@ public class MenuController extends StandardController implements Initializable 
     EventHandler<MouseEvent> handleClicksOnMenuOptions = new EventHandler<>() {
         public void handle(MouseEvent event) {
             if (event.getSource() == singleplayer) {
-                client.game.startGame(GameWithUI.GameMode.SINGLE_PLAYER);
+                client.game.startGame(TicTacToe.GameMode.SINGLE_PLAYER);
             } else if (event.getSource() == multiplayer) {
-                client.game.startGame(GameWithUI.GameMode.MULTIPLAYER);
+                client.game.startGame(TicTacToe.GameMode.MULTIPLAYER);
             } else if (event.getSource() == online) {
-                client.game.startGame(GameWithUI.GameMode.NONE);
+                client.game.startGame(TicTacToe.GameMode.NONE);
             }
             client.getWindow().loadGameScene();
         }
