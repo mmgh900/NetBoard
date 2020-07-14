@@ -16,6 +16,7 @@ import javafx.scene.text.Text;
 import javafx.util.Callback;
 import serlizables.Chat;
 import serlizables.ClientProfile;
+import serlizables.Packet;
 import serlizables.Square;
 
 import java.net.URL;
@@ -42,6 +43,9 @@ public class GameController extends StandardController implements Initializable 
     public Button reset;
     public AnchorPane underBoard;
     public Line winPath;
+
+    public Button searchButton;
+    public TextField searchField;
 
 
     public ListView<ClientProfile> onlineContacts;
@@ -91,6 +95,13 @@ public class GameController extends StandardController implements Initializable 
         reset.setOnMouseClicked(mouseEvent -> {
             if (client.game.getGameMode() != TicTacToe.GameMode.ONLINE) {
                 client.game.startGame(client.game.getGameMode());
+            }
+        });
+
+        searchButton.setOnMouseClicked(mouseEvent -> {
+            String username = searchField.getText();
+            if (!username.isEmpty() && !username.isBlank()) {
+                client.connection.sendPacket(new Packet(username, client.getClientProfile(), Packet.PacketPropose.SEARCH_USERNAME));
             }
         });
     }

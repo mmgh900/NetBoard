@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static serlizables.Packet.PacketPropose.RESPOND_ADD_FRIEND;
+import static serlizables.Packet.PacketPropose.SEARCH_USERNAME;
 
 
 public class Server extends User {
@@ -47,7 +48,7 @@ public class Server extends User {
         }
 
         //Adds sample clients and resets server save file (Recommended to keep commented)
-        //addSampleClients();
+        addSampleClients();
 
         //Fill usersInSystem array list from server save file
         readFile();
@@ -192,6 +193,16 @@ public class Server extends User {
             writeFile();
         } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
             respondToRecoverPassword(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.SEARCH_USERNAME)) {
+            ClientProfile foundClient = null;
+            for (ClientProfile clientProfile : usersInSystem) {
+                if (clientProfile.getUsername().equalsIgnoreCase((String) packet.getContent())) {
+                    foundClient = clientProfile;
+                }
+            }
+            if (foundClient != null) {
+                connection.sendPacket(new Packet(foundClient, SEARCH_USERNAME));
+            }
         }
 
     }

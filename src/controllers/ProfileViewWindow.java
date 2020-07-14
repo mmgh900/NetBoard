@@ -28,6 +28,7 @@ public class ProfileViewWindow extends Stage {
     //Constructor
     public ProfileViewWindow(Client viewer, ClientProfile clientProfile) {
 
+
         //Assign fields
         this.viewer = viewer;
         this.profile = clientProfile;
@@ -43,7 +44,11 @@ public class ProfileViewWindow extends Stage {
         this.initStyle(StageStyle.UNDECORATED);
         this.initModality(Modality.APPLICATION_MODAL);
         this.setScene(profileScene);
-        this.show();
+
+
+        thisWindow.show();
+
+
     }
 
     //Defines button functionality

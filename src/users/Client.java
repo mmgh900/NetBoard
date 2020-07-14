@@ -1,6 +1,7 @@
 package users;
 
 import controllers.DefaultWindow;
+import controllers.ProfileViewWindow;
 import games.TicTacToe;
 import gui.elements.ChatTab;
 import javafx.application.Platform;
@@ -79,9 +80,16 @@ public class Client extends User implements Serializable {
             respondToProfileInfo(packet);
         } else if (packet.getPropose().equals(Packet.PacketPropose.PROFILES_IN_SYSTEM)) {
             respondToProfilesInSystem(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.SEARCH_USERNAME)) {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    new ProfileViewWindow(thisClient, (ClientProfile) packet.getContent());
+                }
+            });
+
         }
     }
-
 
 
     private void respondToProfileInfo(Packet packet) {
@@ -112,6 +120,7 @@ public class Client extends User implements Serializable {
             onlineClients.set(index, clientProfile1);
         }
     }
+
     private void respondToLoadPacket(Packet packet) {
         onlineClients = (ArrayList<ClientProfile>) packet.getContents()[1];
         clientProfile = (ClientProfile) packet.getContents()[0];
@@ -253,7 +262,6 @@ public class Client extends User implements Serializable {
     }
 
     public void sendProfileToServer() {
-        System.out.println(clientProfile.toString() + " now has " + clientProfile.getTicTacToeStatistics().getSinglePlayerLosses());
         connection.sendPacket(new Packet(clientProfile, thisClient, Packet.PacketPropose.PROFILE_INFO));
     }
 

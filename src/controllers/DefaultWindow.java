@@ -118,7 +118,7 @@ public class DefaultWindow extends Stage {
      */
     public VBox newCBox() throws IOException {
         fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(new File("resources/FXMLFiles/Close.fxml").toURL());
+        fxmlLoader.setLocation(new File("resources/FXMLFiles/StageControlls.fxml").toURL());
         fxmlLoader.load();
         StageControls stageControls = fxmlLoader.getController();
         stageControls.setClient(client);

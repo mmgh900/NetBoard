@@ -270,3 +270,9 @@
     -fx-background-color: transparent;
     -fx-underline: true;
 }
+
+.search-button {
+    -fx-background-color: transparent;
+    -fx-font-size: 24;
+    -fx-text-fill: white;
+}
