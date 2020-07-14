@@ -37,6 +37,7 @@ public class RequestMassageSkin extends MassageSkin {
         } else {
             craetContantToGetRespond(massage);
         }
+        System.out.println("I made the skin");
     }
 
     private void craetContantToGetRespond(Massage massage) {
@@ -50,7 +51,10 @@ public class RequestMassageSkin extends MassageSkin {
         hBox2.setSpacing(20);
         hBox1.setAlignment(Pos.CENTER);
         hBox2.setAlignment(Pos.CENTER);
-        vBox.getChildren().addAll(hBox1, hBox2);
+        vBox.getChildren().add(hBox1);
+        if (!massage.isFinished()) {
+            vBox.getChildren().add(hBox2);
+        }
         massageText.setText(massage.getContent());
 
 
@@ -61,13 +65,18 @@ public class RequestMassageSkin extends MassageSkin {
         this.setMaxWidth(395);
 
         decline.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
             @Override
             public void handle(MouseEvent event) {
+                massageText.setText("Request declined.");
+                massage.setContent("Request declined.");
+                massage.setFinished(true);
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        massageText.setText("Request declined.");
-                        getChildren().remove(hBox2);
+                        vBox.getChildren().remove(hBox2);
+                        decline.setOnMouseClicked(null);
+                        accept.setOnMouseClicked(null);
                     }
                 });
                 respondToChoice(false);
@@ -76,11 +85,15 @@ public class RequestMassageSkin extends MassageSkin {
         accept.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                massageText.setText("Request accepted.");
+                massage.setContent("Request accepted.");
+                massage.setFinished(true);
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        massageText.setText("Request accepted.");
-                        getChildren().remove(hBox2);
+                        vBox.getChildren().remove(hBox2);
+                        decline.setOnMouseClicked(null);
+                        accept.setOnMouseClicked(null);
                     }
                 });
                 respondToChoice(true);
@@ -90,7 +103,13 @@ public class RequestMassageSkin extends MassageSkin {
 
 
     public void respondToChoice(boolean answer) {
-        client.connection.sendPacket(new Packet(answer, massage.getSender(), client.getClientProfile(), Packet.PacketPropose.MASSAGE));
+        Packet.PacketPropose outputPurpose = null;
+        if (massage.getMassageType().equals(Massage.MassageType.FRIEND_REQUEST)) {
+            outputPurpose = Packet.PacketPropose.RESPOND_ADD_FRIEND;
+        } else if (massage.getMassageType().equals(Massage.MassageType.PLAY_REQUEST)) {
+            outputPurpose = Packet.PacketPropose.RESPOND_PLAY_TOGETHER;
+        }
+        client.connection.sendPacket(new Packet(answer, massage.getSender(), client.getClientProfile(), outputPurpose));
         if (!isSelf && massage.getMassageType().equals(Massage.MassageType.PLAY_REQUEST)) {
             client.game.startGame(massage.getSender(), client.getClientProfile());
         }

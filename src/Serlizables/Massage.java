@@ -8,8 +8,13 @@ public class Massage implements Serializable {
     private final Chat chat;
     private final ClientProfile sender;
     private final Date date;
-    private final String content;
+    private String content;
     private final MassageType massageType;
+    private boolean isFinished = false;
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     public Massage(Chat chat, ClientProfile sender, Date date, String content, MassageType massageType) {
         this.chat = chat;
@@ -17,6 +22,14 @@ public class Massage implements Serializable {
         this.date = date;
         this.content = content;
         this.massageType = massageType;
+    }
+
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(boolean finished) {
+        isFinished = finished;
     }
 
     public MassageType getMassageType() {

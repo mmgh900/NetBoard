@@ -92,18 +92,16 @@ public class ChatTab extends Tab {
     private void sendFileMassage() {
         //Getting the file and make a byte array out of it
         byte[] bytes = null;
-        File[] selectedFile = null;
+        File selectedFile = null;
         FileInputStream fileInputStream = null;
         try {
-
             FileChooser fileChooser = new FileChooser();
-            selectedFile = new File[1];
-            selectedFile[0] = fileChooser.showOpenDialog(chatController.sendFile.getScene().getWindow());
-            if (selectedFile[0] != null) {
-                if (!selectedFile[0].exists()) {
+            selectedFile = fileChooser.showOpenDialog(chatController.sendFile.getScene().getWindow());
+            if (selectedFile != null) {
+                if (!selectedFile.exists()) {
                     throw new Exception("file is not found");
                 }
-                fileInputStream = new FileInputStream(selectedFile[0]);
+                fileInputStream = new FileInputStream(selectedFile);
                 bytes = fileInputStream.readAllBytes();
             }
         } catch (Exception e) {
@@ -114,11 +112,11 @@ public class ChatTab extends Tab {
         }
 
         //Creat massage, add to chats array list, add to massagesBox, send massage to server, send profile to server
-        Massage massage = new Massage(chat, client.getClientProfile(), new Date(), selectedFile[0].getPath(), Massage.MassageType.IMAGE);
+        Massage massage = new Massage(chat, client.getClientProfile(), new Date(), selectedFile.getPath(), Massage.MassageType.IMAGE);
         chat.getMassages().add(massage);
         addMassageToChat(massage);
-        System.out.println("File length = " + selectedFile[0].length() + " and bytes length = " + bytes.length);
-        client.connection.sendPacket(new Packet(massage, bytes, selectedFile[0].getName(), client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.MASSAGE));
+        System.out.println("File length = " + selectedFile.length() + " and bytes length = " + bytes.length);
+        client.connection.sendPacket(new Packet(massage, bytes, selectedFile.getName(), client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.MASSAGE));
         client.sendProfileToServer();
     }
 
@@ -200,8 +198,14 @@ public class ChatTab extends Tab {
             massageSkin = new TextMassageSkin(massage, client);
         } else if (massage.getMassageType().equals(Massage.MassageType.IMAGE)) {
             massageSkin = new ImageMassageSkin(massage, client);
-        } else if (massage.getMassageType().equals(Massage.MassageType.PLAY_REQUEST) && massage.getMassageType().equals(Massage.MassageType.FRIEND_REQUEST)) {
+        } else if (massage.getMassageType().equals(Massage.MassageType.PLAY_REQUEST) || massage.getMassageType().equals(Massage.MassageType.FRIEND_REQUEST)) {
             massageSkin = new RequestMassageSkin(massage, client);
+        } else {
+            try {
+                throw new Exception();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         MassageSkin finalMassageSkin = massageSkin;
@@ -212,11 +216,13 @@ public class ChatTab extends Tab {
             }
         });
 
+        if (client.game.getGameController().chats.getSelectionModel().getSelectedItem() != null) {
+            if (!client.game.getGameController().chats.getSelectionModel().getSelectedItem().equals(thisChatTab)) {
+                addUnReadMassages();
+            }
+            getChatController().scrollPane.setVvalue(1.0);
+        }
 
-                /*if (!getTabPane().getSelectionModel().getSelectedItem().equals(thisChatTab)) {
-                    addUnReadMassages();
-                }
-                getChatController().scrollPane.setVvalue(1.0);*/
 
     }
 
