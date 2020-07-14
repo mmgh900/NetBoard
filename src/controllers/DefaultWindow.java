@@ -162,6 +162,7 @@ public class DefaultWindow extends Stage {
     }
 
     public void loadGameScene() throws IOException {
+
         Platform.runLater(new Runnable() {
             @Override
             public void run() {

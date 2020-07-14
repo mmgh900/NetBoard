@@ -71,6 +71,7 @@ public class Server extends User {
     @Override
     public void receivePacket(Packet packet) {
 
+
         System.out.println(ANSI_RED + "[SERVER]: received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
         if (packet.getContent() instanceof ClientProfile && packet.getPropose().equals(Packet.PacketPropose.LOGOUT_REQUEST)) {
             if (!(packet.getContent() instanceof ClientProfile) || packet.getContent() == null) {
@@ -233,7 +234,14 @@ public class Server extends User {
             }
         }
 
-        connections.get(receiver).sendPacket(packet);
+        //Saves packets for client if he/she is offline
+        if (connections.get(receiver) == null) {
+            assert receiver != null;
+            receiver.getSavedMassages().add(packet);
+        } else {
+            connections.get(receiver).sendPacket(packet);
+        }
+
     }
 
     private void respondToChat(Packet packet) {
@@ -328,6 +336,7 @@ public class Server extends User {
                 usersInSystem.get(usersInSystem.indexOf(foundClient)).setOnline(true);
                 connections.put(foundClient, connection);
                 connection.sendPacket(new Packet(foundClient, makeOnlineClientsPack(foundClient), this, Packet.PacketPropose.LOAD_PACKET));
+                usersInSystem.get(usersInSystem.indexOf(foundClient)).getSavedMassages().clear();
 
                 sendUpdatedProfile(foundClient);
                 return;

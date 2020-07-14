@@ -110,7 +110,7 @@ public class RequestMassageSkin extends MassageSkin {
             outputPurpose = Packet.PacketPropose.RESPOND_PLAY_TOGETHER;
         }
         client.connection.sendPacket(new Packet(answer, massage.getSender(), client.getClientProfile(), outputPurpose));
-        if (!isSelf && massage.getMassageType().equals(Massage.MassageType.PLAY_REQUEST)) {
+        if (!isSelf && massage.getMassageType().equals(Massage.MassageType.PLAY_REQUEST) && answer) {
             client.game.startGame(massage.getSender(), client.getClientProfile());
         }
     }

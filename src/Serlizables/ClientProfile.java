@@ -21,6 +21,11 @@ public class ClientProfile implements Serializable {
     private String answer;
     private Boolean isOnline;
     private GameStatistics ticTacToeStatistics;
+    private final ArrayList<Packet> savedPackets = new ArrayList<>();
+
+    public ArrayList<Packet> getSavedMassages() {
+        return savedPackets;
+    }
 
     private boolean isPlayingOnline;
 

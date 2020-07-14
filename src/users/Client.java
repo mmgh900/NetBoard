@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static users.Server.ANSI_PURPLE;
 import static users.Server.ANSI_RESET;
@@ -33,7 +32,7 @@ public class Client extends User implements Serializable {
     private ClientProfile clientProfile;
     private Socket socket;
     private boolean isClosed;
-    private final ExecutorService pool;
+    private ExecutorService pool;
     private ArrayList<ClientProfile> onlineClients;
 
 
@@ -41,7 +40,7 @@ public class Client extends User implements Serializable {
 
         isClosed = false;
         boolean isConnected = makeConnection();
-        pool = Executors.newFixedThreadPool(5);
+        //pool = Executors.newFixedThreadPool(5);
         try {
             this.window = new DefaultWindow(this);
 
@@ -74,7 +73,7 @@ public class Client extends User implements Serializable {
 
     @Override
     public void receivePacket(Packet packet) {
-        /*pool.execute(new Thread(() -> {*/
+        //pool.execute(new Thread(() -> {
         System.out.println(ANSI_PURPLE + clientProfile.toString() + ": received packet: " + packet.getPropose().toString().toUpperCase() + ANSI_RESET);
         if (packet.getContent() instanceof ServerMassages) {
             respondToServerMassages(packet);
@@ -108,7 +107,7 @@ public class Client extends User implements Serializable {
 
 
         }*/
-        /*}, "Respond to " + packet.getPropose().toString().toLowerCase()));*/
+        //}, "Respond to " + packet.getPropose().toString().toLowerCase()));
     }
 
     /*private void respondToFile(Packet packet) {
@@ -124,7 +123,7 @@ public class Client extends User implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }*/
+12    }*/
 
     private void respondToProfileInfo(Packet packet) {
         ClientProfile clientProfile1 = (ClientProfile) packet.getContent();
@@ -162,6 +161,7 @@ public class Client extends User implements Serializable {
         }
 
         game.load();
+
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -170,11 +170,32 @@ public class Client extends User implements Serializable {
         });
 
         window.getLoginController().goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
+
         try {
             window.loadMenuScene();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        /*ArrayList<Packet> packets = new ArrayList<>();
+        for (Packet packet1 : clientProfile.getSavedMassages()) {
+            packet.
+        }*/
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                for (Packet packet1 : clientProfile.getSavedMassages()) {
+                    giveAChatTab(packet1.getSenderProfile()).receiveMassage(packet1);
+                }
+                clientProfile.getSavedMassages().clear();
+            }
+        }).start();
+
     }
 
 
