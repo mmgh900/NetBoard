@@ -9,8 +9,6 @@ import javafx.application.Platform;
 import javafx.scene.input.MouseEvent;
 import users.Client;
 
-import java.io.IOException;
-
 public class GameWithUI {
     protected Square[][] squares = new Square[3][3];
     protected GameController gameController;
@@ -91,11 +89,7 @@ public class GameWithUI {
 
     public void startGame(ClientProfile playerX, ClientProfile playerO) {
         startGame(GameMode.ONLINE);
-        try {
-            client.getWindow().loadGameScene();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.getWindow().loadGameScene();
 
         playerO.setPlayingOnline(true);
         playerX.setPlayingOnline(true);

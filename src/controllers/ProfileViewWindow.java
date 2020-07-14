@@ -2,11 +2,9 @@ package controllers;
 
 import Serlizables.Chat;
 import Serlizables.ClientProfile;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -18,7 +16,7 @@ import java.io.IOException;
 public class ProfileViewWindow extends Stage {
 
     private final Client viewer;
-    private final ClientProfile profile;
+    private ClientProfile profile;
 
     private final Stage thisWindow;
 
@@ -28,11 +26,11 @@ public class ProfileViewWindow extends Stage {
     private ProfileShowerController profileShowerController;
 
     //Constructor
-    public ProfileViewWindow(Client viewer, ClientProfile profile) {
+    public ProfileViewWindow(Client viewer, ClientProfile clientProfile) {
 
         //Assign fields
         this.viewer = viewer;
-        this.profile = profile;
+        this.profile = clientProfile;
         thisWindow = this;
 
         //Initialize window
@@ -50,30 +48,19 @@ public class ProfileViewWindow extends Stage {
 
     //Defines button functionality
     private void putOnClickListeners(Client viewer, ClientProfile profile) {
-        profileShowerController.addFriend.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                thisWindow.close();
-                viewer.giveAChatTab(profile).sendFriendRequestMassage();
-                //viewer.connection.sendPacket(new Packet(viewer.getClientProfile(), viewer.getClientProfile(), profile, Packet.PacketPropose.ADD_FRIEND_REQUEST));
-                //addChatWhenSendingRequest(viewer, profile, Packet.PacketPropose.ADD_FRIEND_REQUEST);
-            }
+        profileShowerController.addFriend.setOnMouseClicked(mouseEvent -> {
+            thisWindow.close();
+            viewer.giveAChatTab(profile).sendFriendRequestMassage();
         });
 
-        profileShowerController.startChat.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                thisWindow.close();
-                viewer.giveAChatTab(profile);
-            }
+        profileShowerController.startChat.setOnMouseClicked(mouseEvent -> {
+            thisWindow.close();
+            viewer.giveAChatTab(profile);
         });
 
-        profileShowerController.playTogether.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                thisWindow.close();
-                viewer.giveAChatTab(profile).sendPlayRequestMassage();
-            }
+        profileShowerController.playTogether.setOnMouseClicked(event -> {
+            thisWindow.close();
+            viewer.giveAChatTab(profile).sendPlayRequestMassage();
         });
     }
 
@@ -83,6 +70,7 @@ public class ProfileViewWindow extends Stage {
         for (ClientProfile clientProfile : viewer.getClientProfile().getFriends()) {
             if (clientProfile.equals(profile)) {
                 isAlreadyFriend = true;
+                break;
             }
         }
         boolean isPlayingOnline = viewer.getClientProfile().isPlayingOnline();
@@ -90,6 +78,7 @@ public class ProfileViewWindow extends Stage {
         for (Chat chat : viewer.getClientProfile().getChats()) {
             if (chat.getMembers().get(1).equals(profile)) {
                 isAlreadyChatting = true;
+                break;
             }
         }
 
@@ -127,12 +116,7 @@ public class ProfileViewWindow extends Stage {
             System.out.println("it's not here");
         }
 
-        profileShowerController.close.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                thisWindow.close();
-            }
-        });
+        profileShowerController.close.setOnMouseClicked(event -> thisWindow.close());
 
         profileShowerController.name.setText(profile.getFirstName() + " " + profile.getLastName());
         profileShowerController.username.setText("@" + profile.getUsername());
@@ -151,7 +135,7 @@ public class ProfileViewWindow extends Stage {
             }
         }
         if (foundProfile != null) {
-            profile = foundProfile;
+            this.profile = foundProfile;
         }
 
     }

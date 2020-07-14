@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
 
 import static users.Server.ANSI_PURPLE;
 import static users.Server.ANSI_RESET;
@@ -31,14 +30,11 @@ public class Client extends User implements Serializable {
     private final int loadingCount = 0;
     private ClientProfile clientProfile;
     private Socket socket;
-    private boolean isClosed;
-    private ExecutorService pool;
     private ArrayList<ClientProfile> onlineClients;
 
 
     public Client() {
 
-        isClosed = false;
         boolean isConnected = makeConnection();
         //pool = Executors.newFixedThreadPool(5);
         try {
@@ -50,11 +46,7 @@ public class Client extends User implements Serializable {
         if (!isConnected) {
             window.getLoginController().badNews("No server");
         }
-        try {
-            window.loadLoginScene();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        window.loadLoginScene();
 
         game = new GameWithUI(this);
     }
@@ -171,11 +163,7 @@ public class Client extends User implements Serializable {
 
         window.getLoginController().goodNews("Login successful. Welcome " + clientProfile.getUsername().toUpperCase() + ".");
 
-        try {
-            window.loadMenuScene();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        window.loadMenuScene();
 
         /*ArrayList<Packet> packets = new ArrayList<>();
         for (Packet packet1 : clientProfile.getSavedMassages()) {
@@ -307,7 +295,6 @@ public class Client extends User implements Serializable {
 
     @Override
     public void close() throws IOException {
-        isClosed = true;
         if (socket != null) {
             socket.close();
             connection.close();

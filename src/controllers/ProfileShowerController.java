@@ -9,10 +9,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ProfileShowerController extends StandardController implements Initializable {
-    public static Button playTogetherStatic;
-    public static Button closeStatic;
-    public static Button startChatStatic;
-    public static Button addFriendStatic;
     public Button addFriend;
     public Button playTogether;
     public Button close;
@@ -27,9 +23,6 @@ public class ProfileShowerController extends StandardController implements Initi
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        closeStatic = close;
-        playTogetherStatic = playTogether;
-        startChatStatic = startChat;
-        addFriendStatic = addFriend;
+
     }
 }

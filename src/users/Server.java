@@ -96,26 +96,6 @@ public class Server extends User {
             connection = new Connection(socket, this);
 
             pool.execute(new Thread(connection, socket.toString()));
-
-            /*try {
-                Stage stage = new Stage();
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.showOpenDialog(stage);
-                stage.show();
-                File file = new File(fileChooser.getInitialFileName());
-                if (!file.exists()) {
-                    throw new Exception("file is not found");
-                }
-                FileInputStream fileInputStream = new FileInputStream(file);
-                byte[] bytes = fileInputStream.readAllBytes();
-                System.out.println("File length = " + file.length() + " and bytes length = " + bytes.length);
-                connection.sendPacket(new Packet(bytes, this, Packet.PacketPropose.FILE));
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
-
-
         }
     }
 
@@ -301,7 +281,7 @@ public class Server extends User {
             }
             assert receiver != null;
             receiver.getFriends().add(sender);
-            Connection foundConnection2 = connections.get(sender);
+            Connection foundConnection2 = connections.get(receiver);
             if (sender.getOnline() && foundConnection2 != null) {
                 foundConnection2.sendPacket(new Packet(receiver, this, RESPOND_ADD_FRIEND));
             }

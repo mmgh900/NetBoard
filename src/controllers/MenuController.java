@@ -9,7 +9,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -25,7 +24,7 @@ public class MenuController extends StandardController implements Initializable 
     public ImageView menuImage;
 
     //Set the actions to change the game mode
-    EventHandler handleClicksOnMenuOptions = new EventHandler<MouseEvent>() {
+    EventHandler<MouseEvent> handleClicksOnMenuOptions = new EventHandler<>() {
         public void handle(MouseEvent event) {
             if (event.getSource() == singleplayer) {
                 client.game.startGame(GameWithUI.GameMode.SINGLE_PLAYER);
@@ -34,11 +33,7 @@ public class MenuController extends StandardController implements Initializable 
             } else if (event.getSource() == online) {
                 client.game.startGame(GameWithUI.GameMode.NONE);
             }
-            try {
-                client.getWindow().loadGameScene();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            client.getWindow().loadGameScene();
         }
     };
 
@@ -53,12 +48,7 @@ public class MenuController extends StandardController implements Initializable 
     public void updateProfileUiGraphics() {
         username.setText("@" + client.getClientProfile().getUsername().toLowerCase());
         name.setText(client.getClientProfile().getFirstName());
-        viewProfile.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                new ProfileViewWindow(client, client.getClientProfile());
-            }
-        });
+        viewProfile.setOnMouseClicked(event -> new ProfileViewWindow(client, client.getClientProfile()));
     }
 
 }
