@@ -91,13 +91,13 @@ public class Server extends User {
             ClientProfile clientProfile = (ClientProfile) packet.getContent();
             respondToSignUpRequest(clientProfile);
             //writeFile();
-        } else if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
+        } /*else if (packet.getPropose().equals(Packet.PacketPropose.PLAY_TOGETHER_REQUEST)) {
             respondToPlayTogetherRequest(packet);
-        } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_PLAY_TOGETHER)) {
+        }*/ else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_PLAY_TOGETHER)) {
             respondToPlayTogetherRespond(packet);
-        } else if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
+        } /*else if (packet.getPropose().equals(Packet.PacketPropose.ADD_FRIEND_REQUEST)) {
             respondToAddFriend(packet);
-        } else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
+        }*/ else if (packet.getPropose().equals(Packet.PacketPropose.RESPOND_ADD_FRIEND)) {
             respondToAddFriendRespond(packet);
         } else if (packet.getPropose().equals(Packet.PacketPropose.PROFILE_INFO)) {
             updateOneClient((ClientProfile) packet.getContent());
@@ -105,12 +105,13 @@ public class Server extends User {
             writeFile();
         } else if (packet.getPropose().equals(Packet.PacketPropose.UPDATE_GAME)) {
             respondToUpdateGame(packet);
-        } else if (packet.getPropose().equals(Packet.PacketPropose.CHAT)) {
-            respondToChat(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.MASSAGE)) {
+            respondToMassage(packet);
+            //respondToChat(packet);
             //writeFile();
         } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
             rospondToRecoverPassword(packet);
-        } else if (packet.getPropose().equals(Packet.PacketPropose.FILE)) {
+        } /*else if (packet.getPropose().equals(Packet.PacketPropose.FILE)) {
             ClientProfile sender = null;
             ClientProfile receiver = null;
 
@@ -124,7 +125,7 @@ public class Server extends User {
             }
 
             connections.get(receiver).sendPacket(packet);
-        }
+        }*/
 
 
     }
@@ -223,6 +224,18 @@ public class Server extends User {
 
     }
 
+    private void respondToMassage(Packet packet) {
+        ClientProfile receiver = null;
+
+        for (ClientProfile cip : usersInSystem) {
+            if (packet.getReceiverProfile().equals(cip)) {
+                receiver = cip;
+            }
+        }
+
+        connections.get(receiver).sendPacket(packet);
+    }
+
     private void respondToChat(Packet packet) {
         if (packet.getContent() instanceof Massage) {
             Massage massage = (Massage) packet.getContent();
@@ -262,7 +275,7 @@ public class Server extends User {
 
         foundChat.getMassages().add(massage);
         foundChat.setLastMassage(massage.getDate());
-        sendOneToOne(target, Packet.PacketPropose.CHAT);
+        sendOneToOne(target, Packet.PacketPropose.MASSAGE);
 
     }
 

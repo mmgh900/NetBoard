@@ -38,7 +38,7 @@ public class Massage implements Serializable {
     }
 
     public enum MassageType implements Serializable {
-        TEXT, IMAGE, FILE
+        TEXT, IMAGE, FILE, FRIEND_REQUEST, PLAY_REQUEST
     }
 
     @Override
@@ -57,4 +57,6 @@ public class Massage implements Serializable {
     public String getContent() {
         return content;
     }
+
+
 }

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Line?>
@@ -16,6 +18,27 @@
                 <VBox nodeOrientation="LEFT_TO_RIGHT" prefHeight="700.0" prefWidth="395.0"
                       style="-fx-background-color: black;">
                     <children>
+                        <HBox alignment="CENTER" prefHeight="45.0" prefWidth="395.0" spacing="20.0">
+                            <children>
+                                <TextField prefHeight="37.0" prefWidth="296.0" promptText="Search for username">
+                                    <HBox.margin>
+                                        <Insets/>
+                                    </HBox.margin>
+                                </TextField>
+                                <Button mnemonicParsing="false">
+                                    <graphic>
+                                        <ImageView>
+                                            <image>
+                                                <Image url="@../Images/search%20(1).png"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
+                            </children>
+                            <padding>
+                                <Insets top="10.0"/>
+                            </padding>
+                        </HBox>
                         <TabPane fx:id="contacts" prefHeight="300.0" prefWidth="395.0" tabClosingPolicy="UNAVAILABLE"/>
                         <TabPane fx:id="chats" prefWidth="395.0" tabClosingPolicy="UNAVAILABLE">
                             <tabs>

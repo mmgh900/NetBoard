@@ -47,6 +47,9 @@ public class DefaultWindow extends Stage {
     private static final double BLUR_AMOUNT = 70;
     private static final Effect frostEffect = new GaussianBlur(BLUR_AMOUNT);
 
+    public Client getClient() {
+        return client;
+    }
 
     FXMLLoader fxmlLoader = new FXMLLoader();
 

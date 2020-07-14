@@ -2,13 +2,10 @@ package controllers;
 
 import Serlizables.Chat;
 import Serlizables.ClientProfile;
-import Serlizables.Massage;
 import Serlizables.Square;
 import games.GameWithUI;
 import gui.elements.ChatTab;
-import gui.elements.ImageMassageSkin;
 import gui.elements.SquareSkin;
-import gui.elements.TextMassageSkin;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -28,9 +25,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-
-import static users.Server.ANSI_RED;
-import static users.Server.ANSI_RESET;
 
 public class GameController extends StandardController implements Initializable {
 
@@ -282,7 +276,7 @@ public class GameController extends StandardController implements Initializable 
         playerOViewProfile.setVisible(false);
     }
 
-    public void updateChats(ClientProfile clientProfile) {
+    /*public void updateChats(ClientProfile clientProfile) {
         int numberOfLocalChats = client.getClientProfile().getChats().size();
         int numberOfServerChats = clientProfile.getChats().size();
 
@@ -325,15 +319,12 @@ public class GameController extends StandardController implements Initializable 
                     e.printStackTrace();
                 }
         }
-    }
+    }*/
 
     public void initializeChats() {
         chats.getTabs().clear();
         for (Chat chat : client.getClientProfile().getChats()) {
-            addChatTab(chat);
-            for (Massage massage : chat.getMassages()) {
-                addMassageToChat(massage);
-            }
+            new ChatTab(chat, client);
         }
 
     }
@@ -403,38 +394,6 @@ public class GameController extends StandardController implements Initializable 
 
     }
 
-    public void addMassageToChat(Massage massage) {
-        Chat chat = massage.getChat();
-        int chatIndex = client.getClientProfile().getChats().indexOf(chat);
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                ChatTab chatTab = (ChatTab) chats.getTabs().get(chatIndex);
-                boolean isSelf = (massage.getSender().equals(client.getClientProfile()));
-                if (massage.getMassageType().equals(Massage.MassageType.TEXT)) {
-                    chatTab.getMassages().getChildren().add(new TextMassageSkin(isSelf, massage));
-                } else if (massage.getMassageType().equals(Massage.MassageType.IMAGE)) {
-                    chatTab.getMassages().getChildren().add(new ImageMassageSkin(isSelf, massage));
-                }
-
-                if (!chatTab.getTabPane().getSelectionModel().getSelectedItem().equals(chatTab)) {
-                    chatTab.addUnReadMassages();
-                }
-                chatTab.getChatController().scrollPane.setVvalue(1.0);
-            }
-        });
-
-    }
-
-    public void addChatTab(Chat chat) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                chats.getTabs().add(new ChatTab(chat, client));
-            }
-        });
-
-    }
 
     public void aClientChangedStatus(ClientProfile clientProfile) {
         for (ClientProfile clientProfile1 : client.getClientProfile().getFriends()) {
