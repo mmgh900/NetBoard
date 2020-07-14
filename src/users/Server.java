@@ -48,7 +48,7 @@ public class Server extends User {
         }
 
         //Adds sample clients and resets server save file (Recommended to keep commented)
-        addSampleClients();
+        //addSampleClients();
 
         //Fill usersInSystem array list from server save file
         readFile();
@@ -130,8 +130,6 @@ public class Server extends User {
               ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(file, false))) {
             // Write arrays to the object output stream
             output.writeObject(usersInSystem);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

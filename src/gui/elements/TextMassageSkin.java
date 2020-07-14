@@ -1,6 +1,7 @@
 package gui.elements;
 
 import javafx.geometry.NodeOrientation;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -36,6 +37,7 @@ public class TextMassageSkin extends MassageSkin {
         HBox hBox = new HBox();
         this.getChildren().add(hBox);
         hBox.setSpacing(5);
+        hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.getChildren().setAll(massageBox, date);
         if (isSelf) {
             this.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
