@@ -146,7 +146,6 @@ public class LoginController extends StandardController implements Initializable
 
 
     }
-
     public void goodNews(String s) {
 
         Platform.runLater(() -> {

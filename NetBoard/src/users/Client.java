@@ -20,10 +20,10 @@ import static users.Server.ANSI_RESET;
 
 public class Client extends User implements Serializable {
 
-    private final Client thisClient = this;
     public String downloadPath = "resources/ClientsFiles";
     public TicTacToe game;
     private DefaultWindow window;
+    private final Client thisClient = this;
     private ClientProfile clientProfile;
     private Socket socket;
     private ArrayList<ClientProfile> onlineClients;
@@ -257,16 +257,16 @@ public class Client extends User implements Serializable {
         return clientProfile;
     }
 
-    public void setClientProfile(ClientProfile clientProfile) {
-        this.clientProfile = clientProfile;
-    }
-
     public ArrayList<ClientProfile> getOnlineClients() {
         return onlineClients;
     }
 
     public void sendProfileToServer() {
         socketStreamManager.sendPacket(new Packet(clientProfile, thisClient, Packet.PacketPropose.PROFILE_INFO));
+    }
+
+    public void setClientProfile(ClientProfile clientProfile) {
+        this.clientProfile = clientProfile;
     }
 
     public void logout() {

@@ -8,9 +8,13 @@ public class Massage implements Serializable {
     private final Chat chat;
     private final ClientProfile sender;
     private final Date date;
-    private final MassageType massageType;
     private String content;
+    private final MassageType massageType;
     private boolean isFinished = false;
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     public Massage(Chat chat, ClientProfile sender, Date date, String content, MassageType massageType) {
         this.chat = chat;
@@ -46,6 +50,10 @@ public class Massage implements Serializable {
         return getSender().equals(massage.getSender()) && getDate().equals(massage.getDate()) && getContent().equals(massage.getContent());
     }
 
+    public enum MassageType implements Serializable {
+        TEXT, IMAGE, FILE, FRIEND_REQUEST, PLAY_REQUEST
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(getSender(), getDate(), getContent());
@@ -61,14 +69,6 @@ public class Massage implements Serializable {
 
     public String getContent() {
         return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public enum MassageType implements Serializable {
-        TEXT, IMAGE, FILE, FRIEND_REQUEST, PLAY_REQUEST
     }
 
 

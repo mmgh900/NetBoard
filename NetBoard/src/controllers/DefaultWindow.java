@@ -43,7 +43,6 @@ public class DefaultWindow extends Stage {
 
         this.show();
     }
-
     private void makeScenes() throws IOException {
         fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(new File("resources/FXMLFiles/Menu.fxml").toURL());
@@ -73,7 +72,6 @@ public class DefaultWindow extends Stage {
         loginScene = new Scene(loginRoot, 1260, 700);
         loginScene.getStylesheets().add(defaultStylesheet);
     }
-
     private void applyWindowSetting() {
         this.setOnCloseRequest(windowEvent -> client.logout());
 

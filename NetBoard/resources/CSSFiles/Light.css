@@ -21,7 +21,6 @@
     -fx-font-family: "Product Sans";
     -fx-font-weight: bold;
 }
-
 .additional-options:hover {
     -fx-underline: true;
 }
@@ -48,7 +47,6 @@
     -fx-background-color: #e6e6e6;
     -fx-font-size: 20px;
 }
-
 .chatTextField:focused {
     -fx-pref-height: 30px;
     -fx-background-color: #ffffff;
@@ -62,7 +60,6 @@
     -fx-font-size: 20px;
     -fx-wrap-text: true;
 }
-
 .chatBox:hover {
     -fx-cursor: default;
     -fx-font-weight: bold;
@@ -92,7 +89,6 @@
 .square:hover {
     -fx-background-color: #1a73e8;
 }
-
 .massage {
     -fx-font-family: "Product Sans";
     -fx-font-weight: bold;

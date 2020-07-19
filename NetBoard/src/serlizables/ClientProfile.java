@@ -10,19 +10,39 @@ public class ClientProfile implements Serializable {
 
     /*    private final UserInfo userInfo;*/
 
-    private final ArrayList<ClientProfile> friends = new ArrayList<>();
-    private final ArrayList<Packet> savedPackets = new ArrayList<>();
     private String username;
     private String password;
     private String firstName;
     private String lastName;
     private String email;
+    private final ArrayList<ClientProfile> friends = new ArrayList<>();
     private ArrayList<Chat> chats;
     private SecurityQuestions securityQuestion;
     private String answer;
     private Boolean isOnline;
     private GameStatistics ticTacToeStatistics;
+    private final ArrayList<Packet> savedPackets = new ArrayList<>();
+
+    public ClientProfile(String username, String firstName, String lastName, String email, String answer, Boolean isOnline, GameStatistics ticTacToeStatistics, boolean isPlayingOnline) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.answer = answer;
+        this.isOnline = isOnline;
+        this.ticTacToeStatistics = ticTacToeStatistics;
+        this.isPlayingOnline = isPlayingOnline;
+    }
+
     private boolean isPlayingOnline;
+
+    public ArrayList<Packet> getSavedMassages() {
+        return savedPackets;
+    }
+
+    public boolean isPlayingOnline() {
+        return isPlayingOnline;
+    }
 
     public ClientProfile(String username, String password) {
         this.username = username;
@@ -48,29 +68,6 @@ public class ClientProfile implements Serializable {
         isOnline = false;
     }
 
-    public ClientProfile(String username, String firstName, String lastName, String email, String answer, Boolean isOnline, GameStatistics ticTacToeStatistics, boolean isPlayingOnline) {
-        this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.answer = answer;
-        this.isOnline = isOnline;
-        this.ticTacToeStatistics = ticTacToeStatistics;
-        this.isPlayingOnline = isPlayingOnline;
-    }
-
-    public ArrayList<Packet> getSavedMassages() {
-        return savedPackets;
-    }
-
-    public boolean isPlayingOnline() {
-        return isPlayingOnline;
-    }
-
-    public void setPlayingOnline(boolean playingOnline) {
-        isPlayingOnline = playingOnline;
-    }
-
     @Override
     public String toString() {
         if (username == null) {
@@ -79,6 +76,7 @@ public class ClientProfile implements Serializable {
             return "[" + username.toUpperCase() + "]";
         }
     }
+
 
     public String getFirstName() {
         return firstName;
@@ -100,6 +98,7 @@ public class ClientProfile implements Serializable {
         isOnline = online;
     }
 
+
     public SecurityQuestions getSecurityQuestion() {
         return securityQuestion;
     }
@@ -110,6 +109,10 @@ public class ClientProfile implements Serializable {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setPlayingOnline(boolean playingOnline) {
+        isPlayingOnline = playingOnline;
     }
 
     public GameStatistics getTicTacToeStatistics() {

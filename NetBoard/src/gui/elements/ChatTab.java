@@ -21,13 +21,18 @@ import java.io.IOException;
 import java.util.Date;
 
 public class ChatTab extends Tab {
-    private final VBox massages;
-    private final Client client;
-    private final Date lastUpdate;
     private ChatTab thisChatTab;
     private Chat chat;
+
+    private final VBox massages;
+    private final Client client;
+
     private ChatController chatController;
+
     private int unReadMassages = 0;
+
+    private final Date lastUpdate;
+
     EventHandler<MouseEvent> sendMassage = mouseEvent -> sendTextMassage();
     EventHandler<MouseEvent> sendFile = mouseEvent -> sendFileMassage();
 
@@ -108,7 +113,6 @@ public class ChatTab extends Tab {
         client.sendProfileToServer();
 
     }
-
     private void sendTextMassage() {
         String text = chatController.textField.getText();
         if (text.isBlank() || text.isEmpty()) {

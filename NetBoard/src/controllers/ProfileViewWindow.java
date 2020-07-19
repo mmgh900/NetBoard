@@ -16,9 +16,11 @@ import java.io.IOException;
 public class ProfileViewWindow extends Stage {
 
     private final Client viewer;
-    private final Stage thisWindow;
-    private final FXMLLoader fxmlLoader = new FXMLLoader();
     private ClientProfile profile;
+
+    private final Stage thisWindow;
+
+    private final FXMLLoader fxmlLoader = new FXMLLoader();
     private Parent profileRoot;
     private Scene profileScene = null;
     private ProfileShowerController profileShowerController;

@@ -5,8 +5,8 @@ import users.Client;
 import java.io.Serializable;
 
 public class Packet implements Serializable {
-    private final PacketPropose propose;
     private Serializable[] contents = new Serializable[1];
+    private final PacketPropose propose;
     private ClientProfile senderProfile;
     private String fileName;
     private byte[] file;
