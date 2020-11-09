@@ -13,4 +13,3 @@ How to run: Use a java IDE and add the JavaFX library "lib" folder to the projec
 Note: If you got an error like: "Can't find the file" create a file named "clientProfiles.dat" and put it in ServerSaves
 
 if there was any other errors or problems is the running process PLEASE email me and ask: gheysari.mm@gmail.com
-Download source code: https://github.com/mmgh900/NetBoard
