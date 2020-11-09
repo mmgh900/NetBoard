@@ -1,4 +1,7 @@
 # NetBoard
+![alt text](https://github.com/mmgh900/NetBoard/blob/master/resources/Images/netboardred.png?raw=true)
+
+
 This is a TicTocToe game that I made as my university project.
 
 This project was a good practice to get familiar with network and Java object oriented programming.
