@@ -9,7 +9,7 @@
     -fx-font-weight: bold;
     -fx-background-radius: 45px;
     -fx-text-fill: white;
-    -fx-font-size: 25px;
+    -fx-font-size: 20px;
 }
 
 .button:hover {
@@ -57,7 +57,7 @@
     -fx-font-weight: bold;
     -fx-background-radius: 30px;
     -fx-text-fill: white;
-    -fx-font-size: 25px;
+    -fx-font-size: 20px;
     -fx-wrap-text: true;
 }
 .chatBox:hover {
@@ -65,7 +65,8 @@
     -fx-font-weight: bold;
     -fx-background-radius: 30px;
     -fx-text-fill: white;
-    -fx-font-size: 25px;
+    -fx-font-size: 20px;
+    -fx-wrap-text: true;
 }
 
 
@@ -269,4 +270,10 @@
 .request:hover {
     -fx-background-color: transparent;
     -fx-underline: true;
+}
+
+.search-button {
+    -fx-background-color: transparent;
+    -fx-font-size: 24;
+    -fx-text-fill: white;
 }

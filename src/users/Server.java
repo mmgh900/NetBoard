@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static serlizables.Packet.PacketPropose.RESPOND_ADD_FRIEND;
+import static serlizables.Packet.PacketPropose.SEARCH_USERNAME;
 
 
 public class Server extends User {
@@ -129,8 +130,6 @@ public class Server extends User {
               ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(file, false))) {
             // Write arrays to the object output stream
             output.writeObject(usersInSystem);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -192,6 +191,16 @@ public class Server extends User {
             writeFile();
         } else if (packet.getPropose().equals(Packet.PacketPropose.RECOVER_PASSWORD_REQUEST)) {
             respondToRecoverPassword(packet);
+        } else if (packet.getPropose().equals(Packet.PacketPropose.SEARCH_USERNAME)) {
+            ClientProfile foundClient = null;
+            for (ClientProfile clientProfile : usersInSystem) {
+                if (clientProfile.getUsername().equalsIgnoreCase((String) packet.getContent())) {
+                    foundClient = clientProfile;
+                }
+            }
+            if (foundClient != null) {
+                connection.sendPacket(new Packet(foundClient, SEARCH_USERNAME));
+            }
         }
 
     }

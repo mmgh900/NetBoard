@@ -97,13 +97,21 @@ public class ChatTab extends Tab {
         }
 
         //Creat massage, add to chats array list, add to massagesBox, send massage to server, send profile to server
-        Massage massage = new Massage(chat, client.getClientProfile(), new Date(), selectedFile.getPath(), Massage.MassageType.IMAGE);
+        String format = selectedFile.getName().substring(selectedFile.getName().lastIndexOf("."));
+        Massage.MassageType massageType = null;
+        if (format.equalsIgnoreCase(".png") || format.equalsIgnoreCase(".jpg") || format.equalsIgnoreCase(".gif")) {
+            massageType = Massage.MassageType.IMAGE;
+        } else {
+            massageType = Massage.MassageType.FILE;
+        }
+        Massage massage = new Massage(chat, client.getClientProfile(), new Date(), selectedFile.getPath(), massageType);
         chat.getMassages().add(massage);
         addMassageToChat(massage);
         assert bytes != null;
         System.out.println("File length = " + selectedFile.length() + " and bytes length = " + bytes.length);
         client.connection.sendPacket(new Packet(massage, bytes, selectedFile.getName(), client.getClientProfile(), chat.getMembers().get(1), Packet.PacketPropose.MASSAGE));
         client.sendProfileToServer();
+
     }
     private void sendTextMassage() {
         String text = chatController.textField.getText();
@@ -183,7 +191,7 @@ public class ChatTab extends Tab {
         MassageSkin massageSkin = null;
         if (massage.getMassageType().equals(Massage.MassageType.TEXT)) {
             massageSkin = new TextMassageSkin(massage, client);
-        } else if (massage.getMassageType().equals(Massage.MassageType.IMAGE)) {
+        } else if (massage.getMassageType().equals(Massage.MassageType.IMAGE) || massage.getMassageType().equals(Massage.MassageType.FILE)) {
             massageSkin = new ImageMassageSkin(massage, client);
         } else if (massage.getMassageType().equals(Massage.MassageType.PLAY_REQUEST) || massage.getMassageType().equals(Massage.MassageType.FRIEND_REQUEST)) {
             massageSkin = new RequestMassageSkin(massage, client);

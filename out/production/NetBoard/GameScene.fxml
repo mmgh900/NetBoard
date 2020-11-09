@@ -20,23 +20,24 @@
                     <children>
                         <HBox alignment="CENTER" prefHeight="45.0" prefWidth="395.0" spacing="20.0">
                             <children>
-                                <TextField prefHeight="37.0" prefWidth="296.0" promptText="Search for username">
+                                <TextField fx:id="searchField" prefHeight="49.0" prefWidth="296.0"
+                                           promptText="Search for username" styleClass="search-button">
                                     <HBox.margin>
                                         <Insets/>
                                     </HBox.margin>
                                 </TextField>
-                                <Button mnemonicParsing="false">
+                                <Button fx:id="searchButton" mnemonicParsing="false" styleClass="search-button">
                                     <graphic>
                                         <ImageView>
                                             <image>
-                                                <Image url="@../Images/search%20(1).png"/>
+                                                <Image url="@../Images/search.png"/>
                                             </image>
                                         </ImageView>
                                     </graphic>
                                 </Button>
                             </children>
                             <padding>
-                                <Insets top="10.0"/>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="10.0"/>
                             </padding>
                         </HBox>
                         <TabPane fx:id="contacts" prefHeight="300.0" prefWidth="395.0" tabClosingPolicy="UNAVAILABLE"/>
